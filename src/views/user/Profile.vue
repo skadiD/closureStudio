@@ -21,7 +21,7 @@
           </div>
           <div class="font-bold flex flex-col">
             <span class="text-3xl">Dr.skadiD</span>
-            <span class="text-base-content/50">今天是你加入可露希尔俱乐部第 24 天!</span>
+            <span class="text-base-content/50">今天是你加入可露希尔俱乐部第 {{ days }} 天!</span>
           </div>
         </div>
         <div class="divider my-2" />
@@ -36,11 +36,10 @@
                 </p>
               </div>
               <div class="divider"/>
-              <span class="text-2xl font-bold">你是可露希尔旗舰店<a class="text-info">杰斯盾级</a>会员</span>
-              <div class="text-xl">可在平台内添加托管 2 个游戏账号</div>
+              <span class="text-2xl font-bold">你是可露希尔旗舰店<a class="text-info">{{ levels[gameList.length] }}级</a>会员</span>
+              <div class="text-xl">可在平台内添加托管 {{ 3 - gameList.length }} 个游戏账号</div>
               <div class="grid grid-cols-2 gap-4 mt-2">
-                <GameAccount />
-                <GameAccount :is-add="true" />
+                <GameAccount v-for="(v, k) in gameList" :key="k" :game="v" />
               </div>
               <div class="divider my-2" />
               <span class="text-info text-lg">托管额度已全部使用，无法添加更多账号；<br>若想增加额度，请<b class="text-base-content s-underline">验证账号所有权</b>（尚未开放）</span>
@@ -70,7 +69,10 @@
 import '../../assets/user.css'
 import {useRoute} from "vue-router";
 import GameAccount from "../../components/card/GameAccount.vue";
+import {computed, ref} from "vue";
+import {fetchGameList} from "../../plugins/axios";
 const route = useRoute()
+const levels = ['杰斯顿', '深海杰斯顿', '海上杰斯顿', '空中杰斯顿', '兽主杰斯顿']
 const menu = [
   {
     name: '平台信息',
@@ -79,8 +81,19 @@ const menu = [
     name: '账号安全',
     to: '/profile/account'
   }, {
+    name: '账号认证',
+    to: '/profile/smsVerify'
+  }, {
     name: '我的工单（待建）',
-    to: '/profile/ticket'
+    to: '/profile/damedane'
   }
 ]
+const gameList = ref<ApiUser.Game[]>([])
+fetchGameList().then(res => {
+  if (res.data) gameList.value = res.data
+})
+const days = computed(() => {
+  if (!gameList.value.length) return 1;
+  return Math.ceil((Math.floor(Date.now() / 1000) - gameList.value[0].status.created_at) / 60 / 60 / 24)
+})
 </script>

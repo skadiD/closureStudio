@@ -7,7 +7,7 @@
         <div class="divider mt-0">个人信息</div>
         <p v-if="user.Info.status < 1 && !gameList?.length">你的账号没有完成<span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★</p>
         <p v-if="user.Info.status < 1 && gameList?.length && (firstGame.status.created_at + 86400 - now > 0)">恭喜你添加了第一个账号！现在你可以正常使用并在<b>【{{ calc(firstGame.status.created_at + 86400, now) }}】</b>内完成【手机号：{{ firstGame.game_config.account?.replace(/(\d{3})\d{6}(\d{2})/, '$1****$2') }}】的<b>短信认证</b></p>
-        <p v-if="user.Info.status < 1 && gameList?.length && (firstGame.status.created_at + 86400 - now < 0)">你未在规定的时间内完成短信认证，你的游戏账号与平台账号已被冻结使用</p>
+        <p v-if="user.Info.status < 1 && gameList?.length && (firstGame.status.created_at + 86400 - now < 0)">你未在规定的时间内完成短信认证，你的游戏账号与平台账号已被<b>冻结使用</b></p>
       </div>
       <div class="my-5 bg-info/5 shadow-md px-4 py-5 flex flex-col relative rounded-lg">
         <span class="font-bold text-2xl">欢迎来到可露希尔线上零售店</span>

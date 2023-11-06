@@ -31,6 +31,10 @@ export const router = createRouter({
                     path: '/profile/account',
                     name: '账号安全',
                     component: () => import('../views/user/ProfileAccount.vue')
+                }, {
+                    path: '/profile/smsVerify',
+                    name: '账号认证',
+                    component: () => import('../views/user/ProfileSMS.vue')
                 }]
             }, {
                 path: '/dashboard',

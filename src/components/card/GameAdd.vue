@@ -64,6 +64,8 @@ const start = async () => {
       loading.value = false
       return;
     }
+    setMsg('当前短信认证尚未开放，请勿尝试添加账号！', Type.Warning)
+    return
     doAddGame(token, form.value).then(res => {
       loading.value = false
       if (res.code === 1) {
