@@ -19,6 +19,7 @@
     </div>
     <div class="mt-1 text-2xl font-zhCN ">
       Dr. {{ game.status.nick_name || 'Nameless' }}
+      <span class="text-lg text-info">【{{ game.game_config.account }}】</span>
     </div>
     <div class="grid grid-cols-3">
       <div class="flex flex-col" v-for="m in 3">
@@ -30,20 +31,22 @@
     </div>
     <slot />
   </div>
-  <div :class="classes" class="shadow-lg rounded-2xl p-3 s-pro flex justify-center" v-else>
+  <div :class="classes" class="shadow-lg rounded-2xl p-3 s-pro flex justify-center min-h-[8rem]" v-else>
     <div class="text-center flex justify-center flex-col">
-      <div class="text-2xl font-bold">+</div>
-      <div class="text-xl">添加账号</div>
+      <div class="text-4xl font-bold">{{ allow ? '+' : '×'}}</div>
+      <div class="text-xl text-info">{{ allow ? '添加账号' : '无法添加'}}</div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
   interface Props {
     isAdd: boolean
+    allow: boolean
     game: ApiUser.Game
   }
   const props = withDefaults(defineProps<Props>(), {
     isAdd: false,
+    allow: false,
     game: () => {
       return {} as ApiUser.Game
     }

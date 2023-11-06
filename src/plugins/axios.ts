@@ -26,6 +26,7 @@ interface RequestParam {
     url: string;
     method: RequestMethod;
     data?: any;
+    token?: string;
 }
 interface RequestResultHook<T = any> {
     data: Ref<T | null>;
@@ -51,6 +52,10 @@ async function getRequestResponse(params: {
 
 async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResult<T>> {
     const { url } = param;
+    if (param.token) {
+        service.defaults.headers['X-Platform'] = 'website';
+        service.defaults.headers['token'] = param.token;
+    }
     const method = param.method || 'get';
     const res = (await getRequestResponse({
         instance: service,
@@ -66,6 +71,9 @@ function post<T>(url: string, data?: any) {
 }
 function get<T>(url: string) {
     return asyncRequest<T>({ url, method: 'get' });
+}
+function captcha<T>(url: string, token: string, data?: any) {
+    return asyncRequest<T>({ url, method: 'post', token, data });
 }
 export default service;
 // const AuthServer: string = "http://127.0.0.1:3000/api/v1/";
@@ -88,7 +96,7 @@ function load(fileName: string) {
 
 const Auth_Login = (params: {email: string, password: string}) => post<ApiUser.Auth>(`${AuthServer}login`, params );
 const Auth_Register = (params: {email: string, password: string, noise: string, sign: string}) =>
-    post(`${AuthServer}register`, params);
+    post<ApiUser.Auth>(`${AuthServer}register`, params);
 const Auth_Verify = (code: string) => get(`${AuthServer}verify?code=${code}`);
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
@@ -125,7 +133,7 @@ const fetchSytemConfig = () => get<ApiSystem.Config>('system/config')
 const fetchSytemList = () => get<ApiSystem.Hall[]>('system/apCostList')
 
 
-const doAddGame = (params: any) => post("Game", params); // GameCreate
+const doAddGame = (token: string, params: any) => captcha("game", token, params); // GameCreate
 
 export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info }
 export { fetchSytemConfig, fetchSytemList, fetchGameList }

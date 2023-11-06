@@ -21,7 +21,7 @@ declare namespace ApiSystem {
 }
 declare namespace ApiUser {
     interface Auth {
-        available_slot: number
+        max_slot: number
         token: string;
     }
     interface Info {
@@ -45,7 +45,7 @@ declare namespace ApiUser {
             type: string,
             id: string
         },
-        createdAt: number,
+        created_at: number,
         is_verify: boolean;
         ap: number
     }

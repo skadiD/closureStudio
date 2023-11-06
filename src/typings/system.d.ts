@@ -41,3 +41,11 @@ declare namespace Service {
     /** 自定义的请求结果 */
     type RequestResult<T = any> = SuccessResult<T> | FailedResult;
 }
+interface Window {
+    grecaptcha: {
+        ready: (callback: () => void) => void;
+        execute: (sitekey: string, options: { action: string }) => Promise<string>;
+        render: (id: string, options: { sitekey: string; callback: (token: string) => void }) => void;
+        reset: (id: string) => void;
+    };
+}

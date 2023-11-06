@@ -4,7 +4,7 @@ export const userStore = defineStore("user", {
     state: () => ({
         user: {
             isLogin: false,
-            available_slot: 0,
+            max_slot: 0,
             Token: "",
             Info: {
                 uuid: '',
@@ -20,7 +20,7 @@ export const userStore = defineStore("user", {
     actions: {
         login(slot: number, token: string) {
             this.user.isLogin = true;
-            this.user.available_slot = slot;
+            this.user.max_slot = slot;
             this.user.Token = token;
             this.user.Info = JSON.parse(atob(token.split('.')[1]));
         },

@@ -96,7 +96,7 @@
     Auth_Login(loginParams.value).then(res => {
       if (res.data) {
         setMsg('登录成功', Type.Success)
-        user.login(res.data.available_slot, res.data.token)
+        user.login(res.data.max_slot, res.data.token)
         router.push('/dashboard')
         return
       }
@@ -109,8 +109,13 @@
     // @ts-ignore
     regParams.value.sign = window.skadi(regParams.value.email + "&" + regParams.value.password + "&" + regParams.value.noise)
     Auth_Register(regParams.value).then(res => {
-      console.log(res)
+      if (res.code === 0 || !res.data) {
+        setMsg(res.message || '注册失败', Type.Warning)
+        return;
+      }
       setMsg('注册成功', Type.Success)
+      user.login(res.data.max_slot, res.data.token)
+      router.push('/dashboard')
     })
   }
 </script>

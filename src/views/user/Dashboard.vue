@@ -4,6 +4,10 @@
       <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
         <h2>📢 今日特价</h2>
         <p v-for="k in (config.announcement?.split('\n') || ['可露希尔逃跑了'])">{{ k }}</p>
+        <div class="divider mt-0">个人信息</div>
+        <p v-if="user.Info.status < 1 && !gameList?.length">你的账号没有完成<span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★</p>
+        <p v-if="user.Info.status < 1 && gameList?.length && (firstGame.status.created_at + 86400 - now > 0)">恭喜你添加了第一个账号！现在你可以正常使用并在<b>【{{ calc(firstGame.status.created_at + 86400, now) }}】</b>内完成【手机号：{{ firstGame.game_config.account?.replace(/(\d{3})\d{6}(\d{2})/, '$1****$2') }}】的<b>短信认证</b></p>
+        <p v-if="user.Info.status < 1 && gameList?.length && (firstGame.status.created_at + 86400 - now < 0)">你未在规定的时间内完成短信认证，你的游戏账号与平台账号已被冻结使用</p>
       </div>
       <div class="my-5 bg-info/5 shadow-md px-4 py-5 flex flex-col relative rounded-lg">
         <span class="font-bold text-2xl">欢迎来到可露希尔线上零售店</span>
@@ -17,13 +21,15 @@
         <GameAccount @click="op(1)" v-for="row in gameList" :game="row">
           <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
           <div class="grid gap-4 grid-cols-2 mt-2">
-            <button class="btn btn-outline btn-sm btn-block btn-primary">暂停</button>
+            <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="row.status.code != 0">暂停</button>
+            <button class="btn btn-outline btn-sm btn-block btn-info" v-else>启动</button>
             <button class="btn btn-outline btn-sm btn-block btn-error">删除</button>
           </div>
         </GameAccount>
-        <GameAccount :is-add="true" @click="op(0)"/>
+        <GameAccount :is-add="true" :allow="(user.Info.status < 1 && gameList?.length == 0) || gameList?.length < user.max_slot" @click="op(0)"/>
       </div>
     </div>
+
     <div class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated" v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
       <GameAdd v-if="target == 0" />
       <GamePanel v-else-if="target == 1" />
@@ -38,8 +44,7 @@
   </dialog>
 </template>
 <script setup lang="ts">
-import Loading from "../../components/Loading.vue";
-import {ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {config} from "../common";
 import GameAccount from "../../components/card/GameAccount.vue";
 import 'animate.css';
@@ -48,13 +53,23 @@ import GamePanel from "../../components/card/GamePanel.vue";
 import {userStore} from "../../store/user";
 import {storeToRefs} from "pinia";
 import {fetchGameList} from "../../plugins/axios";
+import {setMsg} from "../../plugins/common";
+import {Type} from "../../components/toast/enmu";
+
 const closeAnn = ref()
 const show = ref(false)
 const target = ref(-1)
 const op = (t: number) => {
+  if (t == 0 && (user.value.Info.status < 1 || gameList.value?.length < user.value.max_slot)) {
+    const content = (user.value.Info.status < 1 && gameList.value?.length > 0) ? '请完成首账号绑定验证' :
+        gameList.value?.length > user.value.max_slot ? '你的托管数量已达上限' : ''
+    setMsg(content, Type.Alert);
+    return
+  }
   show.value = target.value != t
   target.value = target.value == t ? -1 : t
 }
+const now = Math.round(Date.now() / 1000)
 const user_ = userStore()
 const { user } = storeToRefs(user_)
 watch(
@@ -64,9 +79,18 @@ watch(
     }
 )
 const gameList = ref<ApiUser.Game[]>([])
+const firstGame = computed(() => {
+  return gameList.value[0]
+})
 fetchGameList().then(res => {
   if (res.data) gameList.value = res.data
 })
+const calc = (ts1: number, ts2: number) => {
+  const during = Math.abs(ts1 - ts2);
+  const hours = Math.floor(during / (60 * 60));
+  const minutes = Math.floor((during % (60 * 60)) / 60);
+  return `${hours}小时${minutes}分钟`;
+}
 </script>
 <style>
   div, img {
