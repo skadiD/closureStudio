@@ -21,7 +21,6 @@ declare namespace ApiSystem {
 }
 declare namespace ApiUser {
     interface Auth {
-        max_slot: number
         token: string;
     }
     interface Info {
@@ -72,5 +71,29 @@ declare namespace ApiUser {
         status: GameStatus;
         captcha_info: CaptchaInfo;
         game_config: GameConfig;
+    }
+}
+
+declare namespace Registry {
+    interface UserInfo {
+        createdAt: number;
+        idServerPermission: number;
+        idServerPhone: number;
+        idServerQQ: number;
+        idServerStatus: number;
+        ruleFlags: [];
+        rules: [];
+        slots: Slot[];
+        updatedAt: number;
+        uuid: string;
+
+    }
+    interface Slot {
+        createdAt: number;
+        gameAccount: string | null;
+        ruleFlags: string[]
+        updatedAt: number
+        useFlagDefaults: boolean
+        uuid: string
     }
 }

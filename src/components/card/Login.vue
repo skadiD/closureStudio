@@ -92,11 +92,10 @@
   const user = userStore()
   const router = useRouter()
   const loginBtn = () => {
-    // @ts-ignore
     Auth_Login(loginParams.value).then(res => {
       if (res.data) {
         setMsg('登录成功', Type.Success)
-        user.login(res.data.max_slot, res.data.token)
+        user.login(res.data.token)
         router.push('/dashboard')
         return
       }
@@ -114,7 +113,7 @@
         return;
       }
       setMsg('注册成功', Type.Success)
-      user.login(res.data.max_slot, res.data.token)
+      user.login(res.data.token)
       router.push('/dashboard')
     })
   }

@@ -22,7 +22,7 @@
           <li><router-link to="/profile/account" :class="{'bg-info': router.currentRoute.value.name === '账号安全'}">账号设置</router-link></li>
         </ul>
         <div class="flex flex-1" />
-        <button class="btn btn-info btn-block btn-outline" @click="user.logout();router.push('/')">退出登录</button>
+        <button class="btn btn-info btn-block btn-outline" @click="logout">退出登录</button>
       </div>
     </div>
   </main>
@@ -31,6 +31,13 @@
   import Header from "./Header.vue";
   import {userStore} from "../../store/user";
   import {useRouter} from "vue-router";
+  import {setMsg} from "../../plugins/common";
+  import {Type} from "../toast/enmu";
   const user = userStore()
   const router = useRouter()
+  const logout = () => {
+    user.logout();
+    router.push('/')
+    setMsg('已退出登录', Type.Success)
+  }
 </script>

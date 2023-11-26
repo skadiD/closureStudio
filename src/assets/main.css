@@ -8,19 +8,6 @@
 .s-label {
     @apply text-sm mb-2
 }
-.s-sidebar {
-    @apply fixed inset-y-0 left-0 flex-wrap items-center justify-between block w-full my-4
-    transition-all duration-200 ease-in-out -translate-x-full
-    border-0 shadow-none xl:ml-6 bg-base-200 z-50
-    rounded-2xl xl:translate-x-0 overflow-x-hidden p-4
-}
-.s-main {
-    @apply relative h-full max-h-screen transition-all duration-200 ease-in-out rounded-xl w-full
-}
-.s-navbar {
-    @apply relative flex flex-wrap items-center justify-between px-4 py-2 mx-6 transition-all ease-in
-    shadow-md duration-300 rounded-2xl lg:flex-nowrap top-4 bg-base-100
-}
 [data-theme=halloween] .s-pro {
     background-image: repeating-linear-gradient(-45deg,#262626,#262626 .2rem,hsl(0deg 0% 0% / 0%) 0,hsl(0deg 0% 0% / 0%) .4rem)
 }
@@ -35,13 +22,6 @@
 }
 .s-grid-lg {
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))
-}
-.s-file span {
-    display: unset!important;
-    @apply hover:-translate-y-2 border border-info duration-200
-}
-.s-userinfo {
-    @apply z-50 menu menu-sm dropdown-content mt-3 p-2 shadow-lg bg-base-100 rounded-box w-52
 }
 .s-underline {
     @apply underline decoration-info decoration-4 underline-offset-4
@@ -78,7 +58,6 @@
     content: unset;
 }
 .s-margin {
-    display: flex;
     transition: margin-left .75s ease-in-out;
 }
 

@@ -67,7 +67,7 @@
           <div class="w-full items-center flex flex-col border px-2 border-info pt-5 rounded-b-md s-pro">
             <div class="indicator avatar">
               <div class="w-16 mask mask-squircle">
-                <img :src="`https://ak.dzp.me/dst/avatar/${ k.avatar?.type || 'DEFAULT' }/${ k.avatar?.id  || 'avatar_activity_GK' }.webp`" alt="斯卡蒂" />
+                <img :src="`https://assets.closure.setonink.com/dst/avatar/${ k.avatar?.type || 'DEFAULT' }/${ k.avatar?.id  || 'avatar_activity_GK' }.webp`" alt="斯卡蒂" />
               </div>
               <span class="indicator-item indicator-bottom badge badge-info g-glossy text-lg font-en">
                 Lv{{ k.level }}

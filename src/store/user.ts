@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import service from "../plugins/axios";
 
 export const userStore = defineStore("user", {
     state: () => ({
@@ -18,11 +19,11 @@ export const userStore = defineStore("user", {
         },
     }),
     actions: {
-        login(slot: number, token: string) {
+        login(token: string) {
             this.user.isLogin = true;
-            this.user.max_slot = slot;
             this.user.Token = token;
             this.user.Info = JSON.parse(atob(token.split('.')[1]));
+            service.defaults.headers.common['Authorization'] = "Bearer " + token;
         },
         logout() {
             this.$reset();

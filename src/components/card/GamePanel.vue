@@ -22,8 +22,3 @@
   </div>
   <a class="btn btn-block btn-info mt-2">查看托管截图</a>
 </template>
-<style>
-
-</style>
-<script setup lang="ts">
-</script>

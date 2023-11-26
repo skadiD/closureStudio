@@ -1,9 +1,9 @@
 <template>
-  <div :class="classes" class="shadow-lg rounded-2xl px-4 py-3 s-pro" v-if="!isAdd">
+  <div class="hover:scale-105 hover:shadow-lg hover:bg-info/10 active:bg-info/10 active:scale-95 duration-300 shadow-lg rounded-2xl px-4 py-3 s-pro">
     <div class="flex items-center">
       <div class="avatar mr-2">
         <div class="w-12 rounded-md">
-          <img :src="`https://ak.dzp.me/dst/avatar/${ game.status?.avatar.type || 'DEFAULT' }/${ game.status?.avatar.id  || 'avatar_activity_GK' }.webp`" alt="斯卡蒂" />
+          <img :src="`https://assets.closure.setonink.com/dst/avatar/${ game.status?.avatar.type || 'DEFAULT' }/${ game.status?.avatar.id  || 'avatar_activity_GK' }.webp`" alt="斯卡蒂" />
         </div>
       </div>
       <div class="flex">
@@ -31,27 +31,15 @@
     </div>
     <slot />
   </div>
-  <div :class="classes" class="shadow-lg rounded-2xl p-3 s-pro flex justify-center min-h-[8rem]" v-else>
-    <div class="text-center flex justify-center flex-col">
-      <div class="text-4xl font-bold">{{ allow ? '+' : '×'}}</div>
-      <div class="text-xl text-info">{{ allow ? '添加账号' : '无法添加'}}</div>
-    </div>
-  </div>
 </template>
 <script lang="ts" setup>
+
   interface Props {
-    isAdd: boolean
-    allow: boolean
     game: ApiUser.Game
   }
-  const props = withDefaults(defineProps<Props>(), {
-    isAdd: false,
-    allow: false,
+  withDefaults(defineProps<Props>(), {
     game: () => {
       return {} as ApiUser.Game
-    }
+    },
   });
-
-  const classes = 'hover:scale-105 hover:shadow-lg hover:bg-info/10 active:bg-info/10 active:scale-95 duration-300'
-
 </script>

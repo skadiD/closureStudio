@@ -66,7 +66,7 @@
 </style>
 
 <script setup lang="ts">
-import '../../assets/user.css'
+
 import {useRoute} from "vue-router";
 import GameAccount from "../../components/card/GameAccount.vue";
 import {computed, ref} from "vue";

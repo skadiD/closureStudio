@@ -1,24 +1,38 @@
 import axios from "axios";
 import type { Ref } from 'vue';
 import type { AxiosInstance, AxiosError } from 'axios';
-import { handleAxiosError, handleServiceResult } from "./axiosHelper";
-import {config} from "../views/common";
-const service = axios.create({
+import { handleAxiosError } from "./axiosHelper";
+import { config } from "../views/common";
+export const service = axios.create({
     baseURL: "https://api.arknights.host/"
 });
 const user = localStorage.getItem("closureV3_user");
 
 if (user != null) {
-    service.defaults.headers.common['Authorization'] = JSON.parse(user)?.user?.Token;
+    service.defaults.headers.common['Authorization'] = "Bearer " + JSON.parse(user)?.user?.Token;
 }
 service.interceptors.response.use(
     (response) => {
+        if (response.data?.data === undefined) { // quota
+            const data: any = {
+                message: response.data?.message ?? "成功",
+                code: response.data?.code ?? 1,
+                data: response.data
+            }
+            return data;
+        }
         return response.data;
     },
     (axiosError: AxiosError) => {
         const error = handleAxiosError(axiosError);
         config.value.isUnderMaintenance = true
-        return handleServiceResult(error, null);
+        const fail: Service.FailedResult = {
+            error,
+            data: null,
+            message: 'error',
+            code: error.code as number
+        };
+        return fail;
     }
 );
 type RequestMethod = 'get' | 'post' | 'put' | 'delete';
@@ -55,6 +69,9 @@ async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResu
     if (param.token) {
         service.defaults.headers['X-Platform'] = 'website';
         service.defaults.headers['token'] = param.token;
+    } else {
+        delete(service.defaults.headers['X-Platform']);
+        delete(service.defaults.headers['token']);
     }
     const method = param.method || 'get';
     const res = (await getRequestResponse({
@@ -76,9 +93,8 @@ function captcha<T>(url: string, token: string, data?: any) {
     return asyncRequest<T>({ url, method: 'post', token, data });
 }
 export default service;
-// const AuthServer: string = "http://127.0.0.1:3000/api/v1/";
-const AuthServer: string = "https://passport.dzp.me/api/v1/";
-
+const AuthServer: string = "https://passport.closure.setonink.com/api/v1/";
+const RegistryServer: string = "https://registry.closure.setonink.com/";
 function del(url: string, params: any) {
     return new Promise((resolve) => {
         service.delete(url, { data: params }).then((res) => {
@@ -97,12 +113,10 @@ function load(fileName: string) {
 const Auth_Login = (params: {email: string, password: string}) => post<ApiUser.Auth>(`${AuthServer}login`, params );
 const Auth_Register = (params: {email: string, password: string, noise: string, sign: string}) =>
     post<ApiUser.Auth>(`${AuthServer}register`, params);
-const Auth_Verify = (code: string) => get(`${AuthServer}verify?code=${code}`);
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
 const fetchAnnounce = () => get("Common/Announcement"); // Announce
 
-const doGameLogin = (params: any) => post("Game/Login", params); // GameLogin
 const fetchGameLog = (account: string, platform: string) => get(`Game/Log/${account}/${platform}/0`); // GameLog
 const fetchGameList = () => get<ApiUser.Game[]>(`game`); // GameList
 const doDelGame = (params: any) => del("Game", params); // Del
@@ -132,11 +146,11 @@ const apiGeetestSet = (account: string, platform: number, params: any) => post(`
 const fetchSytemConfig = () => get<ApiSystem.Config>('system/config')
 const fetchSytemList = () => get<ApiSystem.Hall[]>('system/apCostList')
 
-
-const doAddGame = (token: string, params: any) => captcha("game", token, params); // GameCreate
-
-export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info }
-export { fetchSytemConfig, fetchSytemList, fetchGameList }
-export { doAddGame, doGameLogin, doDelGame, doGameDataUpdate, doEditAnnounce }
-export { LoadMapList, LoadTableStage, LoadTableItems }
-export { AdminResetPasswd, AdminBan, }
+const doGameLogin = (token: string, account: string) => captcha(`game/login/${account}`, token, null); // GameLogin
+const doAddGame = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
+const Auth_Refresh = () => get<ApiUser.Auth>(`${AuthServer}refreshToken`); // RefreshToken
+const Auth_Verify = (params: any) => post(`${AuthServer}phone`, params); // RealSMS
+const fetchUserSlots = () => get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
+export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info, Auth_Refresh }
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchUserSlots }
+export { doAddGame, doGameLogin }

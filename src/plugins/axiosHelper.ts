@@ -1,64 +1,17 @@
-import type { AxiosError, AxiosResponse } from 'axios';
+import type {AxiosError} from 'axios';
 import {
     DEFAULT_REQUEST_ERROR_CODE,
     DEFAULT_REQUEST_ERROR_MSG,
+    ERROR_STATUS,
     NETWORK_ERROR_CODE,
     NETWORK_ERROR_MSG,
-    ERROR_STATUS,
     REQUEST_TIMEOUT_CODE,
     REQUEST_TIMEOUT_MSG
 } from "./config";
-type ErrorStatus = keyof typeof ERROR_STATUS;
-export async function handleServiceResult<T = any>(error: Service.RequestError | null, data: any) {
-    if (error) {
-        const fail: Service.FailedResult = {
-            error,
-            data: null,
-            message: 'error',
-            code: error.code as number
-        };
-        return fail;
-    }
-    const success: Service.SuccessResult<T> = {
-        error: null,
-        data,
-        message: 'success',
-        code: 1
-    };
-    return success;
-}
-export function handleBackendError(backendResult: Record<string, any>) {
-    const error: Service.RequestError = {
-        type: 'backend',
-        code: backendResult['code'],
-        msg: backendResult['message']
-    };
-    alert(error.msg);
-    return error;
-}
-/**
- * 处理请求成功后的错误
- * @param response - 请求的响应
- */
-export function handleResponseError(response: AxiosResponse) {
-    const error: Service.RequestError = {
-        type: 'axios',
-        code: DEFAULT_REQUEST_ERROR_CODE,
-        msg: DEFAULT_REQUEST_ERROR_MSG
-    };
+import {setMsg} from "./common";
+import {Type} from "../components/toast/enmu";
 
-    if (!window.navigator.onLine) {
-        // 网路错误
-        Object.assign(error, { code: NETWORK_ERROR_CODE, msg: NETWORK_ERROR_MSG });
-    } else {
-        // 请求成功的状态码非200的错误
-        const errorCode: ErrorStatus = response.status as ErrorStatus;
-        const msg = ERROR_STATUS[errorCode] || DEFAULT_REQUEST_ERROR_MSG;
-        Object.assign(error, { type: 'http', code: errorCode, msg });
-    }
-    alert(error);
-    return error;
-}
+type ErrorStatus = keyof typeof ERROR_STATUS;
 /**
  * 处理axios请求失败的错误
  * @param axiosError - 错误
@@ -116,6 +69,6 @@ export function handleAxiosError(axiosError: AxiosError) {
         ]
     ];
     exeStrategyActions(actions);
-    alert(error.msg);
+    setMsg(error.msg, Type.Warning);
     return error;
 }
