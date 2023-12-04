@@ -42,6 +42,7 @@
     z-index: 100;
     margin: 0;
     padding: 0;
+    white-space: inherit;
     &--top-left {
       top: 0;
       left: 0;
