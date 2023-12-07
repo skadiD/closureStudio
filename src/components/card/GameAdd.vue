@@ -53,6 +53,9 @@
       <button class="btn btn-block btn-warning" @click="confirmBtn">确认</button>
     </div>
   </dialog>
+  <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
+    <Geetest :captcha-config="captchaConfig" />
+  </div>
 </template>
 <script lang="ts" setup>
 import {ref} from "vue";
@@ -60,6 +63,8 @@ import {doAddGame} from "../../plugins/axios";
 import {setMsg} from "../../plugins/common";
 import {Type} from "../toast/enmu";
 import {useRouter} from "vue-router";
+import {reactive} from "vue";
+import Geetest from "../Geetest.vue";
 interface Props {
   uuid: string
   isFirst: boolean
@@ -86,6 +91,20 @@ const confirmBtn = () => {
     setMsg('请输入正确的文本', Type.Warning)
   }
 }
+const addGame = (token: string) => {
+  doAddGame(props.uuid, token, form.value).then(res => {
+    loading.value = false
+    if (res.code === 1) {
+      setMsg('登记成功', Type.Success)
+    } else {
+      if (res.message === 'reCAPTCHA认证无效') {
+        window.captchaObj.showCaptcha();
+        return
+      }
+      setMsg(res.message, Type.Warning)
+    }
+  })
+}
 const start = async () => {
   if (props.isFirst && confirmText.value == '') {
     confirm.value.showModal()
@@ -107,15 +126,27 @@ const start = async () => {
       loading.value = false
       return;
     }
-    doAddGame(props.uuid, token, form.value).then(res => {
-      loading.value = false
-      if (res.code === 1) {
-        setMsg('登记成功', Type.Success)
-        router.go(0)
-      } else {
-        setMsg(res.message, Type.Warning)
-      }
-    })
+    addGame(token)
   })
+}
+const captchaConfig = reactive({
+  config: {
+    captchaId: 'd8551513acc423d24401e9622cddd45c',
+    product: 'bind'
+  },
+  handler: captchaHandler
+});
+function captchaHandler(obj: any) {
+  window.captchaObj = obj;
+  obj.appendTo('#captcha').onSuccess(() => {
+    if (captchaConfig.config.product === 'bind') {
+      const result: object = window.captchaObj.getValidate();
+      if (!result) {
+        setMsg('请完成验证', Type.Warning)
+        return;
+      }
+      addGame(JSON.stringify(result));
+    }
+  });
 }
 </script>

@@ -41,6 +41,7 @@ interface RequestParam {
     method: RequestMethod;
     data?: any;
     token?: string;
+    isSSE?: boolean;
 }
 interface RequestResultHook<T = any> {
     data: Ref<T | null>;
@@ -73,6 +74,11 @@ async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResu
         delete(service.defaults.headers['X-Platform']);
         delete(service.defaults.headers['token']);
     }
+    if (param.isSSE) {
+        service.defaults.headers['Accept'] = 'text/event-stream';
+    } else {
+        delete(service.defaults.headers['Accept']);
+    }
     const method = param.method || 'get';
     const res = (await getRequestResponse({
         instance: service,
@@ -91,6 +97,10 @@ function get<T>(url: string) {
 }
 function captcha<T>(url: string, token: string, data?: any) {
     return asyncRequest<T>({ url, method: 'post', token, data });
+}
+function sse<T>(url: string) {
+    return asyncRequest<T>({ url, method: 'get', isSSE: true });
+
 }
 export default service;
 const AuthServer: string = "https://passport.closure.setonink.com/api/v1/";
@@ -151,6 +161,7 @@ const doAddGame = (slot: string, token: string, params: any) => captcha(`${Regis
 const Auth_Refresh = () => get<ApiUser.Auth>(`${AuthServer}refreshToken`); // RefreshToken
 const Auth_Verify = (params: any) => post(`${AuthServer}phone`, params); // RealSMS
 const fetchUserSlots = () => get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
+const fetchGameListBySSE = () => sse<ApiUser.Game[]>('sse/game'); // 实验性获取 GameList
 export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info, Auth_Refresh }
-export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchUserSlots }
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots }
 export { doAddGame, doGameLogin }

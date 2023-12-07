@@ -7,7 +7,7 @@
         <div class="divider mt-0">个人信息</div>
         <p v-if="!userQuota?.idServerPhone && gameList?.length === 1">
           恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(gameList[0]?.status.created_at + 86400, now) }}】</b>。<br>
-          完成【手机号：{{ gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/, '$1****$2') }}】绑定认证<b class="cursor-pointer" @click="realModel.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
+          完成【手机号：{{ gameList[0].status.account?.replace(/(\d{3})\d{6}(\d{2})/, '$1****$2') }}】绑定认证<b class="cursor-pointer" @click="realModel.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
         <p v-if="!gameList?.length">
           你的账号没有完成
@@ -30,12 +30,12 @@
           <div class="grid gap-4 grid-cols-2 mt-2">
             <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="game.status?.code != 0" disabled>暂停</button>
             <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="show = !show;gameLogin(game)" :disabled="loginBtnLoading">启动</button>
-            <button class="btn btn-outline btn-sm btn-block btn-error" disabled>删除</button>
+            <button class="btn btn-outline btn-sm btn-block btn-error" disabled @click="gameDel(game)">删除</button>
           </div>
         </GameAccount>
       </div>
     </div>
-    <div class="bg-base-300 flex-1 flex flex-col md:ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated" v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
+    <div class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated" v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
       <GamePanel/>
     </div>
   </div>
@@ -61,20 +61,24 @@
       <button class="btn btn-block btn-info  mt-2" @click="smsBtn">确认</button>
     </div>
   </dialog>
+  <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
+    <Geetest :captcha-config="captchaConfig" />
+  </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import {config} from "../common";
+import {reactive, ref, watch} from "vue";
+import {config, gameList, startSSE} from "../common";
 import GameAccount from "../../components/card/GameAccount.vue";
 import 'animate.css';
 import GamePanel from "../../components/card/GamePanel.vue";
 import {userStore} from "../../store/user";
 import {storeToRefs} from "pinia";
-import {Auth_Refresh, Auth_Verify, doAddGame, doGameLogin, fetchGameList, fetchUserSlots} from "../../plugins/axios";
+import {Auth_Refresh, Auth_Verify, doGameLogin, fetchUserSlots} from "../../plugins/axios";
 import {setMsg} from "../../plugins/common";
 import {Type} from "../../components/toast/enmu";
 import GameAddCard from "../../components/card/GameAddCard.vue";
 import GameAdd from "../../components/card/GameAdd.vue";
+import Geetest from "../../components/Geetest.vue";
 
 const closeAnn = ref()
 const addModel = ref()
@@ -92,83 +96,37 @@ watch(
       if (v && !user.value.Info.isAdmin) closeAnn.value.showModal()
     }
 )
-const gameList = ref<ApiUser.Game[]>()
-fetchGameList().then(res => {
-  console.dir(res)
-  if (res.data) gameList.value = res.data
-})
+// const gameList = ref<ApiUser.Game[]>()
+// fetchGameList().then(res => {
+//   if (res.data) gameList.value = res.data
+// })
 fetchUserSlots().then(res => {
   if (res.data) userQuota.value = res.data
   slotUUID.value = res.data?.slots.filter(slot => slot.gameAccount === null && slot.ruleFlags.includes('slot_account_format_is_phone'))[0]?.uuid || ''
 })
 const calc = (ts1: number, ts2: number) => {
-  const during = Math.abs(ts1 - ts2);
+  const during = ts1 - ts2;
   const hours = Math.floor(during / (60 * 60));
-  const minutes = Math.floor((during % (60 * 60)) / 60);
+  const minutes = Math.abs(Math.floor((during % (60 * 60)) / 60));
   return `${hours}小时${minutes}分钟`;
 }
 const now = Math.round(Date.now() / 1000)
-const captcha = (data: ApiUser.Game) => {
-  // @ts-ignore
-  if (window["initGeetest"] === undefined) {
-    console.log("没有初始化Geetest")
-    return
-  }
-  setMsg('加载验证码中...', Type.Info)
-  // @ts-ignore
-  window.initGeetest({
-    gt: data.captcha_info.gt,
-    challenge: data.captcha_info.challenge,
-    offline: false,
-    product: "bind",
-    width: "300px",
-    https: true,
-  }, (captchaObj: any) => {
-    captchaObj.onReady(() => {
-      // @ts-ignore
-      captchaObj.verify();
-    })
-    captchaObj.onSuccess(() => {
-      const validate = captchaObj.getValidate();
-      setMsg('提交成功，正在登录...', Type.Success)
-      // apiGeetestSet(data.config.account, data.config.platform, {
-      //   challenge: data.captcha_info.challenge,
-      //   geetest_challenge: validate.geetest_challenge,
-      //   geetest_seccode: validate.geetest_seccode,
-      //   geetest_validate: validate.geetest_validate,
-      //   success: true
-      // }).then(() => {
-      //   //getList()
-      // })
-      captchaObj.destroy(); // 这里是销毁实例，处理完逻辑最终销毁
-    })
-    captchaObj.onError(() => {
-      setMsg('验证码加载失败', Type.Warning)
-    })
-  })
-}
 const loginBtnLoading = ref(false)
 const gameLogin = (game: ApiUser.Game) => {
   loginBtnLoading.value = true
-  window.grecaptcha?.ready(async () => {
+  window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', {action: 'submit'})
     if (token === '') {
       setMsg('pirnt（\'图灵测试エロ,请检查你的 Network")', Type.Warning)
       loginBtnLoading.value = false
       return;
     }
-    doGameLogin(token, game.status?.account).then(res => {
-      loginBtnLoading.value = false
-      if (res.code === 1) {
-        setMsg('启动成功', Type.Success)
-        // router.go(0)
-      } else {
-        setMsg(res.message, Type.Warning)
-      }
-    })
+    login(token, game.status.account)
   })
 }
-
+const gameDel = (game: ApiUser.Game) => {
+  loginBtnLoading.value = true
+}
 // 短信验证码
 const smsCode = ref('')
 const smsBtn = () => {
@@ -190,6 +148,45 @@ const smsBtn = () => {
   }
   setMsg('请输入验证码', Type.Warning)
 }
+const login = (token: string, account: string) => {
+  doGameLogin(token, account).then(res => {
+    loginBtnLoading.value = false
+    if (res.code === 1) {
+      setMsg('启动成功', Type.Success)
+      // router.go(0)
+    } else {
+      if (res.message === '人机验证失败') {
+        captchaConfig.account = account
+        window.captchaObj.showCaptcha();
+        return
+      }
+      setMsg(res.message, Type.Warning)
+    }
+  })
+}
+// geetest
+const captchaConfig = reactive({
+  config: {
+    captchaId: 'd8551513acc423d24401e9622cddd45c',
+    product: 'bind'
+  },
+  account: '',
+  handler: captchaHandler
+});
+function captchaHandler(obj: any) {
+  window.captchaObj = obj;
+  obj.appendTo('#captcha').onSuccess(() => {
+    if (captchaConfig.config.product === 'bind') {
+      const result: object = window.captchaObj.getValidate();
+      if (!result) {
+        setMsg('请完成验证', Type.Warning)
+        return;
+      }
+      login(JSON.stringify(result), captchaConfig.account);
+    }
+  });
+}
+startSSE(user.value.Token)
 </script>
 <style>
   div, img {
