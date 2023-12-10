@@ -73,7 +73,60 @@ declare namespace ApiUser {
         game_config: GameConfig;
     }
 }
-
+declare namespace ApiGame {
+    interface Config {
+        accelerate_slot?: string;
+        accelerate_slot_cn?: string;
+        account?: string;
+        allow_login_assist?: boolean;
+        battle_maps?: string[] | string;
+        enable_building_arrange?: boolean;
+        is_auto_battle?: boolean;
+        is_stopped?: boolean;
+        keeping_ap?: number;
+        map_id?: string;
+        recruit_ignore_robot?: boolean;
+        recruit_reserve?: number;
+    }
+    interface Screenshot {
+        uTCTime: number;
+        fileName: string[];
+        host: string;
+        type: number;
+        url: string;
+    }
+    interface Avatar {
+        id: string;
+        type: string;
+    }
+    interface Status {
+        androidDiamond: number;
+        ap: number;
+        avatar: Avatar;
+        avatarId: string;
+        diamondShard: number;
+        gachaTicket: number;
+        gold: number;
+        lastApAddTime: number;
+        level: number;
+        maxAp: number;
+        nickName: string;
+        recruitLicense: number;
+        secretary: string;
+        secretarySkinId: string;
+        socialPoint: number;
+        tenGachaTicket: number;
+    }
+    interface Detail {
+        config: Config;
+        consumable?: any;
+        inventory?: any;
+        lastFreshTs: number;
+        screenshot: Screenshot[];
+        status: Status;
+        troop?: any;
+    }
+}
 declare namespace Registry {
     interface UserInfo {
         createdAt: number;

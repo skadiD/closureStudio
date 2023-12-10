@@ -21,6 +21,7 @@ const startSSE = (token: string) => {
         // 根据收到的消息解析操作：更新游戏列表 & 掐断链接
         event.addEventListener("game", (event) => {
             gameList.value = JSON.parse(event.data)
+            console.log(JSON.parse(event.data))
         })
         event.addEventListener("close", () => {
             setMsg('你已在其他窗口或设备访问，本页面暂停更新', Type.Warning)

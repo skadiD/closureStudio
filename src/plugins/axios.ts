@@ -158,10 +158,14 @@ const fetchSytemList = () => get<ApiSystem.Hall[]>('system/apCostList')
 
 const doGameLogin = (token: string, account: string) => captcha(`game/login/${account}`, token, null); // GameLogin
 const doAddGame = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
+const doUpdateGameConf = (account: string, game: ApiGame.Config) => post(`game/config/${account}`, {
+    'config': game
+})
 const Auth_Refresh = () => get<ApiUser.Auth>(`${AuthServer}refreshToken`); // RefreshToken
 const Auth_Verify = (params: any) => post(`${AuthServer}phone`, params); // RealSMS
 const fetchUserSlots = () => get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
 const fetchGameListBySSE = () => sse<ApiUser.Game[]>('sse/game'); // 实验性获取 GameList
+const fetchGameDetails = (account: string) => get<ApiGame.Detail>(`game/${account}`)
 export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info, Auth_Refresh }
-export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots }
-export { doAddGame, doGameLogin }
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails }
+export { doAddGame, doGameLogin, doUpdateGameConf }

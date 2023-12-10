@@ -48,4 +48,15 @@ interface Window {
         render: (id: string, options: { sitekey: string; callback: (token: string) => void }) => void;
         reset: (id: string) => void;
     };
+    initGeetest4: (options: any, handle: any) => void;
+    captchaObj: {
+        verify: () => void;
+        onReady: (callback: () => void) => void;
+        onRefresh: (callback: () => void) => void;
+        onError: (callback: () => void) => void;
+        onSuccess: (callback: () => void) => void;
+        appendTo: (id: string) => any;
+        getValidate: () => any;
+        showCaptcha: () => void;
+    };
 }

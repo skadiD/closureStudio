@@ -25,7 +25,7 @@
       <div class="text-2xl font-bold">我的托管（{{ userQuota?.slots.filter(slot => slot.gameAccount !== null)?.length }} 已用 / {{ userQuota?.slots?.length }} 可用）</div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <GameAddCard v-if="!gameList?.length" @click="addModel.showModal()"/>
-        <GameAccount v-else v-for="(game, key) in gameList" :game="game" @click="show = !show" :key="key">
+        <GameAccount v-else v-for="(game, key) in gameList" :game="game" @click="openGameConf(game)" :key="key">
           <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
           <div class="grid gap-4 grid-cols-2 mt-2">
             <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="game.status?.code != 0" disabled>暂停</button>
@@ -36,7 +36,7 @@
       </div>
     </div>
     <div class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated" v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
-      <GamePanel/>
+      <GamePanel :account="selectGame" />
     </div>
   </div>
   <dialog ref="closeAnn" class="modal" style="outline-width: 0">
@@ -58,7 +58,7 @@
         <input class="s-input peer focus:ring-info" v-model="smsCode">
         <label class="s-label peer-focus:text-info">请输入收到的验证码</label>
       </div>
-      <button class="btn btn-block btn-info  mt-2" @click="smsBtn">确认</button>
+      <button class="btn btn-block btn-info mt-2" @click="smsBtn">确认</button>
     </div>
   </dialog>
   <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
@@ -73,7 +73,7 @@ import 'animate.css';
 import GamePanel from "../../components/card/GamePanel.vue";
 import {userStore} from "../../store/user";
 import {storeToRefs} from "pinia";
-import {Auth_Refresh, Auth_Verify, doGameLogin, fetchUserSlots} from "../../plugins/axios";
+import {Auth_Refresh, Auth_Verify, doGameLogin, fetchGameDetails, fetchUserSlots} from "../../plugins/axios";
 import {setMsg} from "../../plugins/common";
 import {Type} from "../../components/toast/enmu";
 import GameAddCard from "../../components/card/GameAddCard.vue";
@@ -96,10 +96,6 @@ watch(
       if (v && !user.value.Info.isAdmin) closeAnn.value.showModal()
     }
 )
-// const gameList = ref<ApiUser.Game[]>()
-// fetchGameList().then(res => {
-//   if (res.data) gameList.value = res.data
-// })
 fetchUserSlots().then(res => {
   if (res.data) userQuota.value = res.data
   slotUUID.value = res.data?.slots.filter(slot => slot.gameAccount === null && slot.ruleFlags.includes('slot_account_format_is_phone'))[0]?.uuid || ''
@@ -187,6 +183,13 @@ function captchaHandler(obj: any) {
   });
 }
 startSSE(user.value.Token)
+
+// 账号配置面板
+const selectGame = ref('')
+const openGameConf = (game: ApiUser.Game) => {
+  selectGame.value = show.value ? '' : game.status.account
+  show.value = !show.value;
+}
 </script>
 <style>
   div, img {
