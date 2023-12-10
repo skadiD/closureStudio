@@ -35,7 +35,7 @@
         <input class="s-input peer focus:ring-info" v-model="editConfig.battle_maps">
         <label class="s-label peer-focus:text-info">托管地图队列</label>
       </div>
-      <a class="btn btn-block btn-info mt-4" @click="submit">登录</a>
+      <a class="btn btn-block btn-info mt-4" @click="submit">递交</a>
     </div>
   </dialog>
 </template>
