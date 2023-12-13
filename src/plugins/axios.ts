@@ -71,13 +71,13 @@ async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResu
         service.defaults.headers['X-Platform'] = 'website';
         service.defaults.headers['token'] = param.token;
     } else {
-        delete(service.defaults.headers['X-Platform']);
-        delete(service.defaults.headers['token']);
+        delete (service.defaults.headers['X-Platform']);
+        delete (service.defaults.headers['token']);
     }
     if (param.isSSE) {
         service.defaults.headers['Accept'] = 'text/event-stream';
     } else {
-        delete(service.defaults.headers['Accept']);
+        delete (service.defaults.headers['Accept']);
     }
     const method = param.method || 'get';
     const res = (await getRequestResponse({
@@ -120,14 +120,14 @@ function load(fileName: string) {
     });
 }
 
-const Auth_Login = (params: {email: string, password: string}) => post<ApiUser.Auth>(`${AuthServer}login`, params );
-const Auth_Register = (params: {email: string, password: string, noise: string, sign: string}) =>
+const Auth_Login = (params: { email: string, password: string }) => post<ApiUser.Auth>(`${AuthServer}login`, params);
+const Auth_Register = (params: { email: string, password: string, noise: string, sign: string }) =>
     post<ApiUser.Auth>(`${AuthServer}register`, params);
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
 const fetchAnnounce = () => get("Common/Announcement"); // Announce
 
-const fetchGameLog = (account: string, platform: string) => get(`Game/Log/${account}/${platform}/0`); // GameLog
+const fetchGameLogs = (account: string, id: number) => get<ApiGame.GameLogs>(`game/log/${account}/${id}`)
 const fetchGameList = () => get<ApiUser.Game[]>(`game`); // GameList
 const doDelGame = (params: any) => del("Game", params); // Del
 const fetchGameScreen = (account: string, platform: string) =>
@@ -169,3 +169,4 @@ const fetchGameDetails = (account: string) => get<ApiGame.Detail>(`game/${accoun
 export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info, Auth_Refresh }
 export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails }
 export { doAddGame, doGameLogin, doUpdateGameConf }
+export { fetchGameLogs }

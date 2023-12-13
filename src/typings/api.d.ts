@@ -126,6 +126,19 @@ declare namespace ApiGame {
         status: Status;
         troop?: any;
     }
+
+    interface GameLogs {
+        logs: GameLogEntry[]
+        hasMore: boolean
+    }
+
+    interface GameLogEntry {
+        id: number;
+        ts: number;
+        name: string;
+        logLevel: number;
+        content: string;
+    }
 }
 declare namespace Registry {
     interface UserInfo {

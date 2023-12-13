@@ -15,15 +15,18 @@
     , true) }} </div>
   <a class="btn btn-info btn-outline btn-block my-1" @click="configModel.showModal()">托管配置</a>
   <div class="divider">不实时日志</div>
-  <div class="h-[calc(100vh-32rem)] overflow-hidden">
+  <div class="h-[calc(100vh-28rem)] overflow-y-auto">
     <table class="text-[1rem]">
       <tbody>
-        <tr v-for="k in 10">
-          <td class="text-info whitespace-nowrap">07-29 11:13</td>
-          <td class="pl-2">[泠夭v2] 下次基建排班将在 2023-07-29 14:13:17 自动进行</td>
+        <tr v-for="log in gameLogs.logs">
+          <td class="text-info whitespace-nowrap">{{ formatTimestamp(log.ts) }}</td>
+          <td class="pl-2">{{ log.content }}</td>
         </tr>
       </tbody>
     </table>
+    <a v-if="gameLogs.hasMore && !isLoadingGameLogs" class="btn btn-info btn-outline btn-block my-1" @click="logsLoad">
+      {{ '加载更多' }}
+    </a>
   </div>
   <a class="btn btn-block btn-info mt-2">查看托管截图</a>
   <dialog ref="configModel" class="modal" style="outline-width: 0">
@@ -48,15 +51,25 @@
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { doUpdateGameConf, fetchGameDetails } from "../../plugins/axios";
+import { doUpdateGameConf, fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
+import formatTimestamp from "../../plugins/time"
 interface Props {
   account: string
 }
 const props = withDefaults(defineProps<Props>(), {
   account: ''
 });
+
+const gameLogs = ref<ApiGame.GameLogs>(
+  {
+    logs: [],
+    hasMore: false
+  }
+)
+const isLoadingGameLogs = ref(false)
+
 const details = ref<ApiGame.Detail>()
 const configModel = ref()
 const editConfig = ref<ApiGame.Config>({
@@ -85,6 +98,21 @@ watch(() => props.account, (val) => {
     setMsg(res.message, Type.Warning)
   })
 })
+
+watch(() => props.account, (val) => {
+  if (val == '') return
+  isLoadingGameLogs.value = true
+  fetchGameLogs(val, 0).then(res => {
+    if (res.data) {
+      gameLogs.value = res.data
+      return
+    }
+    setMsg(res.message, Type.Warning)
+  }).finally(() => {
+    isLoadingGameLogs.value = false
+  })
+})
+
 const battleMaps = {
   "清空": "清空",
   "1-7": "main_01-07",
@@ -127,7 +155,21 @@ const addToBattleMaps = (mapId: string) => {
 };
 
 
-
+const logsLoad = () => {
+  if (isLoadingGameLogs.value) return
+  if (gameLogs.value.logs.length == 0) return
+  isLoadingGameLogs.value = true
+  fetchGameLogs(props.account, gameLogs.value.logs[gameLogs.value.logs.length - 1].id).then(res => {
+    if (res.data) {
+      gameLogs.value.logs.push(...res.data.logs)
+      gameLogs.value.hasMore = res.data.hasMore
+      return
+    }
+    setMsg(res.message, Type.Warning)
+  }).finally(() => {
+    isLoadingGameLogs.value = false
+  })
+}
 
 const submit = () => {
   editConfig.value.battle_maps = JSON.parse(<string>editConfig.value.battle_maps)
