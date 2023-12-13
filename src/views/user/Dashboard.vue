@@ -45,7 +45,7 @@
     <div
       class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
       v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
-      <GamePanel :account="selectGame" />
+      <GamePanel :account="selectGame" :statusCode="selectGameStatusCode" />
     </div>
   </div>
   <dialog ref="closeAnn" class="modal" style="outline-width: 0">
@@ -207,8 +207,11 @@ startSSE(user.value.Token)
 
 // 账号配置面板
 const selectGame = ref('')
+const selectGameStatusCode = ref(0)
 const openGameConf = (game: ApiUser.Game) => {
+  console.log(game.status.code)
   selectGame.value = show.value ? '' : game.status.account
+  selectGameStatusCode.value = game.status.code
   show.value = !show.value;
 }
 </script>

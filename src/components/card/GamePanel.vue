@@ -13,20 +13,22 @@
     ((details?.status.maxAp || 0) - (Math.floor((Date.now() / 1000 - (details?.status.lastApAddTime || 0)) / 360) +
       (details?.status.ap || 0))) * 360 + Math.ceil(Date.now() / 1000)
     , true) }} </div>
-  <a class="btn btn-info btn-outline btn-block my-1" @click="configModel.showModal()">托管配置</a>
+  <button class="btn btn-info btn-outline btn-block my-1" :disabled="props.statusCode == 1 || props.statusCode == 0"
+    @click="configModel.showModal()">托管配置</button>
   <div class="divider">不实时日志</div>
   <div class="h-[calc(100vh-28rem)] overflow-y-auto">
     <table class="text-[1rem]">
       <tbody>
         <tr v-for="log in gameLogs.logs">
-          <td class="text-info whitespace-nowrap">{{ formatTimestamp(log.ts) }}</td>
+          <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, true) }}</td>
           <td class="pl-2">{{ log.content }}</td>
         </tr>
       </tbody>
     </table>
-    <a v-if="gameLogs.hasMore && !isLoadingGameLogs" class="btn btn-info btn-outline btn-block my-1" @click="logsLoad">
+    <button :disabled="!gameLogs.hasMore || isLoadingGameLogs" class="btn btn-info btn-outline btn-block my-1"
+      @click="logsLoad">
       {{ '加载更多' }}
-    </a>
+    </button>
   </div>
   <a class="btn btn-block btn-info mt-2">查看托管截图</a>
   <dialog ref="configModel" class="modal" style="outline-width: 0">
@@ -54,12 +56,14 @@ import { ref, watch } from "vue";
 import { doUpdateGameConf, fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
-import formatTimestamp from "../../plugins/time"
 interface Props {
-  account: string
+  account: string,
+  statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
+
 }
 const props = withDefaults(defineProps<Props>(), {
-  account: ''
+  account: '',
+  statusCode: 0
 });
 
 const gameLogs = ref<ApiGame.GameLogs>(
@@ -86,9 +90,10 @@ const editConfig = ref<ApiGame.Config>({
   recruit_ignore_robot: false,
   recruit_reserve: 0,
 })
-watch(() => props.account, (val) => {
-  if (val == '') return
-  fetchGameDetails(val).then(res => {
+watch([() => props.account, () => props.statusCode], ([account, code]) => {
+  if (account == '') return
+  if (code == 0) return
+  fetchGameDetails(account).then(res => {
     if (res.data) {
       details.value = res.data
       editConfig.value = res.data.config
