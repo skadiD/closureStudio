@@ -1,7 +1,6 @@
 import {ref} from "vue";
 import {setMsg} from "../plugins/common";
 import {Type} from "../components/toast/enmu";
-
 const config = ref<ApiSystem.Config>({} as ApiSystem.Config)
 
 let event: EventSource | null = null

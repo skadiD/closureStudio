@@ -82,7 +82,7 @@ watch(() => props.account, (val) => {
       editConfig.value.battle_maps = JSON.stringify(editConfig.value.battle_maps)
       return
     }
-    setMsg("请求数据失败", Type.Warning)
+    setMsg(res.message, Type.Warning)
   })
 })
 const battleMaps = {

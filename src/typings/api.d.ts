@@ -36,7 +36,7 @@ declare namespace ApiUser {
         account: string;
         platform: number;
         uuid: string;
-        code: number;
+        code: number;   // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
         text: string;
         nick_name: string;
         level: number;
