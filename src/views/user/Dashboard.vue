@@ -76,7 +76,7 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref, watch } from "vue";
-import { config, gameList, startSSE } from "../common";
+import { config, gameList, startSSE } from "../../plugins/sse";
 import GameAccount from "../../components/card/GameAccount.vue";
 import 'animate.css';
 import GamePanel from "../../components/card/GamePanel.vue";

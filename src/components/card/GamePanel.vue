@@ -13,8 +13,7 @@
     ((details?.status.maxAp || 0) - (Math.floor((Date.now() / 1000 - (details?.status.lastApAddTime || 0)) / 360) +
       (details?.status.ap || 0))) * 360 + Math.ceil(Date.now() / 1000)
     , true) }} </div>
-  <button class="btn btn-info btn-outline btn-block my-1" :disabled="props.statusCode == 1 || props.statusCode == 0"
-    @click="configModel.showModal()">托管配置</button>
+  <button class="btn btn-info btn-outline btn-block my-1" @click="configModel.showModal()">托管配置</button>
   <div class="divider">不实时日志</div>
   <div class="h-[calc(100vh-28rem)] overflow-y-auto">
     <table class="text-[1rem]">
@@ -33,37 +32,22 @@
   <a class="btn btn-block btn-info mt-2">查看托管截图</a>
   <dialog ref="configModel" class="modal" style="outline-width: 0">
     <div class="modal-box">
-      <h3 class="font-bold text-2xl">托管配置</h3>
-      <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
-        当前配置界面为究极无敌盖中盖版本，请在专家指导下使用
-      </div>
-      <div class="s-combo">
-        <input class="s-input peer focus:ring-info" v-model="editConfig.battle_maps">
-        <label class="s-label peer-focus:text-info">托管地图队列</label>
-        <div>
-          <button class="btn btn-info m-1" v-for="(mapId, mapName) in battleMaps" :key="mapId"
-            @click="addToBattleMaps(mapId)">
-            {{ mapName }}
-          </button>
-        </div>
-      </div>
-      <a class="btn btn-block btn-info mt-4" @click="submit">递交</a>
+      <Config :account="props.account" />
     </div>
   </dialog>
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import { doUpdateGameConf, fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
+import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
+import Config from "./ConfigPanel.vue";
 interface Props {
   account: string,
-  statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
-
+  // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
 }
 const props = withDefaults(defineProps<Props>(), {
   account: '',
-  statusCode: 0
 });
 
 const gameLogs = ref<ApiGame.GameLogs>(
@@ -73,7 +57,6 @@ const gameLogs = ref<ApiGame.GameLogs>(
   }
 )
 const isLoadingGameLogs = ref(false)
-
 const details = ref<ApiGame.Detail>()
 const configModel = ref()
 const editConfig = ref<ApiGame.Config>({
@@ -90,9 +73,8 @@ const editConfig = ref<ApiGame.Config>({
   recruit_ignore_robot: false,
   recruit_reserve: 0,
 })
-watch([() => props.account, () => props.statusCode], ([account, code]) => {
+watch(() => props.account, (account) => {
   if (account == '') return
-  if (code == 0) return
   fetchGameDetails(account).then(res => {
     if (res.data) {
       details.value = res.data
@@ -118,48 +100,6 @@ watch(() => props.account, (val) => {
   })
 })
 
-const battleMaps = {
-  "清空": "清空",
-  "1-7": "main_01-07",
-  "活动1图": "act30side_01",
-  "活动2图": "act30side_02",
-  "活动3图": "act30side_03",
-  "活动4图": "act30side_04",
-  "活动5图": "act30side_05",
-  "活动6图": "act30side_06",
-  "活动7图": "act30side_07",
-  "活动8图": "act30side_08",
-}
-const addToBattleMaps = (mapId: string) => {
-  let battleMapsArray: string[];
-
-  // 尝试解析 battle_maps 作为 JSON。如果失败，初始化为空数组。
-  try {
-    battleMapsArray = JSON.parse(editConfig.value.battle_maps as string);
-    if (!Array.isArray(battleMapsArray)) {
-      battleMapsArray = [];
-    }
-  } catch (e) {
-    battleMapsArray = [];
-  }
-
-  // 如果 mapId 是 "清空"，则清空数组。否则，正常处理 mapId。
-  if (mapId === "清空") {
-    battleMapsArray = [];
-  } else {
-    // 检查 mapId 是否已经存在于数组中，如果不存在，则添加它。
-    if (!battleMapsArray.includes(mapId)) {
-      battleMapsArray.push(mapId);
-    }
-  }
-
-  // 更新 editConfig.value.battle_maps 为字符串形式的 JSON。
-  editConfig.value.battle_maps = JSON.stringify(battleMapsArray);
-
-  console.log("After push or clear:", editConfig.value.battle_maps);
-};
-
-
 const logsLoad = () => {
   if (isLoadingGameLogs.value) return
   if (gameLogs.value.logs.length == 0) return
@@ -176,10 +116,5 @@ const logsLoad = () => {
   })
 }
 
-const submit = () => {
-  editConfig.value.battle_maps = JSON.parse(<string>editConfig.value.battle_maps)
-  doUpdateGameConf(props.account, editConfig.value).then(res => {
-    setMsg(res.message, Type.Info)
-  })
-}
+
 </script>
