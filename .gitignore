@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+item_table.json
+stage_table.json
+package-lock.json
