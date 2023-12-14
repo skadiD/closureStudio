@@ -66,6 +66,7 @@ declare namespace ApiUser {
         recruit_ignore_robot: boolean;
         recruit_reserve: number;
         map_id: string;
+        allow_login_assist: boolean;
     }
     interface Game {
         status: GameStatus;
