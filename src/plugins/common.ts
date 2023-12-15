@@ -43,3 +43,11 @@ export function getTheme() {
 
 export const isNight =
   new Date().getHours() >= 22 || new Date().getHours() <= 6;
+
+export const getStageName = (stages: Gamedata.Stages, stageId: string) => {
+  // check key is exist
+  if (!stages[stageId]) {
+    return "未知关卡";
+  }
+  return stages[stageId].name;
+};
