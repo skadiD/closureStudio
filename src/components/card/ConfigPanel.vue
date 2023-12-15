@@ -42,17 +42,15 @@
             <span className="label-text">允许他人协助登录</span>
             <input v-model="config.allow_login_assist" type="checkbox" className="toggle toggle-sm" />
         </label>
-
-
     </div>
 
-    <div className="divider h-0">作战地图</div>
+    <div className="divider h-2">作战地图</div>
 
     <div className="flex py-2">
         <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="暴君" />
         <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
             <option v-for="(stage, key) in filteredStages" :key="key" :value="key">
-                {{ stage.name }}
+                {{ stage.code }} {{ stage.name }}
             </option>
         </select>
     </div>
@@ -118,7 +116,6 @@ const getStageName = (stageId: string) => {
 
 const filteredStages = computed(() => {
     // 如果 stageKeyWord 为空，则返回所有 stage（但最多 10 个）
-    console.log("刷新")
     if (!stageKeyWord.value.trim()) {
         return Object.keys(stages.value).reduce((acc, key, index) => {
             if (index < 10) {
