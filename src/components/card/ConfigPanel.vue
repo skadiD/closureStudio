@@ -58,7 +58,7 @@
     <div class="flex flex-wrap">
         <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap"
             class="btn btn-outline btn-warning btn-xs m-1">
-            {{ getStageName(battleMap) }}
+            {{ getStageName(stages, battleMap) }}
         </button>
     </div>
 
@@ -69,13 +69,13 @@
 import { ref, watch } from "vue";
 import {
     doUpdateGameConf,
-    fetchGameLogs,
 } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { gameList } from "../../plugins/sse";
 import { computed } from "vue";
 import { stages } from "../../plugins/stage";
+import { getStageName } from "../../plugins/common";
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -110,9 +110,6 @@ const addStageToConfig = (event: Event) => {
         config.value.battle_maps.push(selectedKey);
     }
 };
-const getStageName = (stageId: string) => {
-    return stages.value[stageId].name;
-};
 
 const filteredStages = computed(() => {
     // 如果 stageKeyWord 为空，则返回所有 stage（但最多 10 个）
@@ -146,6 +143,7 @@ watch(() => {
         isDisabled.value = false
     }
 });
+
 const removeBattleMap = (battleMap: string) => {
     config.value.battle_maps = config.value.battle_maps.filter(item => item !== battleMap);
 };

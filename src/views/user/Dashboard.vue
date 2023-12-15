@@ -28,50 +28,53 @@
       <div class="text-2xl font-bold">我的托管（{{ userQuota?.slots.filter(slot => slot.gameAccount !== null)?.length }} 已用 /
         {{ userQuota?.slots?.length }} 可用）</div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <GameAddCard v-if="!gameList?.length" @click="addModel.showModal()" />
-        <GameAccount v-else v-for="(game, key) in gameList" :game="game" @click="openGameConf(game)" :key="key">
-          <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
-          <div class="grid gap-4 grid-cols-2 mt-2">
-            <button class="btn btn-outline btn-sm btn-block btn-primary"
-              v-if="game.status?.code != 0 && game.status?.code != 1" @click="show = !show; suspend(game.status.account)"
-              :disabled="loginBtnLoading">暂停</button>
-            <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="show = !show; gameLogin(game)"
-              :disabled="loginBtnLoading || game.status?.code == 1">启动</button>
-            <button class="btn btn-outline btn-sm btn-block btn-error" disabled @click="gameDel(game)">删除</button>
+        <div v-for="(slot, key) in userQuota?.slots" :key="key">
+          <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userInfo="userQuota" @click="addModel.showModal()" />
+          <GameAccount v-else :game="getGameByAccount(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
+            <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
+            <div class="grid gap-4 grid-cols-2 mt-2">
+              <button class="btn btn-outline btn-sm btn-block btn-primary"
+                v-if="getGameByAccount(slot.gameAccount)?.status?.code != 0 && getGameByAccount(slot.gameAccount)?.status?.code != 1"
+                @click="show = !show; suspend(slot.gameAccount)" :disabled="loginBtnLoading">暂停</button>
+              <button class="btn btn-outline btn-sm btn-block btn-info" v-else
+                @click="show = !show; gameLogin(slot.gameAccount)"
+                :disabled="loginBtnLoading || getGameByAccount(slot.gameAccount)?.status?.code == 1">启动</button>
+              <button class="btn btn-outline btn-sm btn-block btn-error" disabled>删除</button>
+            </div>
+          </GameAccount>
+        </div>
+        <div
+          class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
+          v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
+          <GamePanel :account="selectGame" :statusCode="selectGameStatusCode" />
+        </div>
+      </div>
+      <dialog ref="closeAnn" class="modal" style="outline-width: 0">
+        <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
+          <h2>平台打烊中</h2>
+          <p>可露希尔大卖场积极维护中，欢迎明天再来！</p>
+          <button class="btn btn-info btn-block mb-3">助力可露希尔砍一刀</button>
+        </div>
+      </dialog>
+      <dialog ref="addModel" class="modal" style="outline-width: 0">
+        <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
+          <GameAdd :is-first="!userQuota?.idServerPhone" :uuid="slotUUID" />
+        </div>
+      </dialog>
+      <dialog ref="realModel" class="modal" style="outline-width: 0">
+        <div class="modal-box">
+          <div class="text-3xl text-info font-bold text-center">归属验证</div>
+          <div class="s-combo mb-6 mt-4">
+            <input class="s-input peer focus:ring-info" v-model="smsCode">
+            <label class="s-label peer-focus:text-info">请输入收到的验证码</label>
           </div>
-        </GameAccount>
+          <button class="btn btn-block btn-info mt-2" @click="smsBtn">确认</button>
+        </div>
+      </dialog>
+      <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
+        <Geetest :captcha-config="captchaConfig" />
       </div>
     </div>
-    <div
-      class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
-      v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
-      <GamePanel :account="selectGame" :statusCode="selectGameStatusCode" />
-    </div>
-  </div>
-  <dialog ref="closeAnn" class="modal" style="outline-width: 0">
-    <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
-      <h2>平台打烊中</h2>
-      <p>可露希尔大卖场积极维护中，欢迎明天再来！</p>
-      <button class="btn btn-info btn-block mb-3">助力可露希尔砍一刀</button>
-    </div>
-  </dialog>
-  <dialog ref="addModel" class="modal" style="outline-width: 0">
-    <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-      <GameAdd :is-first="!userQuota?.idServerPhone" :uuid="slotUUID" />
-    </div>
-  </dialog>
-  <dialog ref="realModel" class="modal" style="outline-width: 0">
-    <div class="modal-box">
-      <div class="text-3xl text-info font-bold text-center">归属验证</div>
-      <div class="s-combo mb-6 mt-4">
-        <input class="s-input peer focus:ring-info" v-model="smsCode">
-        <label class="s-label peer-focus:text-info">请输入收到的验证码</label>
-      </div>
-      <button class="btn btn-block btn-info mt-2" @click="smsBtn">确认</button>
-    </div>
-  </dialog>
-  <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
-    <Geetest :captcha-config="captchaConfig" />
   </div>
 </template>
 <script setup lang="ts">
@@ -117,7 +120,7 @@ const calc = (ts1: number, ts2: number) => {
 }
 const now = Math.round(Date.now() / 1000)
 const loginBtnLoading = ref(false)
-const gameLogin = (game: ApiUser.Game) => {
+const gameLogin = (account: string) => {
   loginBtnLoading.value = true
   window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
@@ -126,12 +129,18 @@ const gameLogin = (game: ApiUser.Game) => {
       loginBtnLoading.value = false
       return;
     }
-    login(token, game.status.account)
+    login(token, account)
   })
 }
 const gameDel = (game: ApiUser.Game) => {
   loginBtnLoading.value = true
 }
+
+const getGameByAccount = (account: string) => {
+  return gameList.value.find(game => game.status.account === account)
+}
+
+
 // 短信验证码
 const smsCode = ref('')
 const smsBtn = () => {
@@ -208,8 +217,9 @@ startSSE(user.value.Token)
 // 账号配置面板
 const selectGame = ref('')
 const selectGameStatusCode = ref(0)
-const openGameConf = (game: ApiUser.Game) => {
-  console.log(game.status.code)
+const openGameConf = (account: string) => {
+  const game = gameList.value.find(game => game.status.account === account)
+  if (!game) return
   selectGame.value = show.value ? '' : game.status.account
   selectGameStatusCode.value = game.status.code
   show.value = !show.value;

@@ -25,7 +25,7 @@
       </tbody>
     </table>
     <button :disabled="!gameLogs.hasMore || isLoadingGameLogs" class="btn btn-info btn-outline btn-block my-1"
-      @click="logsLoad">
+      @click="getLogs">
       {{ '加载更多' }}
     </button>
   </div>
@@ -42,6 +42,7 @@ import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import Config from "./ConfigPanel.vue";
+import { gameList } from "../../plugins/sse";
 interface Props {
   account: string,
   // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -59,52 +60,35 @@ const gameLogs = ref<ApiGame.GameLogs>(
 const isLoadingGameLogs = ref(false)
 const details = ref<ApiGame.Detail>()
 const configModel = ref()
-const editConfig = ref<ApiGame.Config>({
-  accelerate_slot: '',
-  accelerate_slot_cn: '',
-  account: '',
-  allow_login_assist: false,
-  battle_maps: [],
-  enable_building_arrange: false,
-  is_auto_battle: false,
-  is_stopped: false,
-  keeping_ap: 0,
-  map_id: '',
-  recruit_ignore_robot: false,
-  recruit_reserve: 0,
-})
-watch(() => props.account, (account) => {
-  if (account == '') return
-  fetchGameDetails(account).then(res => {
+
+watch(() => {
+  return gameList.value.find(game => game.status.account === props.account);
+}, (newGame) => {
+  if (newGame) {
+    if (newGame.status.code > 1) {
+      getGameDetails();
+    }
+    getLogs();
+  }
+});
+
+const getGameDetails = () => {
+  fetchGameDetails(props.account).then(res => {
     if (res.data) {
       details.value = res.data
-      editConfig.value = res.data.config
-      editConfig.value.battle_maps = JSON.stringify(editConfig.value.battle_maps)
       return
     }
     setMsg(res.message, Type.Warning)
   })
-})
+}
 
-watch(() => props.account, (val) => {
-  if (val == '') return
-  isLoadingGameLogs.value = true
-  fetchGameLogs(val, 0).then(res => {
-    if (res.data) {
-      gameLogs.value = res.data
-      return
-    }
-    setMsg(res.message, Type.Warning)
-  }).finally(() => {
-    isLoadingGameLogs.value = false
-  })
-})
 
-const logsLoad = () => {
+const getLogs = () => {
   if (isLoadingGameLogs.value) return
-  if (gameLogs.value.logs.length == 0) return
   isLoadingGameLogs.value = true
-  fetchGameLogs(props.account, gameLogs.value.logs[gameLogs.value.logs.length - 1].id).then(res => {
+  const lastLogId = gameLogs.value.logs[gameLogs.value.logs.length - 1]?.id || 0; // 设置为0如果为undefined
+
+  fetchGameLogs(props.account, lastLogId).then(res => {
     if (res.data) {
       gameLogs.value.logs.push(...res.data.logs)
       gameLogs.value.hasMore = res.data.hasMore
@@ -113,8 +97,9 @@ const logsLoad = () => {
     setMsg(res.message, Type.Warning)
   }).finally(() => {
     isLoadingGameLogs.value = false
-  })
+  });
 }
+
 
 
 </script>
