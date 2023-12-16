@@ -48,14 +48,22 @@
 
     <div className="flex py-2">
         <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="暴君" />
-        <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
-            <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">
-                {{ stage.code }} {{ stage.name }}
-                <!-- 循环显示 stage.items 中的图片 -->
-                <img v-for="(itemKey, itemIndex) in stage.items" :key="itemIndex" :src="assets.getItemLink(itemKey)"
-                    alt="Item Image" />
-            </option>
-        </select>
+        <div className="dropdown dropdown-hover w-full">
+            <div tabIndex={0} role="button" className="btn btn-outline btn-xs w-full h-8">👇👇👇</div>
+            <ul tabIndex={0} className="dropdown-content z-[1] menu shadow bg-base-100 rounded-box w-full">
+                <li v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key"
+                    @click="addStageToConfig(key)">
+                    <div class="flex items-center space-x-2">
+                        <span>{{ stage.code }} {{ stage.name }}</span>
+                        <template v-for="(itemKey, itemIndex) in stage.items" :key="itemIndex">
+                            <!-- 仅显示最多三个图片 -->
+                            <img v-if="itemIndex < 2" :src="assets.getItemLink(itemKey)" alt="Item Image" class="w-3 h-3" />
+                        </template>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
     </div>
     <div className="divider h-0">作战队列</div>
     <div class="flex flex-wrap">
@@ -106,11 +114,13 @@ const config = ref<ApiUser.GameConfig>({
 
 
 
-const addStageToConfig = (event: Event) => {
-    const selectElement = event.target as HTMLSelectElement;
-    const selectedKey = selectElement.value;
-    if (!config.value.battle_maps.includes(selectedKey)) {
-        config.value.battle_maps.push(selectedKey);
+const addStageToConfig = (code: string | number) => {
+    // if code is number 
+    if (typeof code === "number") {
+        code = code.toString();
+    }
+    if (!config.value.battle_maps.includes(code)) {
+        config.value.battle_maps.push(code);
     }
 };
 
