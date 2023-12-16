@@ -2,6 +2,7 @@ import { computed, ref } from "vue";
 import { setMsg } from "../common";
 import { Type } from "../../components/toast/enmu";
 import { load } from "../axios";
+import constants from "../constants";
 
 const itemData = ref<Gamedata.Items>({});
 const stageData = ref<Gamedata.Stages>({});
@@ -47,11 +48,22 @@ const assets = computed(() => {
     }, {} as Gamedata.Stages);
   };
 
+  const getItemLink = (key: string) => {
+    const item = itemData.value[key];
+    if (!item) {
+      return "";
+    }
+    // https://assets.closure.setonink.com/dst/items/LIMITED_TKT_GACHA_10_2501.webp
+    return `${constants.AssetsHost}/dst/items/${item.icon}.webp`;
+
+  };
+
   return {
     getStageName,
     getItemName,
     getItemIcon,
     filteredStages,
+    getItemLink,
     stages: stageData,
     items: itemData,
   };

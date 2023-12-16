@@ -51,6 +51,9 @@
         <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
             <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">
                 {{ stage.code }} {{ stage.name }}
+                <!-- 循环显示 stage.items 中的图片 -->
+                <img v-for="(itemKey, itemIndex) in stage.items" :key="itemIndex" :src="assets.getItemLink(itemKey)"
+                    alt="Item Image" />
             </option>
         </select>
     </div>
