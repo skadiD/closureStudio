@@ -57,7 +57,7 @@
                         <span>{{ stage.code }} {{ stage.name }}</span>
                         <template v-for="(itemKey, itemIndex) in stage.items" :key="itemIndex">
                             <!-- 仅显示最多三个图片 -->
-                            <img v-if="itemIndex < 2" :src="assets.getItemLink(itemKey)" alt="Item Image" class="w-3 h-3" />
+                            <img v-if="itemIndex < 2" :src="assets.getItemLink(itemKey)" alt="Item Image" class="w-6 h-6" />
                         </template>
                     </div>
                 </li>
