@@ -43,11 +43,6 @@
             </div>
           </GameAccount>
         </div>
-        <div
-          class="bg-base-300 flex-1 flex flex-col ml-4 md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
-          v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
-          <GamePanel :account="selectGame" :statusCode="selectGameStatusCode" />
-        </div>
       </div>
       <dialog ref="closeAnn" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
@@ -74,6 +69,11 @@
       <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
         <Geetest :captcha-config="captchaConfig" />
       </div>
+    </div>
+    <div
+        class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
+        v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
+      <GamePanel :account="selectGame" :statusCode="selectGameStatusCode" />
     </div>
   </div>
 </template>

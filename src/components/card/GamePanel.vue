@@ -4,7 +4,7 @@
   <div class="w-full grid grid-cols-3 justify-items-center">
     <div class="flex flex-col" v-for="m in 3">
       <span class="text-base-content/70 text-xl font-extrabold">{{ ['龙门币', '合成玉', '源石'][m - 1] }}</span>
-      <span class="text-3xl text-center mt-2 font-en">
+      <span class="text-2xl md:text-3xl text-center mt-2 font-en">
         {{ [details?.status?.gold, details?.status?.diamondShard, details?.status?.androidDiamond][m - 1] }}
       </span>
     </div>
