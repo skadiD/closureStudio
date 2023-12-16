@@ -49,10 +49,13 @@
     <div className="flex py-2">
         <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="暴君" />
         <div className="dropdown dropdown-hover w-full">
-            <div tabIndex={0} role="button" className="btn btn-outline btn-xs w-full h-8">👇👇👇</div>
-            <ul tabIndex={0} className="dropdown-content z-[1] menu shadow bg-base-100 rounded-box w-full">
-                <li v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key"
-                    @click="addStageToConfig(key)">
+            <div tabIndex={0} role="button" className="btn btn-outline btn-xs w-full h-8">{{
+                Object.values(assets.filteredStages(stageKeyWord)).length > 0 ?
+                Object.values(assets.filteredStages(stageKeyWord))[0].name :
+                "未知地图" }}</div>
+            <ul tabIndex={0}
+                className="dropdown-content z-[1] menu shadow bg-base-100 rounded-box w-full h-96 overflow-y-auto">
+                <li v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" @click="addStageToConfig(key)">
                     <div class="flex items-center space-x-2">
                         <span>{{ stage.code }} {{ stage.name }}</span>
                         <template v-for="(itemKey, itemIndex) in stage.items" :key="itemIndex">
