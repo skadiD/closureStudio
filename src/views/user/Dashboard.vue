@@ -29,7 +29,7 @@
         {{ userQuota?.slots?.length }} 可用）</div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div v-for="(slot, key) in userQuota?.slots" :key="key">
-          <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userInfo="userQuota" @click="addModel.showModal()" />
+          <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota" :key="key" @click="addModel.showModal()" />
           <GameAccount v-else :game="getGameByAccount(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
             <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
             <div class="grid gap-4 grid-cols-2 mt-2">

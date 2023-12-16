@@ -8,47 +8,48 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 interface Props {
   slot: Registry.Slot,
-  userInfo: Registry.UserInfo,
+  userQuota: Registry.UserInfo,
 }
 const props = withDefaults(defineProps<Props>(), {
   slot: undefined,
-  userInfo: undefined,
+  userQuota: undefined,
 });
 
-const message = ref('')
-const isLocked = ref(true)
-watch([() => props.slot, () => props.userInfo], ([slot, userInfo]) => {
-  if (!slot || !userInfo) {
-    message.value = '添加托管'
+const isLocked = ref(false);
+
+const message = computed(() => {
+  if (!props.userQuota) {
+    isLocked.value = true;
+    return '添加游戏托管';
   }
-  if (slot.ruleFlags.includes("slot_account_format_is_phone") && slot.ruleFlags.includes("slot_account_sms_verified")) {
-    message.value = '添加第一个托管';
-    isLocked.value = false;
-  } else if (slot.ruleFlags.includes("slot_user_sms_verified")) {
-    if (userInfo.idServerPhone) {
-      message.value = '添加游戏托管';
-      isLocked.value = false;
-    } else {
-      message.value = '请完成绑定';
-      isLocked.value = true;
+
+  if (props.slot.ruleFlags.includes("slot_account_format_is_phone") && props.slot.ruleFlags.includes("slot_account_sms_verified")) {
+    return '添加第一个托管';
+  }
+
+  if (props.slot.ruleFlags.includes("slot_user_sms_verified")) {
+    if (props.userQuota.idServerPhone) {
+      return '添加游戏托管';
     }
-  } else if (slot.ruleFlags.includes("slot_user_qq_verified")) {
-    if (!userInfo.idServerPhone) {
-      message.value = '添加游戏托管';
-      isLocked.value = false;
-    } else if (!userInfo.idServerQQ) {
-      message.value = '请完成QQ绑定';
-      isLocked.value = false;
-    } else {
-      message.value = '添加游戏托管';
-      isLocked.value = true;
+    isLocked.value = true;
+    return '请完成绑定';
+  }
+
+  if (props.slot.ruleFlags.includes("slot_user_qq_verified")) {
+    if (props.userQuota.idServerPhone && props.userQuota.idServerQQ) {
+      return '添加游戏托管';
+    }
+    isLocked.value = true;
+    if (!props.userQuota.idServerPhone) {
+      return '请完成绑定';
+    }
+    if (!props.userQuota.idServerQQ) {
+      return '请完成QQ绑定';
     }
   }
-})
-
-
-
+}
+);
 </script>
