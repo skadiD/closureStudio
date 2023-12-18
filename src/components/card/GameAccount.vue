@@ -33,7 +33,7 @@
         <span class="text-md font-bold font-en">{{
           [
             game.status?.ap,
-            getStageName(stages, game.game_config?.map_id) || "未选择",
+            assets.getStageName(game.game_config?.map_id) || "未选择",
             game.status?.text,
           ][m - 1]
         }}</span>
@@ -43,8 +43,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { getStageName } from "../../plugins/common";
-import { stages } from "../../plugins/stage";
+import { assets } from "../../plugins/assets/assets";
 interface Props {
   game: ApiUser.Game;
 }

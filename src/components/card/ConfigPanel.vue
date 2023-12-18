@@ -48,17 +48,31 @@
 
     <div className="flex py-2">
         <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="暴君" />
-        <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
-            <option v-for="(stage, key) in filteredStages" :key="key" :value="key">
-                {{ stage.code }} {{ stage.name }}
-            </option>
-        </select>
+        <div className="dropdown dropdown-hover w-full">
+            <div tabIndex={0} role="button" className="btn btn-outline btn-xs w-full h-8">{{
+                Object.values(assets.filteredStages(stageKeyWord)).length > 0 ?
+                Object.values(assets.filteredStages(stageKeyWord))[0].name :
+                "未知地图" }}</div>
+            <ul tabIndex={0}
+                className="dropdown-content z-[1] menu shadow bg-base-100 rounded-box w-full h-96 overflow-y-auto">
+                <li v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" @click="addStageToConfig(key)">
+                    <div class="flex items-center space-x-2">
+                        <span>{{ stage.code }} {{ stage.name }}</span>
+                        <template v-for="(itemKey, itemIndex) in stage.items" :key="itemIndex">
+                            <!-- 仅显示最多三个图片 -->
+                            <img v-if="itemIndex < 2" :src="assets.getItemLink(itemKey)" alt="Item Image" class="w-6 h-6" />
+                        </template>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
     </div>
     <div className="divider h-0">作战队列</div>
     <div class="flex flex-wrap">
         <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap"
             class="btn btn-outline btn-warning btn-xs m-1">
-            {{ getStageName(stages, battleMap) }}
+            {{ assets.getStageName(battleMap) }}
         </button>
     </div>
 
@@ -74,8 +88,8 @@ import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { gameList } from "../../plugins/sse";
 import { computed } from "vue";
-import { stages } from "../../plugins/stage";
-import { getStageName } from "../../plugins/common";
+import { assets } from "../../plugins/assets/assets";
+
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -103,35 +117,15 @@ const config = ref<ApiUser.GameConfig>({
 
 
 
-const addStageToConfig = (event: Event) => {
-    const selectElement = event.target as HTMLSelectElement;
-    const selectedKey = selectElement.value;
-    if (!config.value.battle_maps.includes(selectedKey)) {
-        config.value.battle_maps.push(selectedKey);
+const addStageToConfig = (code: string | number) => {
+    // if code is number 
+    if (typeof code === "number") {
+        code = code.toString();
+    }
+    if (!config.value.battle_maps.includes(code)) {
+        config.value.battle_maps.push(code);
     }
 };
-
-const filteredStages = computed(() => {
-    // 如果 stageKeyWord 为空，则返回所有 stage（但最多 10 个）
-    if (!stageKeyWord.value.trim()) {
-        return Object.keys(stages.value).reduce((acc, key, index) => {
-            if (index < 10) {
-                acc[key] = stages.value[key];
-            }
-            return acc;
-        }, {} as Gamedata.Stages);
-    }
-
-    // 过滤并返回匹配关键词的 stage（但最多 10 个）
-    let count = 0;
-    return Object.entries(stages.value).reduce((acc, [key, value]) => {
-        if (count < 10 && (key.includes(stageKeyWord.value) || value.code.includes(stageKeyWord.value.toUpperCase()) || value.name.includes(stageKeyWord.value))) {
-            acc[key] = value;
-            count++;
-        }
-        return acc;
-    }, {} as Gamedata.Stages);
-});
 
 watch(() => {
     return gameList.value.find(game => game.status.account === props.account);

@@ -54,6 +54,15 @@ declare namespace Gamedata {
   interface Stages {
     [key: string]: Stage;
   }
+
+  interface Items {
+    [key: string]: Item;
+  }
+
+  interface Item {
+    name: string;
+    icon: string;
+  }
 }
 interface Window {
   grecaptcha: {
