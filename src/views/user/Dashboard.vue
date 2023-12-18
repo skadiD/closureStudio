@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full">
     <div class="w-full flex-col max-w-4xl 2xl:max-w-6xl xl:mr-auto s-margin md:!flex"
-      :class="show ? 'xl:ml-0  !hidden' : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'">
+      :class="show ? 'xl:ml-0 !hidden' : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'">
       <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
         <div class="text-2xl md:text-4xl font-bold text-info mt-3">📢 今日特价</div>
         <p v-for="k in (config.announcement?.split('\n') || ['可露希尔逃跑了'])">{{ k }}</p>
@@ -16,15 +16,7 @@
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
       </div>
-      <div class="my-5 bg-info/5 shadow-md px-4 py-5 flex flex-col relative rounded-lg">
-        <span class="font-bold text-2xl">欢迎来到可露希尔线上零售店</span>
-        <span class="text-2xl text-base-content/60">当前托管运行状况：<b class="text-info">良好</b></span>
-        <div class="mt-8">
-          <span class="font-bold text-2xl md:text-4xl">点击 ↓↓ 查看<span class="text-info">『托管详情』</span></span><br>
-          <img class="absolute right-0 bottom-0 w-28 md:w-36 opacity-10 md:opacity-50 rounded-t-full rounded-bl-full"
-            src="/assets/closure.ico" alt="start">
-        </div>
-      </div>
+      <IndexStatus />
       <div class="text-2xl font-bold">我的托管（{{ userQuota?.slots.filter(slot => slot.gameAccount !== null)?.length }} 已用 /
         {{ userQuota?.slots?.length }} 可用）</div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -44,13 +36,7 @@
           </GameAccount>
         </div>
       </div>
-      <dialog ref="closeAnn" class="modal" style="outline-width: 0">
-        <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
-          <h2>平台打烊中</h2>
-          <p>可露希尔大卖场积极维护中，欢迎明天再来！</p>
-          <button class="btn btn-info btn-block mb-3">助力可露希尔砍一刀</button>
-        </div>
-      </dialog>
+      <NetworkDialog />
       <dialog ref="addModel" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
           <GameAdd :is-first="!userQuota?.idServerPhone" :uuid="slotUUID" />
@@ -78,42 +64,38 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import { reactive, ref } from "vue";
 import { config, gameList, startSSE } from "../../plugins/sse";
-import GameAccount from "../../components/card/GameAccount.vue";
 import 'animate.css';
-import GamePanel from "../../components/card/GamePanel.vue";
 import { userStore } from "../../store/user";
-import { storeToRefs } from "pinia";
-import { Auth_Refresh, Auth_Verify, doGameLogin, doUpdateGameConf, fetchGameDetails, fetchUserSlots } from "../../plugins/axios";
+import { Auth_Refresh, Auth_Verify, doGameLogin, doUpdateGameConf, fetchUserSlots } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../../components/toast/enmu";
-import GameAddCard from "../../components/card/GameAddCard.vue";
-import GameAdd from "../../components/card/GameAdd.vue";
+import { GameAccount, GamePanel, GameAddCard, GameAdd, IndexStatus } from "../../components/card/index"
 import Geetest from "../../components/Geetest.vue";
+import NetworkDialog from "../../components/dialog/NetworkDialog.vue";
 
-const closeAnn = ref()
 const addModel = ref()
 const realModel = ref()
+// PC 侧边显示托管信息
 const show = ref(false)
-const user_ = userStore()
-const { user } = storeToRefs(user_)
-
+const user = userStore()
+startSSE(user.Token)
 const userQuota = ref<Registry.UserInfo>()
+
 // 现在只有第一个账号
 const slotUUID = ref('')
-watch(
-  () => config.value.isUnderMaintenance,
-  (v) => {
-    if (v && !user.value.Info.isAdmin) closeAnn.value.showModal()
-  }
-)
 fetchUserSlots().then(res => {
   if (res.data) userQuota.value = res.data
-  slotUUID.value = res.data?.slots.filter(slot => slot.gameAccount === null && slot.ruleFlags.includes('slot_account_format_is_phone'))[0]?.uuid || ''
+  slotUUID.value = res.data?.slots.filter(
+    slot => slot.gameAccount === null &&
+    slot.ruleFlags.includes('slot_account_format_is_phone')
+  )[0]?.uuid || ''
 })
+// 计算到期时间
 const calc = (ts1: number, ts2: number) => {
   const during = ts1 - ts2;
+  if (during <= 0) return '请先启动游戏托管';
   const hours = Math.floor(during / (60 * 60));
   const minutes = Math.abs(Math.floor((during % (60 * 60)) / 60));
   return `${hours}小时${minutes}分钟`;
@@ -140,18 +122,15 @@ const getGameByAccount = (account: string) => {
   return gameList.value.find(game => game.status.account === account)
 }
 
-
 // 短信验证码
 const smsCode = ref('')
 const smsBtn = () => {
   if (smsCode.value !== '') {
-    Auth_Verify({
-      code: smsCode.value,
-    }).then(res => {
+    Auth_Verify(smsCode.value).then(res => {
       if (res.code === 1) {
         setMsg('认证成功', Type.Success)
         Auth_Refresh().then(res => {
-          if (res.data) user_.login(res.data.token)
+          if (res.data) user.login(res.data.token)
           realModel.value.close()
         })
         return
@@ -202,17 +181,14 @@ const captchaConfig = reactive({
 function captchaHandler(obj: any) {
   window.captchaObj = obj;
   obj.appendTo('#captcha').onSuccess(() => {
-    if (captchaConfig.config.product === 'bind') {
-      const result: object = window.captchaObj.getValidate();
-      if (!result) {
-        setMsg('请完成验证', Type.Warning)
-        return;
-      }
-      login(JSON.stringify(result), captchaConfig.account);
+    const result: object = window.captchaObj.getValidate();
+    if (!result) {
+      setMsg('请完成验证', Type.Warning)
+      return;
     }
+    login(JSON.stringify(result), captchaConfig.account);
   });
 }
-startSSE(user.value.Token)
 
 // 账号配置面板
 const selectGame = ref('')
@@ -220,6 +196,7 @@ const selectGameStatusCode = ref(0)
 const openGameConf = (account: string) => {
   const game = gameList.value.find(game => game.status.account === account)
   if (!game) return
+  // 这些感觉可以再优化下
   selectGame.value = show.value ? '' : game.status.account
   selectGameStatusCode.value = game.status.code
   show.value = !show.value;

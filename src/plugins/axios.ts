@@ -106,8 +106,8 @@ function sse<T>(url: string) {
   return asyncRequest<T>({ url, method: "get", isSSE: true });
 }
 export default service;
-const AuthServer: string = "https://passport.closure.setonink.com/api/v1/";
-const RegistryServer: string = "https://registry.closure.setonink.com/";
+const AuthServer: string = "https://passport.ltsc.vip/api/v1/";
+const RegistryServer: string = "https://registry.ltsc.vip/";
 function del(url: string, params: any) {
   return new Promise((resolve) => {
     service.delete(url, { data: params }).then((res) => {
@@ -176,7 +176,7 @@ const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
     config: game,
   });
 const Auth_Refresh = () => get<ApiUser.Auth>(`${AuthServer}refreshToken`); // RefreshToken
-const Auth_Verify = (params: any) => post(`${AuthServer}phone`, params); // RealSMS
+const Auth_Verify = (code: string) => post(`${AuthServer}phone`, { code }); // RealSMS
 const fetchUserSlots = () =>
   get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
 const fetchGameListBySSE = () => sse<ApiUser.Game[]>("sse/game"); // 实验性获取 GameList

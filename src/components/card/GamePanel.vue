@@ -1,18 +1,21 @@
 <template>
   <a class="text-3xl mt-2 text-info font-bold">托管详情</a>
-  <div class="divider">账号信息</div>
-  <div class="w-full grid grid-cols-3 justify-items-center">
-    <div class="flex flex-col" v-for="m in 3">
-      <span class="text-base-content/70 text-xl font-extrabold">{{ ['龙门币', '合成玉', '源石'][m - 1] }}</span>
-      <span class="text-2xl md:text-3xl text-center mt-2 font-en">
+  <template v-if="selectGame?.status.code || 0 > 1">
+    <div class="divider">账号信息</div>
+    <div class="w-full grid grid-cols-3 justify-items-center">
+      <div class="flex flex-col" v-for="m in 3">
+        <span class="text-base-content/70 text-xl font-extrabold">{{ ['龙门币', '合成玉', '源石'][m - 1] }}</span>
+        <span class="text-2xl md:text-3xl text-center mt-2 font-en">
         {{ [details?.status?.gold, details?.status?.diamondShard, details?.status?.androidDiamond][m - 1] }}
       </span>
+      </div>
     </div>
-  </div>
-  <div class="divider text-info text-lg font-bold"> 理智溢出: {{ formatTime(
-    ((details?.status.maxAp || 0) - (Math.floor((Date.now() / 1000 - (details?.status.lastApAddTime || 0)) / 360) +
-      (details?.status.ap || 0))) * 360 + Math.ceil(Date.now() / 1000)
-    , true) }} </div>
+    <div class="divider text-info text-lg font-bold"> 理智溢出: {{ formatTime(
+        ((details?.status.maxAp || 0) - (Math.floor((Date.now() / 1000 - (details?.status.lastApAddTime || 0)) / 360) +
+            (details?.status.ap || 0))) * 360 + Math.ceil(Date.now() / 1000)
+        , true) }} </div>
+  </template>
+  <div class="divider" v-else>你的游戏尚未启动，请先配置</div>
   <button class="btn btn-info btn-outline btn-block my-1" @click="configModel.showModal()">托管配置</button>
   <div class="divider">不实时日志</div>
   <div class="h-[calc(100vh-28rem)] overflow-y-auto">
@@ -37,7 +40,7 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import {computed, ref, watch} from "vue";
 import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
@@ -51,23 +54,20 @@ const props = withDefaults(defineProps<Props>(), {
   account: '',
 });
 
-const gameLogs = ref<ApiGame.GameLogs>(
-  {
-    logs: [],
-    hasMore: false
-  }
-)
+const gameLogs = ref<ApiGame.GameLogs>({
+  logs: [],
+  hasMore: false
+})
+const selectGame = computed(() => {
+  return gameList.value.find(game => game.status.account === props.account);
+})
 const isLoadingGameLogs = ref(false)
 const details = ref<ApiGame.Detail>()
 const configModel = ref()
 
-watch(() => {
-  return gameList.value.find(game => game.status.account === props.account);
-}, (newGame) => {
-  if (newGame) {
-    if (newGame.status.code > 1) {
-      getGameDetails();
-    }
+watch(() => selectGame.value, (val) => {
+  if (val) {
+    if (val.status.code > 1) getGameDetails();
     getLogs();
   }
 });

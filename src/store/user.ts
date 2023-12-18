@@ -32,5 +32,6 @@ export const userStore = defineStore("user", {
     getters: {
         isLogin: (state) => state.user.isLogin,
         Token: (state) => state.user.Token,
+        isAdmin: (state) => state.user.Info.isAdmin,
     }
 });
