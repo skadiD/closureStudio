@@ -8,15 +8,15 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-  import {watch, ref} from "vue";
-  import {config} from "../../plugins/sse";
-  import {userStore} from "../../store/user";
-  const closeAnn = ref()
-  const user = userStore()
-  watch(
-      () => config.value.isUnderMaintenance,
-      (v) => {
-        if (v && !user.isAdmin) closeAnn.value.showModal()
-      }
-  )
+import { watch, ref } from "vue";
+import { userStore } from "../../store/user";
+import { config } from "../../plugins/sse/sse";
+const closeAnn = ref()
+const user = userStore()
+watch(
+  () => config.value.isUnderMaintenance,
+  (v) => {
+    if (v && !user.isAdmin) closeAnn.value.showModal()
+  }
+)
 </script>

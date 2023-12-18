@@ -87,7 +87,7 @@
   import {onMounted, ref} from "vue";
   import Login from "../components/card/Login.vue";
   import {userStore} from "../store/user";
-  import {config} from "../plugins/sse";
+  import {config} from "../plugins/sse/sse";
   import {fetchSytemList} from "../plugins/axios";
   import {isNight} from "../plugins/common";
   const followBtn = ref(false)   // 启动按钮跟随鼠标

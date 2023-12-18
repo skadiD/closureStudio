@@ -86,7 +86,7 @@ import {
 } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
-import { gameList } from "../../plugins/sse";
+import { gameList } from "../../plugins/sse/sse";
 import { computed } from "vue";
 import { assets } from "../../plugins/assets/assets";
 
@@ -128,7 +128,7 @@ const addStageToConfig = (code: string | number) => {
 };
 
 watch(() => {
-    return gameList.value.find(game => game.status.account === props.account);
+    return gameList.value.find(props.account);
 }, (newGame) => {
     if (newGame) {
         config.value = newGame.game_config;

@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Ref } from "vue";
 import type { AxiosInstance, AxiosError } from "axios";
 import { handleAxiosError } from "./axiosHelper";
-import { config } from "./sse";
+import { config } from "./sse/sse";
 export const service = axios.create({
   baseURL: "https://api.arknights.host/",
 });
@@ -13,7 +13,7 @@ if (user != null) {
     "Bearer " + JSON.parse(user)?.user?.Token;
 }
 service.interceptors.response.use(
-  (response) => {
+  response => {
     if (response.data?.data === undefined) {
       // quota
       const data: any = {
@@ -109,8 +109,8 @@ export default service;
 const AuthServer: string = "https://passport.ltsc.vip/api/v1/";
 const RegistryServer: string = "https://registry.ltsc.vip/";
 function del(url: string, params: any) {
-  return new Promise((resolve) => {
-    service.delete(url, { data: params }).then((res) => {
+  return new Promise(resolve => {
+    service.delete(url, { data: params }).then(res => {
       resolve(res);
     });
   });
@@ -120,8 +120,8 @@ function load<T>(fileName: string): Promise<T> {
   return new Promise((resolve, reject) => {
     axios
       .get(`/data/${fileName}.json`)
-      .then((res) => resolve(res.data as T))
-      .catch((error) => reject(error));
+      .then(res => resolve(res.data as T))
+      .catch(error => reject(error));
   });
 }
 

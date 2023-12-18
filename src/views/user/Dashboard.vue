@@ -6,12 +6,12 @@
         <div class="text-2xl md:text-4xl font-bold text-info mt-3">📢 今日特价</div>
         <p v-for="k in (config.announcement?.split('\n') || ['可露希尔逃跑了'])">{{ k }}</p>
         <div class="divider mt-0">个人信息</div>
-        <p v-if="!userQuota?.idServerPhone && gameList?.length === 1">
-          恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(gameList[0]?.status.created_at + 86400, now) }}】</b>。<br>
-          完成【手机号：{{ gameList[0].status.account?.replace(/(\d{3})\d{6}(\d{2})/, '$1****$2') }}】绑定认证<b
+        <p v-if="!userQuota?.idServerPhone && games.length === 1">
+          恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(games[0]?.status.created_at + 86400, now) }}】</b>。<br>
+          完成【手机号：{{ games[0].status.account?.replace(/(\d{3})\d{6}(\d{2})/, '$1****$2') }}】绑定认证<b
             class="cursor-pointer" @click="realModel.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
-        <p v-if="!gameList?.length">
+        <p v-if="!games?.length">
           你的账号没有完成
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
@@ -22,15 +22,15 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div v-for="(slot, key) in userQuota?.slots" :key="key">
           <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota" :key="key" @click="addModel.showModal()" />
-          <GameAccount v-else :game="getGameByAccount(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
+          <GameAccount v-else :game="gameList.find(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
             <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
             <div class="grid gap-4 grid-cols-2 mt-2">
               <button class="btn btn-outline btn-sm btn-block btn-primary"
-                v-if="getGameByAccount(slot.gameAccount)?.status?.code != 0 && getGameByAccount(slot.gameAccount)?.status?.code != 1"
+                v-if="gameList.find(slot.gameAccount)?.status?.code != 0 && gameList.find(slot.gameAccount)?.status?.code != 1"
                 @click="show = !show; suspend(slot.gameAccount)" :disabled="loginBtnLoading">暂停</button>
               <button class="btn btn-outline btn-sm btn-block btn-info" v-else
                 @click="show = !show; gameLogin(slot.gameAccount)"
-                :disabled="loginBtnLoading || getGameByAccount(slot.gameAccount)?.status?.code == 1">启动</button>
+                :disabled="loginBtnLoading || gameList.find(slot.gameAccount)?.status?.code == 1">启动</button>
               <button class="btn btn-outline btn-sm btn-block btn-error" disabled>删除</button>
             </div>
           </GameAccount>
@@ -65,7 +65,7 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { config, gameList, startSSE } from "../../plugins/sse";
+import { config, gameList } from "../../plugins/sse/sse";
 import 'animate.css';
 import { userStore } from "../../store/user";
 import { Auth_Refresh, Auth_Verify, doGameLogin, doUpdateGameConf, fetchUserSlots } from "../../plugins/axios";
@@ -80,7 +80,8 @@ const realModel = ref()
 // PC 侧边显示托管信息
 const show = ref(false)
 const user = userStore()
-startSSE(user.Token)
+gameList.value.startSSE(user.Token)
+const games = gameList.value.data.value;
 const userQuota = ref<Registry.UserInfo>()
 
 // 现在只有第一个账号
@@ -118,9 +119,6 @@ const gameDel = (game: ApiUser.Game) => {
   loginBtnLoading.value = true
 }
 
-const getGameByAccount = (account: string) => {
-  return gameList.value.find(game => game.status.account === account)
-}
 
 // 短信验证码
 const smsCode = ref('')
@@ -194,7 +192,7 @@ function captchaHandler(obj: any) {
 const selectGame = ref('')
 const selectGameStatusCode = ref(0)
 const openGameConf = (account: string) => {
-  const game = gameList.value.find(game => game.status.account === account)
+  const game = gameList.value.find(account)
   if (!game) return
   // 这些感觉可以再优化下
   selectGame.value = show.value ? '' : game.status.account
