@@ -10,13 +10,13 @@
             <div className="label">
                 <span className="label-text">理智保留</span>
             </div>
-            <input v-model="config.keeping_ap" type="text" className="input input-sm input-bordered w-full max-w-xs" />
+            <input v-model="config.keeping_ap" type="number" className="input input-sm input-bordered w-full max-w-xs" />
         </label>
         <label className="form-control w-full max-w-xs">
             <div className="label">
                 <span className="label-text">招募卷保留</span>
             </div>
-            <input v-model="config.recruit_reserve" type="text" className="input input-sm input-bordered w-full max-w-xs" />
+            <input v-model="config.recruit_reserve" type="number" className="input input-sm input-bordered w-full max-w-xs" />
         </label>
     </div>
     <div className="divider h-0">智能开关</div>
@@ -64,7 +64,7 @@
     </div>
 
 
-    <a className="btn btn-block btn-info mt-4" @click="submit">递交</a>
+    <a className="btn btn-block btn-info mt-4" @click="onSubmit">递交</a>
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
@@ -129,7 +129,15 @@ watch(() => {
 const removeBattleMap = (battleMap: string) => {
     config.value.battle_maps = config.value.battle_maps.filter(item => item !== battleMap);
 };
-const submit = () => {
+const onSubmit = () => {
+    if (config.value.keeping_ap < 0) {
+        setMsg("理智保留不能小于0", Type.Warning);
+        return;
+    }
+    if (config.value.recruit_reserve < 0) {
+        setMsg("招募卷保留不能小于0", Type.Warning);
+        return;
+    }
     const copyConfig = JSON.parse(JSON.stringify(config.value));
     delete copyConfig.is_stopped;
     delete copyConfig.map_id;
