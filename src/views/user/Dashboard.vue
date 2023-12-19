@@ -59,7 +59,7 @@
     <div
         class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
         v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
-      <GamePanel :account="selectGame" :statusCode="selectGameStatusCode" />
+      <GamePanel :account="selectGame" />
     </div>
   </div>
 </template>
@@ -190,13 +190,11 @@ function captchaHandler(obj: any) {
 
 // 账号配置面板
 const selectGame = ref('')
-const selectGameStatusCode = ref(0)
 const openGameConf = (account: string) => {
   const game = gameList.value.find(account)
   if (!game) return
   // 这些感觉可以再优化下
   selectGame.value = show.value ? '' : game.status.account
-  selectGameStatusCode.value = game.status.code
   show.value = !show.value;
 }
 </script>

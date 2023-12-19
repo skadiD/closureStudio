@@ -1,19 +1,19 @@
 <template>
   <a class="text-3xl mt-2 text-info font-bold">托管详情</a>
-  <template v-if="selectGame?.status.code || 0 > 1">
+  <template v-if="selectedGame?.status.code || 0 > 1">
     <div class="divider">账号信息</div>
     <div class="w-full grid grid-cols-3 justify-items-center">
       <div class="flex flex-col" v-for="m in 3">
         <span class="text-base-content/70 text-xl font-extrabold">{{ ['龙门币', '合成玉', '源石'][m - 1] }}</span>
         <span class="text-2xl md:text-3xl text-center mt-2 font-en">
-        {{ [details?.status?.gold, details?.status?.diamondShard, details?.status?.androidDiamond][m - 1] }}
-      </span>
+          {{ [details?.status?.gold, details?.status?.diamondShard, details?.status?.androidDiamond][m - 1] }}
+        </span>
       </div>
     </div>
     <div class="divider text-info text-lg font-bold"> 理智溢出: {{ formatTime(
-        ((details?.status.maxAp || 0) - (Math.floor((Date.now() / 1000 - (details?.status.lastApAddTime || 0)) / 360) +
-            (details?.status.ap || 0))) * 360 + Math.ceil(Date.now() / 1000)
-        , true) }} </div>
+      ((details?.status.maxAp || 0) - (Math.floor((Date.now() / 1000 - (details?.status.lastApAddTime || 0)) / 360) +
+        (details?.status.ap || 0))) * 360 + Math.ceil(Date.now() / 1000)
+      , true) }} </div>
   </template>
   <div class="divider" v-else>你的游戏尚未启动，请先配置</div>
   <button class="btn btn-info btn-outline btn-block my-1" @click="configModel.showModal()">托管配置</button>
@@ -40,7 +40,7 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import {computed, ref, watch} from "vue";
+import { computed, ref, watch } from "vue";
 import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
@@ -58,46 +58,53 @@ const gameLogs = ref<ApiGame.GameLogs>({
   logs: [],
   hasMore: false
 })
-const selectGame = gameList.value.find(props.account)
+const selectedGame = ref<ApiUser.Game>()
 const isLoadingGameLogs = ref(false)
 const details = ref<ApiGame.Detail>()
 const configModel = ref()
 
-watch(() => selectGame?.status.code, (val) => {
-  if (val) {
-    if (val > 1) getGameDetails();
-    getLogs();
+watch(() => props.account, (newVal) => {
+  selectedGame.value = gameList.value.find(newVal)
+  if (selectedGame.value?.status?.code && selectedGame.value?.status?.code > 1) {
+    getGameDetails()
+    getLogs()
   }
-});
+})
 
-const getGameDetails = () => {
-  fetchGameDetails(props.account).then(res => {
+const getGameDetails = async () => {
+  try {
+    const res = await fetchGameDetails(props.account);
     if (res.data) {
-      details.value = res.data
-      return
+      details.value = res.data;
+    } else {
+      setMsg(res.message, Type.Warning);
     }
-    setMsg(res.message, Type.Warning)
-  })
-}
+  } catch (error) {
+    reportError(error)
+  }
+};
 
 
-const getLogs = () => {
-  if (isLoadingGameLogs.value) return
-  isLoadingGameLogs.value = true
+
+const getLogs = async () => {
+  if (isLoadingGameLogs.value) return;
+  isLoadingGameLogs.value = true;
   const lastLogId = gameLogs.value.logs[gameLogs.value.logs.length - 1]?.id || 0; // 设置为0如果为undefined
 
-  fetchGameLogs(props.account, lastLogId).then(res => {
+  try {
+    const res = await fetchGameLogs(props.account, lastLogId);
     if (res.data) {
-      gameLogs.value.logs.push(...res.data.logs)
-      gameLogs.value.hasMore = res.data.hasMore
-      return
+      gameLogs.value.logs.push(...res.data.logs);
+      gameLogs.value.hasMore = res.data.hasMore;
+    } else {
+      setMsg(res.message, Type.Warning);
     }
-    setMsg(res.message, Type.Warning)
-  }).finally(() => {
-    isLoadingGameLogs.value = false
-  });
-}
-
+  } catch (error) {
+    reportError(error)
+  } finally {
+    isLoadingGameLogs.value = false;
+  }
+};
 
 
 </script>

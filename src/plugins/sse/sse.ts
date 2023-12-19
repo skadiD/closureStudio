@@ -5,12 +5,14 @@ import { userStore } from "../../store/user";
 import { router } from "../router";
 const config = ref<ApiSystem.Config>({} as ApiSystem.Config);
 const gameListData = ref<ApiUser.Game[]>([]);
+let event: EventSource | null = null;
 
 const gameList = computed(() => {
-  let event: EventSource | null = null;
   const user = userStore();
   const find = (gameAccount: string) => {
-    return gameListData.value.find(game => game.status.account === gameAccount);
+    return gameListData.value.find(
+      (game) => game.status.account === gameAccount
+    );
   };
 
   const startSSE = (token: string) => {
@@ -37,12 +39,11 @@ const gameList = computed(() => {
       event = new EventSource(
         `https://api.arknights.host/sse/games?token=${token}`
       );
-      event.onopen = e => {
+      event.onopen = (e) => {
         setMsg("链接到服务器成功", Type.Success);
-
       };
       // 根据收到的消息解析操作：更新游戏列表 & 掐断链接
-      event.addEventListener("game", event => {
+      event.addEventListener("game", (event) => {
         gameListData.value = JSON.parse(event.data);
         console.log(JSON.parse(event.data));
       });
@@ -50,7 +51,7 @@ const gameList = computed(() => {
         setMsg("你已在其他窗口或设备访问，本页面暂停更新", Type.Warning);
         event?.close();
       });
-      event.onerror = e => {
+      event.onerror = (e) => {
         setMsg("与服务器通信中断", Type.Alert);
       };
     }
