@@ -49,11 +49,11 @@
     <div className="flex py-2">
         <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="暴君" />
         <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
+            <option key="-- 请选择地图 --" value="-- 请选择地图 --">-- 请选择地图 --</option> 
             <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">
                 {{ stage.code }} {{ stage.name }}
             </option>
         </select>
-
     </div>
     <div className="divider h-0">作战队列</div>
     <div class="flex flex-wrap">
@@ -107,6 +107,9 @@ const config = ref<ApiUser.GameConfig>({
 const addStageToConfig = (event: Event) => {
     const selectElement = event.target as HTMLSelectElement;
     const selectedKey = selectElement.value;
+    if (selectedKey === "-- 请选择地图 --") {
+        return;
+    }
     if (!config.value.battle_maps.includes(selectedKey)) {
         config.value.battle_maps.push(selectedKey);
     }
