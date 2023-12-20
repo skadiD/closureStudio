@@ -47,7 +47,7 @@
     <div className="divider h-2">作战地图</div>
 
     <div className="flex py-2">
-        <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="暴君" />
+        <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="-- 请输入代号\名称--" />
         <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
             <option key="-- 请选择地图 --" value="-- 请选择地图 --">-- 请选择地图 --</option> 
             <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">
