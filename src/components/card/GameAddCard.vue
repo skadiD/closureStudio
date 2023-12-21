@@ -9,6 +9,8 @@
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { userStore } from "../../store/user";
+import { allowGameCreate } from "../../plugins/quota/quota";
 interface Props {
   slot: Registry.Slot,
   userQuota: Registry.UserInfo,
@@ -17,39 +19,13 @@ const props = withDefaults(defineProps<Props>(), {
   slot: undefined,
   userQuota: undefined,
 });
-
+const user = userStore();
 const isLocked = ref(false);
 
 const message = computed(() => {
-  if (!props.userQuota) {
-    isLocked.value = true;
-    return '添加游戏托管';
-  }
-
-  if (props.slot.ruleFlags.includes("slot_account_format_is_phone") && props.slot.ruleFlags.includes("slot_account_sms_verified")) {
-    return '添加第一个托管';
-  }
-
-  if (props.slot.ruleFlags.includes("slot_user_sms_verified")) {
-    if (props.userQuota.idServerPhone) {
-      return '添加游戏托管';
-    }
-    isLocked.value = true;
-    return '请完成绑定';
-  }
-
-  if (props.slot.ruleFlags.includes("slot_user_qq_verified")) {
-    if (props.userQuota.idServerPhone && props.userQuota.idServerQQ) {
-      return '添加游戏托管';
-    }
-    isLocked.value = true;
-    if (!props.userQuota.idServerPhone) {
-      return '请完成绑定';
-    }
-    if (!props.userQuota.idServerQQ) {
-      return '请完成QQ绑定';
-    }
-  }
+  const response = allowGameCreate(props.slot, props.userQuota, user.isVerify);
+  isLocked.value = response.isLocked;
+  return response.message;
 }
 );
 </script>

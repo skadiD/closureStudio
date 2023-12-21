@@ -27,7 +27,7 @@ declare namespace ApiUser {
         uuid: string;
         email: string;
         permission: number;
-        status: number;
+        status: number; // 0封禁 -1未验证手机 1正常  2人工验证
         isAdmin: boolean;
         exp: number;
         slot: number

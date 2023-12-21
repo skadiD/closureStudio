@@ -29,7 +29,9 @@
         <a href="/blog/Terms&Policies" target="_blank" class="s-underline">用户协议</a>、
         <a href="/blog/FAQ" target="_blank" class="s-underline">常见问题</a>
       </p>
-      <p class="skd-title">具有一定阅读理解能力，已阅读<a class="text-info" href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md">《提问的智慧》</a>，能基于此与本团队反馈问题</p>
+      <p class="skd-title">具有一定阅读理解能力，已阅读<a class="text-info"
+          href="https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md">《提问的智慧》</a>，能基于此与本团队反馈问题
+      </p>
     </div>
   </div>
   <div class="flex-1 mb-4" />
@@ -37,7 +39,7 @@
     <span v-if="loading" class="loading loading-bars" />
     明日方舟，启动
   </button>
-  <dialog v-if="isFirst" ref="confirm" class="modal" style="outline-width: 0" >
+  <dialog v-if="isFirst" ref="confirm" class="modal" style="outline-width: 0">
     <div class="bg-base-100 mx-4 p-4 shadow-lg max-w-md rounded-lg">
       <div class="text-3xl text-warning font-bold text-center mt-2">温馨提示</div>
       <div class="divider" />
@@ -58,12 +60,12 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {ref} from "vue";
-import {doAddGame} from "../../plugins/axios";
-import {setMsg} from "../../plugins/common";
-import {Type} from "../toast/enmu";
-import {useRouter} from "vue-router";
-import {reactive} from "vue";
+import { ref } from "vue";
+import { doAddGame } from "../../plugins/axios";
+import { setMsg } from "../../plugins/common";
+import { Type } from "../toast/enmu";
+import { useRouter } from "vue-router";
+import { reactive } from "vue";
 import Geetest from "../Geetest.vue";
 interface Props {
   uuid: string
@@ -91,6 +93,8 @@ const confirmBtn = () => {
     setMsg('请输入正确的文本', Type.Warning)
   }
 }
+
+
 const addGame = (token: string) => {
   doAddGame(props.uuid, token, form.value).then(res => {
     loading.value = false
@@ -99,10 +103,13 @@ const addGame = (token: string) => {
     } else {
       if (res.message === 'reCAPTCHA认证无效') {
         window.captchaObj.showCaptcha();
-        return
+      } else {
+        setMsg(res.message, Type.Warning)
       }
-      setMsg(res.message, Type.Warning)
     }
+  }).catch(e => {
+    loading.value = false
+    setMsg('密码编码失败', Type.Warning)
   })
 }
 const start = async () => {
@@ -120,7 +127,7 @@ const start = async () => {
   }
   loading.value = true
   window.grecaptcha?.ready(async () => {
-    const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', {action: 'submit'})
+    const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
     if (token === '') {
       setMsg('pirnt（\'图灵测试エロ,请检查你的 Network")', Type.Warning)
       loading.value = false
@@ -129,6 +136,8 @@ const start = async () => {
     addGame(token)
   })
 }
+
+
 const captchaConfig = reactive({
   config: {
     captchaId: 'd8551513acc423d24401e9622cddd45c',
@@ -136,6 +145,7 @@ const captchaConfig = reactive({
   },
   handler: captchaHandler
 });
+
 function captchaHandler(obj: any) {
   window.captchaObj = obj;
   obj.appendTo('#captcha').onSuccess(() => {

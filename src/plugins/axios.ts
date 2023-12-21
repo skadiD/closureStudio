@@ -13,7 +13,7 @@ if (user != null) {
     "Bearer " + JSON.parse(user)?.user?.Token;
 }
 service.interceptors.response.use(
-  response => {
+  (response) => {
     if (response.data?.data === undefined) {
       // quota
       const data: any = {
@@ -109,8 +109,8 @@ export default service;
 const AuthServer: string = "https://passport.ltsc.vip/api/v1/";
 const RegistryServer: string = "https://registry.ltsc.vip/";
 function del(url: string, params: any) {
-  return new Promise(resolve => {
-    service.delete(url, { data: params }).then(res => {
+  return new Promise((resolve) => {
+    service.delete(url, { data: params }).then((res) => {
       resolve(res);
     });
   });
@@ -120,8 +120,8 @@ function load<T>(fileName: string): Promise<T> {
   return new Promise((resolve, reject) => {
     axios
       .get(`/data/${fileName}.json`)
-      .then(res => resolve(res.data as T))
-      .catch(error => reject(error));
+      .then((res) => resolve(res.data as T))
+      .catch((error) => reject(error));
   });
 }
 
@@ -140,7 +140,6 @@ const fetchAnnounce = () => get("Common/Announcement"); // Announce
 const fetchGameLogs = (account: string, id: number) =>
   get<ApiGame.GameLogs>(`game/log/${account}/${id}`);
 const fetchGameList = () => get<ApiUser.Game[]>(`game`); // GameList
-const doDelGame = (params: any) => del("Game", params); // Del
 const fetchGameScreen = (account: string, platform: string) =>
   get(`Game/Screenshot/${account}/${platform}`); // GetScreen
 const fetchDetails = (account: string, platform: string) =>
@@ -171,6 +170,12 @@ const doGameLogin = (token: string, account: string) =>
   captcha(`game/login/${account}`, token, null); // GameLogin
 const doAddGame = (slot: string, token: string, params: any) =>
   captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
+
+const doDelGame = (slot: string, token: string) =>
+  captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
+    account: null,
+  });
+
 const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
   post(`game/config/${account}`, {
     config: game,
@@ -191,6 +196,6 @@ export {
   fetchUserSlots,
   fetchGameDetails,
 };
-export { doAddGame, doGameLogin, doUpdateGameConf };
+export { doAddGame, doGameLogin, doDelGame, doUpdateGameConf };
 export { fetchGameLogs };
 export { load };

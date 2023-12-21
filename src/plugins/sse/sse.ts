@@ -3,6 +3,7 @@ import { setMsg } from "../common";
 import { Type } from "../../components/toast/enmu";
 import { userStore } from "../../store/user";
 import { router } from "../router";
+import { userQuota } from "../quota/userQuota";
 const config = ref<ApiSystem.Config>({} as ApiSystem.Config);
 const gameListData = ref<ApiUser.Game[]>([]);
 let event: EventSource | null = null;
@@ -46,6 +47,7 @@ const gameList = computed(() => {
       event.addEventListener("game", (event) => {
         gameListData.value = JSON.parse(event.data);
         console.log(JSON.parse(event.data));
+        userQuota.value.queryMe();
       });
       event.addEventListener("close", () => {
         setMsg("你已在其他窗口或设备访问，本页面暂停更新", Type.Warning);
