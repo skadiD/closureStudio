@@ -12,15 +12,15 @@
           {{ k }}
         </p>
         <div class="divider mt-0">个人信息</div>
-        <p v-if="user.info.status === -1">
+        <p v-if="user.info.status === 0">
           o(╥﹏╥)o 你的账号已被封禁，如有疑问请联系管理员
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
-        <p v-if="user.info.status === 0 && games.length === 0">
+        <p v-if="user.info.status === -1 && games.length === 0">
           你的账号没有完成
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
-        <p v-if="user.info.status === 0 && games.length === 1">
+        <p v-if="user.info.status === -1 && games.length === 1">
           恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(games[0]?.status.created_at + 86400, now) }}】</b>。<br />
           完成【手机号：{{
             games[0].status.account?.replace(/(\d{3})\d{6}(\d{2})/, "$1****$2")
