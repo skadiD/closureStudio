@@ -12,7 +12,7 @@
 <script setup lang="ts">
 import { loadTheme } from "./plugins/common";
 import Docker from "./components/toast/Docker.vue";
-import { config } from "./plugins/sse/sse";
+import { config } from "./plugins/sse";
 import { fetchSytemConfig } from "./plugins/axios";
 import { loadAssets } from "./plugins/assets/assets";
 import Geetest from "./components/Geetest.vue";

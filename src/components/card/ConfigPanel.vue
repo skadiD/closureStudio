@@ -1,25 +1,23 @@
 <template>
-    <h3 className="font-bold text-2xl">托管配置</h3>
-    <div role="alert" className="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
+    <h3 class="font-bold text-2xl">托管配置</h3>
+    <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
         当前配置界面为究极无敌盖中盖版本，请在专家指导下使用
     </div>
-
-
-    <div className="flex">
-        <label className="form-control w-full max-w-xs mr-4">
-            <div className="label">
-                <span className="label-text">理智保留</span>
+    <div class="flex">
+        <label class="form-control w-full max-w-xs mr-4">
+            <div class="label">
+                <span class="label-text">理智保留</span>
             </div>
-            <input v-model="config.keeping_ap" type="number" className="input input-sm input-bordered w-full max-w-xs" />
+            <input v-model="config.keeping_ap" type="number" class="input input-sm input-bordered w-full max-w-xs" />
         </label>
-        <label className="form-control w-full max-w-xs">
-            <div className="label">
-                <span className="label-text">招募卷保留</span>
+        <label class="form-control w-full max-w-xs">
+            <div class="label">
+                <span class="label-text">招募卷保留</span>
             </div>
-            <input v-model="config.recruit_reserve" type="number" className="input input-sm input-bordered w-full max-w-xs" />
+            <input v-model="config.recruit_reserve" type="number" class="input input-sm input-bordered w-full max-w-xs" />
         </label>
     </div>
-    <div className="divider h-0">智能开关</div>
+    <div class="divider h-0">智能开关</div>
     <div class="grid grid-cols-2 gap-4 h-8">
         <label class="label cursor-pointer mb-4">
             <span class="label-text">自动基建</span>
@@ -32,30 +30,30 @@
         </label>
     </div>
 
-    <div className="grid grid-cols-2 gap-4 h-8">
-        <label className="label cursor-pointer mb-4">
-            <span className="label-text">忽略机器人</span>
-            <input v-model="config.recruit_ignore_robot" type="checkbox" className="toggle toggle-sm" />
+    <div class="grid grid-cols-2 gap-4 h-8">
+        <label class="label cursor-pointer mb-4">
+            <span class="label-text">忽略机器人</span>
+            <input v-model="config.recruit_ignore_robot" type="checkbox" class="toggle toggle-sm" />
         </label>
 
-        <label className="label cursor-pointer mb-4">
-            <span className="label-text">允许他人协助登录</span>
-            <input v-model="config.allow_login_assist" type="checkbox" className="toggle toggle-sm" />
+        <label class="label cursor-pointer mb-4">
+            <span class="label-text">允许他人协助登录</span>
+            <input v-model="config.allow_login_assist" type="checkbox" class="toggle toggle-sm" />
         </label>
     </div>
 
-    <div className="divider h-2">作战地图</div>
+    <div class="divider h-2">作战地图</div>
 
-    <div className="flex py-2">
-        <input v-model="stageKeyWord" className="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="-- 请输入代号\名称--" />
-        <select className="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
+    <div class="flex py-2">
+        <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="-- 请输入代号\名称--" />
+        <select class="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
             <option key="-- 请选择地图 --" value="-- 请选择地图 --">-- 请选择地图 --</option> 
             <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">
                 {{ stage.code }} {{ stage.name }}
             </option>
         </select>
     </div>
-    <div className="divider h-0">作战队列</div>
+    <div class="divider h-0">作战队列</div>
     <div class="flex flex-wrap">
         <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap"
             class="btn btn-outline btn-warning btn-xs m-1">
@@ -64,7 +62,7 @@
     </div>
 
 
-    <a className="btn btn-block btn-info mt-4" @click="onSubmit">递交</a>
+    <a class="btn btn-block btn-info mt-4" @click="onSubmit">递交</a>
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
@@ -73,7 +71,7 @@ import {
 } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
-import { gameList } from "../../plugins/sse/sse";
+import {findGame, gameList} from "../../plugins/sse";
 import { computed } from "vue";
 import { assets } from "../../plugins/assets/assets";
 
@@ -116,7 +114,7 @@ const addStageToConfig = (event: Event) => {
 };
 
 watch(() => {
-    return gameList.value.find(props.account);
+    return findGame(props.account);
 }, (newGame) => {
     if (newGame) {
         config.value = newGame.game_config;

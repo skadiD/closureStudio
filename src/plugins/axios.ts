@@ -2,7 +2,7 @@ import axios from "axios";
 import type { Ref } from "vue";
 import type { AxiosInstance, AxiosError } from "axios";
 import { handleAxiosError } from "./axiosHelper";
-import { config } from "./sse/sse";
+import { config } from "./sse";
 export const service = axios.create({
   baseURL: "https://api.arknights.host/",
 });

@@ -14,16 +14,15 @@
         <div class="divider mt-0">个人信息</div>
         <p v-if="user.info.status === 0">
           o(╥﹏╥)o 你的账号已被封禁，如有疑问请联系管理员
-          <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
-        <p v-if="user.info.status === -1 && games.length === 0">
+        <p v-if="user.info.status === -1 && gameList?.length === 0">
           你的账号没有完成
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
-        <p v-if="user.info.status === -1 && games.length === 1">
-          恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(games[0]?.status.created_at + 86400, now) }}】</b>。<br />
+        <p v-if="user.info.status === -1 && gameList?.length === 1">
+          恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
           完成【手机号：{{
-            games[0].status.account?.replace(/(\d{3})\d{6}(\d{2})/, "$1****$2")
+            gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/, "$1****$2")
           }}】绑定认证<b class="cursor-pointer" @click="realModel.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
         <p v-if="user.info.status >= 1">
@@ -41,24 +40,17 @@
         <div v-for="(slot, key) in userQuota.data.value?.slots" :key="key">
           <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota.data.value" :key="key"
             @click="addGameOnClick(slot, slot.uuid)" />
-          <GameAccount v-else :game="gameList.find(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
+          <GameAccount v-else :game="findGame(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
             <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">
               START
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-              <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="gameList.find(slot.gameAccount)?.status?.code != 0 &&
-                gameList.find(slot.gameAccount)?.status?.code != 1
-                " @click="
-    show = !show;
-  suspend(slot.gameAccount);
-  " :disabled="loginBtnLoading">
+              <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="findGame(slot.gameAccount)?.status?.code != 0 && findGame(slot.gameAccount)?.status?.code != 1
+                " @click="show = !show;suspend(slot.gameAccount)" :disabled="loginBtnLoading">
                 暂停
               </button>
               <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="
-                show = !show;
-              gameLogin(slot.gameAccount);
-              " :disabled="loginBtnLoading ||
-  gameList.find(slot.gameAccount)?.status?.code == 1
+                show = !show;gameLogin(slot.gameAccount);" :disabled="loginBtnLoading || findGame(slot.gameAccount)?.status?.code == 1
   ">
                 启动
               </button>
@@ -72,7 +64,7 @@
       <NetworkDialog />
       <dialog ref="addModel" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" />
+          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => {addModel.close()}" />
         </div>
       </dialog>
       <dialog ref="realModel" class="modal" style="outline-width: 0">
@@ -95,54 +87,39 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, reactive, ref, toDisplayString } from "vue";
-import { config, gameList } from "../../plugins/sse/sse";
+import {ref} from "vue";
+import {config, findGame, gameList, startSSE} from "../../plugins/sse";
 import "animate.css";
-import { userStore } from "../../store/user";
-import {
-  Auth_Refresh,
-  Auth_Verify,
-  doDelGame,
-  doGameLogin,
-  doUpdateGameConf,
-  fetchUserSlots,
-} from "../../plugins/axios";
-import { setMsg } from "../../plugins/common";
-import { Type } from "../../components/toast/enmu";
-import {
-  GameAccount,
-  GamePanel,
-  GameAddCard,
-  GameAdd,
-  IndexStatus,
-} from "../../components/card/index";
-import Geetest from "../../components/Geetest.vue";
+import {userStore} from "../../store/user";
+import {Auth_Refresh, Auth_Verify, doDelGame, doGameLogin, doUpdateGameConf,} from "../../plugins/axios";
+import {setMsg} from "../../plugins/common";
+import {Type} from "../../components/toast/enmu";
+import {GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus,} from "../../components/card/index";
 import NetworkDialog from "../../components/dialog/NetworkDialog.vue";
-import { allowGameCreate } from "../../plugins/quota/quota";
+import {allowGameCreate} from "../../plugins/quota/quota";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
-import { userQuota } from "../../plugins/quota/userQuota";
-import { watch } from "fs";
+import {userQuota} from "../../plugins/quota/userQuota";
+
 const addModel = ref();
 const realModel = ref();
 const show = ref(false);
 const user = userStore();
-const games = gameList.value.data.value;
 
 const selectedSlotUUID = ref("");
 
-// start 
-gameList.value.startSSE(user.token);
+// start
+startSSE(user);
 
 const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
   if (!userQuota.value.data.value) {
-    setMsg("创建凭据为空，无法继续", Type.Warning);
+    setMsg("游戏托管槽位数据异常，无法提交", Type.Warning);
     return;
-  };
+  }
   const response = allowGameCreate(
     slot,
     userQuota.value.data.value,
     user.isVerify
-  );
+  )
   if (response.isLocked) {
     setMsg(response.message, Type.Warning);
     return;
@@ -153,6 +130,7 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
 
 // 计算到期时间
 const calc = (ts1: number, ts2: number) => {
+  ts1 += 86400;
   const during = ts1 - ts2;
   if (during <= 0) return "请先启动游戏托管";
   const hours = Math.floor(during / (60 * 60));
@@ -234,9 +212,10 @@ const deleteGame = async (token: string, slotUUID: string) => {
       if (Object.hasOwnProperty.call(res.data, "err")) {
         window.captchaObj.showCaptcha();
       }
-    } else {
-      window.captchaObj.showCaptcha();
+      setMsg('删除成功', Type.Success)
+      return
     }
+    window.captchaObj.showCaptcha();
   }).catch(e => {
     setMsg('验证失败', Type.Warning)
   })
@@ -244,6 +223,7 @@ const deleteGame = async (token: string, slotUUID: string) => {
 
 
 const deleteOnClick = async (slotUUID: string) => {
+  setMsg('删除中...', Type.Warning)
   updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID));
   window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute(
@@ -257,8 +237,6 @@ const deleteOnClick = async (slotUUID: string) => {
     deleteGame(token, slotUUID);
   });
 };
-
-
 
 // geetest
 const geetestDeleteGameOnSuccess = (slotUUID: string) => {
@@ -276,7 +254,7 @@ const geetestLoginGameOnSuccess = (gameAccount: string) => {
 // 账号配置面板
 const selectGame = ref("");
 const openGameConf = (account: string) => {
-  const game = gameList.value.find(account);
+  const game = findGame(account);
   if (!game) return;
   // 这些感觉可以再优化下
   selectGame.value = show.value ? "" : game.status.account;

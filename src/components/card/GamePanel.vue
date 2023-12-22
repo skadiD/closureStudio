@@ -40,12 +40,12 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import Config from "./ConfigPanel.vue";
-import { gameList } from "../../plugins/sse/sse";
+import { findGame } from "../../plugins/sse";
 interface Props {
   account: string,
   // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -64,7 +64,7 @@ const details = ref<ApiGame.Detail>()
 const configModel = ref()
 
 watch(() => props.account, (newVal) => {
-  selectedGame.value = gameList.value.find(newVal)
+  selectedGame.value = findGame(newVal)
   if (selectedGame.value?.status?.code && selectedGame.value?.status?.code > 1) {
     getGameDetails()
     getLogs()

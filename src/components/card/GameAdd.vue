@@ -57,12 +57,10 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
-import { doAddGame } from "../../plugins/axios";
-import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
-import { useRouter } from "vue-router";
-import { reactive } from "vue";
+import {ref} from "vue";
+import {doAddGame} from "../../plugins/axios";
+import {setMsg} from "../../plugins/common";
+import {Type} from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 
 interface AddGameForm {
@@ -74,15 +72,16 @@ interface AddGameForm {
 interface Props {
   uuid: string
   isFirst: boolean
+  close: Function
 }
 const props = withDefaults(defineProps<Props>(), {
   uuid: '',
-  isFirst: true
+  isFirst: true,
+  close: () => {}
 });
 const confirm = ref()
 const confirmText = ref('')
 const loading = ref(false)
-const router = useRouter()
 const form = ref<AddGameForm>({
   account: '',
   password: '',
@@ -107,15 +106,16 @@ const addGame = (token: string) => {
       if (Object.hasOwnProperty.call(res.data, "err")) {
         window.captchaObj.showCaptcha();
       }
-    } else {
-      window.captchaObj.showCaptcha();
+      setMsg('账号托管提交成功', Type.Success)
+      props.close()
+      return
     }
-  }).catch(e => {
-    loading.value = false
-    setMsg('密码编码失败', Type.Warning)
+    window.captchaObj.showCaptcha();
   })
+  // 有全局拦截器 catch不到东西的
 }
 const start = async () => {
+  loading.value = true
   if (props.isFirst && confirmText.value == '') {
     confirm.value.showModal()
     return
@@ -128,12 +128,15 @@ const start = async () => {
     setMsg('请填写登录信息', Type.Warning)
     return;
   }
-  loading.value = true
   updateCaptchaHandler(geetestAddGameOnSuccess(props.uuid, form.value));
-
   window.grecaptcha?.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
-    window.captchaObj.showCaptcha();
+    if (token === "") {
+      setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
+      loading.value = false;
+      return;
+    }
+    addGame(token)
   })
 }
 const geetestAddGameOnSuccess = (uuid: string, form: AddGameForm) => {

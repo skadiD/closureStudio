@@ -10,7 +10,7 @@
 <script lang="ts" setup>
 import { watch, ref } from "vue";
 import { userStore } from "../../store/user";
-import { config } from "../../plugins/sse/sse";
+import { config } from "../../plugins/sse";
 const closeAnn = ref()
 const user = userStore()
 watch(
