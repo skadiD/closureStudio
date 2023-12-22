@@ -27,7 +27,8 @@
             </div>
             <span class="text-base-content/40 text-center">登录&注册有问题？点击查看
               <a href="/blog/FAQ" target="_blank" class="s-underline">常见问题</a></span>
-            <a class="btn btn-block btn-info" @click="loginBtn">登录</a>
+            <a class="btn btn-block btn-info" @click="loginBtn">
+              <span v-if="isLoading" class="loading loading-bars" />登录</a>
           </div>
         </div>
       </div>
@@ -58,7 +59,8 @@
             </div>
             <span class="text-base-content/40 text-center">登录&注册有问题？点击查看
               <a href="/blog/FAQ" target="_blank" class="s-underline">常见问题</a></span>
-            <a class="btn btn-block btn-info" @click="regBtn">注册</a>
+            <a class="btn btn-block btn-info" @click="regBtn"><span v-if="isLoading"
+                class="loading loading-bars" />注册</a>
           </div>
         </div>
       </div>
@@ -70,51 +72,60 @@
 </template>
 
 <script setup lang="ts">
-  import {ref} from "vue";
-  import {setMsg} from "../../plugins/common";
-  import {Type} from "../toast/enmu";
-  import Docker from "../toast/Docker.vue";
-  import {Auth_Login, Auth_Register} from "../../plugins/axios";
-  import {userStore} from "../../store/user";
-  import {useRouter} from "vue-router";
-  // @ts-ignore
-  const isLogin = ref(true)
-  const loginParams = ref({
-    email: '',
-    password: ''
-  })
-  const regParams = ref({
-    email: '',
-    password: '',
-    noise: '',
-    sign: ''
-  })
-  const user = userStore()
-  const router = useRouter()
-  const loginBtn = () => {
-    Auth_Login(loginParams.value).then(res => {
-      if (res.data) {
-        setMsg('登录成功', Type.Success)
-        user.login(res.data.token)
-        router.push('/dashboard')
-        return
-      }
-      setMsg(res.message, Type.Info)
-    })
-  }
-  const regBtn = () => {
-    // @ts-ignore
-    regParams.value.noise = window.idaks?.join('')
-    // @ts-ignore
-    regParams.value.sign = window.skadi(regParams.value.email + "&" + regParams.value.password + "&" + regParams.value.noise)
-    Auth_Register(regParams.value).then(res => {
-      if (res.code === 0 || !res.data) {
-        setMsg(res.message || '注册失败', Type.Warning)
-        return;
-      }
-      setMsg('注册成功', Type.Success)
+import { ref } from "vue";
+import { setMsg } from "../../plugins/common";
+import { Type } from "../toast/enmu";
+import Docker from "../toast/Docker.vue";
+import { Auth_Login, Auth_Register } from "../../plugins/axios";
+import { userStore } from "../../store/user";
+import { useRouter } from "vue-router";
+// @ts-ignore
+const isLogin = ref(true)
+const loginParams = ref({
+  email: '',
+  password: ''
+})
+const regParams = ref({
+  email: '',
+  password: '',
+  noise: '',
+  sign: ''
+})
+const user = userStore()
+const router = useRouter()
+const isLoading = ref(false)
+const loginBtn = () => {
+  if (isLoading.value) return
+  isLoading.value = true
+  Auth_Login(loginParams.value).then(res => {
+    if (res.data) {
+      setMsg('登录成功', Type.Success)
       user.login(res.data.token)
       router.push('/dashboard')
-    })
-  }
+      return
+    }
+    setMsg(res.message, Type.Info)
+  }).finally(() => {
+    isLoading.value = false
+  })
+}
+const regBtn = () => {
+  if (isLoading.value) return
+  isLoading.value = true
+  // @ts-ignore
+  regParams.value.noise = window.idaks?.join('')
+  // @ts-ignore
+  regParams.value.sign = window.skadi(regParams.value.email + "&" + regParams.value.password + "&" + regParams.value.noise)
+  Auth_Register(regParams.value).then(res => {
+    if (res.code === 0 || !res.data) {
+      setMsg(res.message || '注册失败', Type.Warning)
+      return;
+    }
+    setMsg('注册成功', Type.Success)
+    user.login(res.data.token)
+    router.push('/dashboard')
+  }).finally(() => {
+    isLoading.value = false
+  })
+}
 </script>
