@@ -21,6 +21,7 @@ const startSSE = (user: any) => {
     // check user.user.exp is expired or not? this is utc time 1703262578
     if (user.user.Info.exp < Math.floor(Date.now() / 1000)) {
       setMsg("登录已过期，请重新登录", Type.Warning);
+      user.logout()
       router.push("/");
       return false;
     }
