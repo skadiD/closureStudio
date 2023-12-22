@@ -87,9 +87,6 @@
           </button>
         </div>
       </dialog>
-      <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
-        <Geetest :captcha-config="captchaConfig" />
-      </div>
     </div>
     <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
       v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
@@ -122,7 +119,7 @@ import {
 import Geetest from "../../components/Geetest.vue";
 import NetworkDialog from "../../components/dialog/NetworkDialog.vue";
 import { allowGameCreate } from "../../plugins/quota/quota";
-import createCaptchaHandler from "../../plugins/geetest/captcha";
+import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { watch } from "fs";
 const addModel = ref();
@@ -166,7 +163,7 @@ const now = Math.round(Date.now() / 1000);
 const loginBtnLoading = ref(false);
 
 const gameLogin = (account: string) => {
-  captchaConfig.handler = () => { geetestLoginGameOnSuccess(account) }
+  updateCaptchaHandler(geetestLoginGameOnSuccess(account));
   loginBtnLoading.value = true;
   window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute(
@@ -221,7 +218,6 @@ const login = (token: string, account: string) => {
       // router.go(0)
     } else {
       if (res.message === "人机验证失败") {
-        captchaConfig.account = account;
         window.captchaObj.showCaptcha();
         return;
       }
@@ -233,7 +229,6 @@ const login = (token: string, account: string) => {
 
 
 const deleteGame = async (token: string, slotUUID: string) => {
-  captchaConfig.handler = () => { geetestDeleteGameOnSuccess(slotUUID) }
   doDelGame(slotUUID, token).then(res => {
     if (res.code === 1) {
       if (Object.hasOwnProperty.call(res.data, "err")) {
@@ -249,6 +244,7 @@ const deleteGame = async (token: string, slotUUID: string) => {
 
 
 const deleteOnClick = async (slotUUID: string) => {
+  updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID));
   window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute(
       "6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN",
@@ -272,20 +268,9 @@ const geetestDeleteGameOnSuccess = (slotUUID: string) => {
 }
 const geetestLoginGameOnSuccess = (gameAccount: string) => {
   return (geetestToken: string) => {
-    login(geetestToken, gameAccount)
+    doGameLogin(geetestToken, gameAccount)
   }
 }
-
-const captchaConfig = reactive({
-  config: {
-    captchaId: "d8551513acc423d24401e9622cddd45c",
-    product: "bind",
-  },
-  account: "",
-  handler: () => { },
-});
-
-
 
 
 // 账号配置面板

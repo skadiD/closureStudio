@@ -55,9 +55,6 @@
       <button class="btn btn-block btn-warning" @click="confirmBtn">确认</button>
     </div>
   </dialog>
-  <div id="captcha" :class="{ 'h-0': captchaConfig.config.product === 'bind' }">
-    <Geetest :captcha-config="captchaConfig" />
-  </div>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
@@ -66,7 +63,14 @@ import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { useRouter } from "vue-router";
 import { reactive } from "vue";
-import Geetest from "../Geetest.vue";
+import updateCaptchaHandler from "../../plugins/geetest/captcha";
+
+interface AddGameForm {
+  account: string
+  password: string
+  platform: number
+}
+
 interface Props {
   uuid: string
   isFirst: boolean
@@ -79,11 +83,12 @@ const confirm = ref()
 const confirmText = ref('')
 const loading = ref(false)
 const router = useRouter()
-const form = ref({
+const form = ref<AddGameForm>({
   account: '',
   password: '',
   platform: 1
 })
+
 const confirmBtn = () => {
   if (confirmText.value === '我确信我的手机号可收到验证码') {
     confirm.value.close()
@@ -99,13 +104,11 @@ const addGame = (token: string) => {
   doAddGame(props.uuid, token, form.value).then(res => {
     loading.value = false
     if (res.code === 1) {
-      setMsg('登记成功', Type.Success)
-    } else {
-      if (res.message === 'reCAPTCHA认证无效') {
+      if (Object.hasOwnProperty.call(res.data, "err")) {
         window.captchaObj.showCaptcha();
-      } else {
-        setMsg(res.message, Type.Warning)
       }
+    } else {
+      window.captchaObj.showCaptcha();
     }
   }).catch(e => {
     loading.value = false
@@ -126,37 +129,17 @@ const start = async () => {
     return;
   }
   loading.value = true
+  updateCaptchaHandler(geetestAddGameOnSuccess(props.uuid, form.value));
+
   window.grecaptcha?.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
-    if (token === '') {
-      setMsg('pirnt（\'图灵测试エロ,请检查你的 Network")', Type.Warning)
-      loading.value = false
-      return;
-    }
-    addGame(token)
+    window.captchaObj.showCaptcha();
   })
 }
-
-
-const captchaConfig = reactive({
-  config: {
-    captchaId: 'd8551513acc423d24401e9622cddd45c',
-    product: 'bind'
-  },
-  handler: captchaHandler
-});
-
-function captchaHandler(obj: any) {
-  window.captchaObj = obj;
-  obj.appendTo('#captcha').onSuccess(() => {
-    if (captchaConfig.config.product === 'bind') {
-      const result: object = window.captchaObj.getValidate();
-      if (!result) {
-        setMsg('请完成验证', Type.Warning)
-        return;
-      }
-      addGame(JSON.stringify(result));
-    }
-  });
+const geetestAddGameOnSuccess = (uuid: string, form: AddGameForm) => {
+  return (geetestToken: string) => {
+    doAddGame(uuid, geetestToken, form)
+  }
 }
+
 </script>

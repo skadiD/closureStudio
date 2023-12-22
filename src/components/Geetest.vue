@@ -1,17 +1,13 @@
 <template>
-  <div class="captcha" />
+  <div class="captcha"> </div>
 </template>
 <script lang="ts" setup>
-  import {onMounted} from "vue";
+import { onMounted, onUnmounted } from "vue";
+onMounted(() => {
+  console.log("组件已挂载");
+});
 
-  const prop = defineProps<{
-    captchaConfig: {
-      config: any
-      handler: any
-    }
-  }>()
-  onMounted(() => {
-    //@ts-ignore
-    window.initGeetest4(prop.captchaConfig.config, prop.captchaConfig.handler)
-  })
+onUnmounted(() => {
+  console.log("组件即将卸载");
+});
 </script>
