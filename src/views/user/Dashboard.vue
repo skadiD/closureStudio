@@ -1,8 +1,8 @@
 <template>
   <div class="flex h-full">
     <div class="w-full flex-col max-w-4xl 2xl:max-w-6xl xl:mr-auto s-margin md:!flex" :class="show
-      ? 'xl:ml-0 !hidden'
-      : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'
+        ? 'xl:ml-0 !hidden'
+        : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'
       ">
       <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
         <div class="text-2xl md:text-4xl font-bold text-info mt-3">
@@ -12,9 +12,9 @@
           {{ k }}
         </p>
         <div class="divider mt-0">个人信息</div>
-        <p v-if="user.info.status === 0">
+        <!-- <p v-if="user.info.status === 0">
           o(╥﹏╥)o 你的账号已被封禁，如有疑问请联系管理员
-        </p>
+        </p> -->
         <p v-if="user.info.status === -1 && gameList?.length === 0">
           你的账号没有完成
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
@@ -22,7 +22,10 @@
         <p v-if="user.info.status === -1 && gameList?.length === 1">
           恭喜你添加了第一个账号！验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
           完成【手机号：{{
-            gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/, "$1****$2")
+            gameList[0]?.status.account?.replace(
+              /(\d{3})\d{6}(\d{2})/,
+              "$1****$2"
+            )
           }}】绑定认证<b class="cursor-pointer" @click="realModel.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
         <p v-if="user.info.status >= 1">
@@ -32,7 +35,9 @@
       <IndexStatus />
       <div class="text-2xl font-bold">
         我的托管（{{
-          userQuota.data.value?.slots.filter((slot) => slot.gameAccount !== null)?.length
+          userQuota.data.value?.slots.filter(
+            (slot) => slot.gameAccount !== null
+          )?.length
         }}
         已用 / {{ userQuota.data.value?.slots?.length }} 可用）
       </div>
@@ -45,16 +50,23 @@
               START
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-              <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="findGame(slot.gameAccount)?.status?.code != 0 && findGame(slot.gameAccount)?.status?.code != 1
-                " @click="show = !show;suspend(slot.gameAccount)" :disabled="loginBtnLoading">
+              <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="findGame(slot.gameAccount)?.status?.code != 0 &&
+                findGame(slot.gameAccount)?.status?.code != 1
+                " @click="
+    show = !show;
+  suspend(slot.gameAccount);
+  " :disabled="isLoading">
                 暂停
               </button>
               <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="
-                show = !show;gameLogin(slot.gameAccount);" :disabled="loginBtnLoading || findGame(slot.gameAccount)?.status?.code == 1
+                show = !show;
+              gameLogin(slot.gameAccount);
+              " :disabled="isLoading || findGame(slot.gameAccount)?.status?.code == 1
   ">
                 启动
               </button>
-              <button class="btn btn-outline btn-sm btn-block btn-error" @click.stop="deleteOnClick(slot.uuid)">
+              <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error"
+                @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">
                 删除
               </button>
             </div>
@@ -64,7 +76,10 @@
       <NetworkDialog />
       <dialog ref="addModel" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => {addModel.close()}" />
+          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => {
+              addModel.close();
+            }
+            " />
         </div>
       </dialog>
       <dialog ref="realModel" class="modal" style="outline-width: 0">
@@ -87,19 +102,32 @@
   </div>
 </template>
 <script setup lang="ts">
-import {ref} from "vue";
-import {config, findGame, gameList, startSSE} from "../../plugins/sse";
+import { ref } from "vue";
+import { config, findGame, gameList, startSSE } from "../../plugins/sse";
 import "animate.css";
-import {userStore} from "../../store/user";
-import {Auth_Refresh, Auth_Verify, doDelGame, doGameLogin, doUpdateGameConf,} from "../../plugins/axios";
-import {setMsg} from "../../plugins/common";
-import {Type} from "../../components/toast/enmu";
-import {GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus,} from "../../components/card/index";
+import { userStore } from "../../store/user";
+import {
+  Auth_Refresh,
+  Auth_Verify,
+  doDelGame,
+  doGameLogin,
+  doUpdateGameConf,
+} from "../../plugins/axios";
+import { setMsg } from "../../plugins/common";
+import { Type } from "../../components/toast/enmu";
+import {
+  GameAccount,
+  GameAdd,
+  GameAddCard,
+  GamePanel,
+  IndexStatus,
+} from "../../components/card/index";
 import NetworkDialog from "../../components/dialog/NetworkDialog.vue";
-import {allowGameCreate} from "../../plugins/quota/quota";
+import { allowGameCreate } from "../../plugins/quota/quota";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
-import {userQuota} from "../../plugins/quota/userQuota";
-
+import { userQuota } from "../../plugins/quota/userQuota";
+import { canDeleteGame } from "../../plugins/quota/quota";
+import { NOTIFY } from "../../plugins/config";
 const addModel = ref();
 const realModel = ref();
 const show = ref(false);
@@ -119,7 +147,7 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
     slot,
     userQuota.value.data.value,
     user.isVerify
-  )
+  );
   if (response.isLocked) {
     setMsg(response.message, Type.Warning);
     return;
@@ -138,11 +166,11 @@ const calc = (ts1: number, ts2: number) => {
   return `${hours}小时${minutes}分钟`;
 };
 const now = Math.round(Date.now() / 1000);
-const loginBtnLoading = ref(false);
+const isLoading = ref(false);
 
 const gameLogin = (account: string) => {
   updateCaptchaHandler(geetestLoginGameOnSuccess(account));
-  loginBtnLoading.value = true;
+  isLoading.value = true;
   window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute(
       "6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN",
@@ -150,10 +178,11 @@ const gameLogin = (account: string) => {
     );
     if (token === "") {
       setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
-      loginBtnLoading.value = false;
+      isLoading.value = false;
       return;
     }
     login(token, account);
+    // window.captchaObj.showCaptcha();
   });
 };
 
@@ -178,19 +207,19 @@ const smsBtn = () => {
 };
 
 const suspend = (account: string) => {
-  loginBtnLoading.value = true;
+  isLoading.value = true;
   const config: ApiGame.Config = {
     is_stopped: true,
   };
   doUpdateGameConf(account, config).then((res) => {
-    loginBtnLoading.value = false;
+    isLoading.value = false;
     setMsg(res.message, Type.Info);
   });
 };
 
 const login = (token: string, account: string) => {
   doGameLogin(token, account).then((res) => {
-    loginBtnLoading.value = false;
+    isLoading.value = false;
     if (res.code === 1) {
       setMsg("启动成功", Type.Success);
       // router.go(0)
@@ -204,26 +233,36 @@ const login = (token: string, account: string) => {
   });
 };
 
-
-
 const deleteGame = async (token: string, slotUUID: string) => {
-  doDelGame(slotUUID, token).then(res => {
-    if (res.code === 1) {
-      if (Object.hasOwnProperty.call(res.data, "err")) {
-        window.captchaObj.showCaptcha();
+  doDelGame(slotUUID, token)
+    .then((res) => {
+      if (res.code === 1) {
+        if (Object.hasOwnProperty.call(res.data, "err")) {
+          window.captchaObj.showCaptcha();
+        }
+        isLoading.value = false;
+        setMsg("删除成功", Type.Success);
+        return;
       }
-      setMsg('删除成功', Type.Success)
-      return
-    }
-    window.captchaObj.showCaptcha();
-  }).catch(e => {
-    setMsg('验证失败', Type.Warning)
-  })
-}
+      window.captchaObj.showCaptcha();
+    })
+    .catch((e) => {
+      setMsg("验证失败", Type.Warning);
+    });
+};
 
+const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
+  // can you delete it?
+  if (userQuota.value.data.value === undefined) {
+    setMsg("游戏托管槽位数据异常，无法提交", Type.Warning);
+    return;
+  }
 
-const deleteOnClick = async (slotUUID: string) => {
-  setMsg('删除中...', Type.Warning)
+  if (!canDeleteGame(userQuota.value.data.value, gameAccount)) {
+    setMsg(NOTIFY.NOT_ALLOW_DELETE_GAME, Type.Warning);
+    return;
+  }
+  isLoading.value = true;
   updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID));
   window.grecaptcha.ready(async () => {
     const token = await window.grecaptcha.execute(
@@ -235,21 +274,21 @@ const deleteOnClick = async (slotUUID: string) => {
       return;
     }
     deleteGame(token, slotUUID);
+    // window.captchaObj.showCaptcha();
   });
 };
 
 // geetest
 const geetestDeleteGameOnSuccess = (slotUUID: string) => {
   return (geetestToken: string) => {
-    doDelGame(slotUUID, geetestToken)
-  }
-}
+    deleteGame(geetestToken, slotUUID);
+  };
+};
 const geetestLoginGameOnSuccess = (gameAccount: string) => {
   return (geetestToken: string) => {
-    doGameLogin(geetestToken, gameAccount)
-  }
-}
-
+    doGameLogin(geetestToken, gameAccount);
+  };
+};
 
 // 账号配置面板
 const selectGame = ref("");

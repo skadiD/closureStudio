@@ -2,7 +2,7 @@ import { computed, ref } from "vue";
 import { setMsg } from "../common";
 import { Type } from "../../components/toast/enmu";
 import { load } from "../axios";
-import constants from "../constants";
+import { constants } from "../config";
 
 const itemData = ref<Gamedata.Items>({});
 const stageData = ref<Gamedata.Stages>({});

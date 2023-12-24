@@ -137,6 +137,7 @@ const start = async () => {
       return;
     }
     addGame(token)
+    // window.captchaObj.showCaptcha();
   })
 }
 const geetestAddGameOnSuccess = (uuid: string, form: AddGameForm) => {

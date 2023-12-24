@@ -41,3 +41,11 @@ export const ERROR_STATUS = {
 
 /** 不弹出错误信息的code */
 export const NO_ERROR_MSG_CODE: (string | number)[] = [];
+
+export const constants = {
+    AssetsHost: "https://assets.closure.setonink.com",
+};
+
+export const NOTIFY = {
+    NOT_ALLOW_DELETE_GAME: "你不能删除这个账号",
+}

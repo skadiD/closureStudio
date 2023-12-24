@@ -3,6 +3,22 @@ export interface canAddGameResult {
   isLocked: boolean;
 }
 
+export const canDeleteGame = (
+  userQuota: Registry.UserInfo,
+  gameAccount: string
+) => {
+  if (!userQuota) {
+    return false;
+  }
+  if (userQuota.idServerPhone.toString() === gameAccount) {
+    return false;
+  }
+  if (userQuota.idServerPhone.toString() === "") {
+    return true;
+  }
+  return true;
+};
+
 export const allowGameCreate = (
   slot: Registry.Slot,
   userQuota: Registry.UserInfo,
