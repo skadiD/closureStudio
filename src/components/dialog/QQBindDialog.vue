@@ -7,7 +7,7 @@
       </div>
       <div v-if="!isLoading">
         <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
-          请点击下方QQ进行复制, 并发送到QQ官方群组中。
+          请点击下方QQ进行代码复制, 并发送到QQ官方群组中。
           <div class="flex justify-center">
             <p target="_blank" @click="copyQQCodeAndOpenLink"
               href="https://qm.qq.com/cgi-bin/qm/qr?k=YNU1S-_hVFD89w3cj8-ewkPFXXSiBRbY&jump_from=webapi&authKey=BU70QS4whXzJIi62KWNd9h8HZB5Vl2FSnjlrqYYf08RL5tbxnZhf2NMr9uLJNoYu">
