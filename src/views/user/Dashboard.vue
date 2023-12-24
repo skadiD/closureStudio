@@ -29,7 +29,7 @@
           }}】绑定认证<b class="cursor-pointer" @click="RealNameRef.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
         <p v-if="user.info.status === 1 && userQuota.data.value?.idServerQQ.length === 0">
-          完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="qqModel.showModal()">👉点我解锁👈</b>提升托管数量
+          完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="QQBindRef.showModal()">👉点我解锁👈</b>提升托管数量
         </p>
         <p v-if="user.info.status >= 1">
           恭喜你完成了验证，你可以启动游戏进行托管。
@@ -118,10 +118,8 @@ import { userQuota } from "../../plugins/quota/userQuota";
 import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
 const addModel = ref();
-const qqModel = ref();
 const show = ref(false);
 const user = userStore();
-
 const selectedSlotUUID = ref("");
 
 // start
