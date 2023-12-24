@@ -40,6 +40,7 @@ export function SetTheme(name: string) {
 export function getTheme() {
   return localStorage.getItem("theme");
 }
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const isNight =
   new Date().getHours() >= 22 || new Date().getHours() <= 6;
