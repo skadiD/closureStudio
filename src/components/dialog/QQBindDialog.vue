@@ -7,10 +7,16 @@
       </div>
       <div v-if="!isLoading">
         <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
-          请点击下方代码进行复制,并在QQ官方群组
-          <a target="_blank" @click="copyQQCodeAndOpenLink"
-            href="https://qm.qq.com/cgi-bin/qm/qr?k=YNU1S-_hVFD89w3cj8-ewkPFXXSiBRbY&jump_from=webapi&authKey=BU70QS4whXzJIi62KWNd9h8HZB5Vl2FSnjlrqYYf08RL5tbxnZhf2NMr9uLJNoYu">[1345795]</a>
-          <a href="qq://group/?code=450555868" target="_blank">[450555868]</a> 中进行发送。
+          请点击下方QQ进行复制, 并发送到QQ官方群组中。
+          <div class="flex justify-center">
+            <p target="_blank" @click="copyQQCodeAndOpenLink"
+              href="https://qm.qq.com/cgi-bin/qm/qr?k=YNU1S-_hVFD89w3cj8-ewkPFXXSiBRbY&jump_from=webapi&authKey=BU70QS4whXzJIi62KWNd9h8HZB5Vl2FSnjlrqYYf08RL5tbxnZhf2NMr9uLJNoYu">
+              <Icon icon="bi:tencent-qq" width="48" height="48" />
+            </p>
+            <p href="qq://group/?code=450555868" target="_blank">
+              <Icon icon="bi:tencent-qq" width="48" height="48" />
+            </p>
+          </div>
         </div>
         <p @click="copyQQCode">{{ qqCode }}</p>
         <button @click="QQBindRef.close()" class="btn btn-info btn-block mb-3">关闭</button>
@@ -27,7 +33,7 @@ import { userQuota } from '../../plugins/quota/userQuota';
 import { NOTIFY } from '../../plugins/config';
 import { setMsg, sleep } from '../../plugins/common';
 import { Type } from '../toast/enmu';
-
+import { Icon } from '@iconify/vue';
 
 const qqCode = ref('')
 const isLoading = ref(true)
@@ -56,6 +62,7 @@ onUnmounted(() => {
 
 watch(() => isOpen.value, (isOpen) => {
   if (isOpen) {
+    fetchQQBindCode();
     intervalId = window.setInterval(getQQBindCode, 5000);
   } else {
     if (intervalId) {
@@ -87,7 +94,6 @@ const getQQBindCode = () => {
     qqCode.value = quota.idServerQQ
     return
   }
-  isLoading.value = true
   fetchQQBindCode().then((res) => {
     if (res.code === 1) {
       qqCode.value = res.data as string
@@ -95,9 +101,12 @@ const getQQBindCode = () => {
     }
     if (res.code === 2) {
       qqCode.value = NOTIFY.ALREADY_BIND_QQ
+      if (intervalId) {
+        clearInterval(intervalId);
+        intervalId = null;
+      }
       return
     }
-
   }).finally(() => {
     isLoading.value = false
   })

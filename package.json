@@ -32,6 +32,7 @@
     "workbox-routing": "^7.0.0"
   },
   "devDependencies": {
+    "@iconify/vue": "^4.1.1",
     "@types/node": "^20.8.9",
     "@types/qs": "^6.9.9",
     "@vitejs/plugin-vue": "^4.4.0",
