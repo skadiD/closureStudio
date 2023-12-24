@@ -182,6 +182,10 @@ const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
   });
 const Auth_Refresh = () => get<ApiUser.Auth>(`${AuthServer}refreshToken`); // RefreshToken
 const Auth_Verify = (code: string) => post(`${AuthServer}phone`, { code }); // RealSMS
+
+// qq bind
+const fetchQQBindCode = () => get(`${AuthServer}qq`); // QQBindCode // get qqcode
+
 const fetchUserSlots = () =>
   get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
 const fetchGameListBySSE = () => sse<ApiUser.Game[]>("sse/game"); // 实验性获取 GameList
@@ -196,6 +200,6 @@ export {
   fetchUserSlots,
   fetchGameDetails,
 };
-export { doAddGame, doGameLogin, doDelGame, doUpdateGameConf };
+export { doAddGame, doGameLogin, doDelGame, doUpdateGameConf,fetchQQBindCode };
 export { fetchGameLogs };
 export { load };

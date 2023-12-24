@@ -145,8 +145,8 @@ declare namespace Registry {
     interface UserInfo {
         createdAt: number;
         idServerPermission: number;
-        idServerPhone: number;
-        idServerQQ: number;
+        idServerPhone: string;
+        idServerQQ: string;
         idServerStatus: number;
         ruleFlags: [];
         rules: [];
