@@ -1,5 +1,5 @@
 <template>
-  <dialog :ref="qqModel" class="modal" style="outline-width: 0">
+  <dialog ref="QQBindRef" class="modal" style="outline-width: 0">
     <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
       <h2>QQ 绑定</h2>
       <p>{{ qqCode }}</p>
@@ -9,13 +9,7 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-
-interface Props {
-  qqModel: any
-}
-const props = withDefaults(defineProps<Props>(), {
-  qqModel: null
-});
+import { QQBindRef } from './index'
 const qqCode = ref('123456')
 </script>
   

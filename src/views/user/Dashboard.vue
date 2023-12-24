@@ -26,7 +26,7 @@
               /(\d{3})\d{6}(\d{2})/,
               "$1****$2"
             )
-          }}】绑定认证<b class="cursor-pointer" @click="realModel.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
+          }}】绑定认证<b class="cursor-pointer" @click="RealNameRef.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
         <p v-if="user.info.status === 1 && userQuota.data.value?.idServerQQ.length === 0">
           完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="qqModel.showModal()">👉点我解锁👈</b>提升托管数量
@@ -79,25 +79,11 @@
       <NetworkDialog />
       <dialog ref="addModel" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => {
-            addModel.close();
-          }
-            " />
+          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => {addModel.close()}" />
         </div>
       </dialog>
-      <dialog ref="realModel" class="modal" style="outline-width: 0">
-        <div class="modal-box">
-          <div class="text-3xl text-info font-bold text-center">归属验证</div>
-          <div class="s-combo mb-6 mt-4">
-            <input class="s-input peer focus:ring-info" v-model="smsCode" />
-            <label class="s-label peer-focus:text-info">请输入收到的验证码</label>
-          </div>
-          <button class="btn btn-block btn-info mt-2" @click="smsBtn">
-            确认
-          </button>
-        </div>
-      </dialog>
-      <QQBindDialog :qqModel="qqModel"/>
+      <RealNameDialog />
+      <QQBindDialog />
     </div>
     <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
       v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
@@ -111,15 +97,13 @@ import { config, findGame, gameList, startSSE } from "../../plugins/sse";
 import "animate.css";
 import { userStore } from "../../store/user";
 import {
-  Auth_Refresh,
-  Auth_Verify,
   doDelGame,
   doGameLogin,
   doUpdateGameConf,
 } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../../components/toast/enmu";
-import QQBindDialog from "../../components/dialog/QQBindDialog.vue";
+import { QQBindDialog, QQBindRef, RealNameDialog, RealNameRef } from "../../components/dialog";
 import {
   GameAccount,
   GameAdd,
@@ -133,9 +117,7 @@ import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
-
 const addModel = ref();
-const realModel = ref();
 const qqModel = ref();
 const show = ref(false);
 const user = userStore();
@@ -194,25 +176,6 @@ const gameLogin = (account: string) => {
   });
 };
 
-// 短信验证码
-const smsCode = ref("");
-const smsBtn = () => {
-  if (smsCode.value !== "") {
-    Auth_Verify(smsCode.value).then((res) => {
-      if (res.code === 1) {
-        setMsg("认证成功", Type.Success);
-        Auth_Refresh().then((res) => {
-          if (res.data) user.login(res.data.token);
-          realModel.value.close();
-        });
-        return;
-      }
-      setMsg(res.message, Type.Warning);
-    });
-    return;
-  }
-  setMsg("请输入验证码", Type.Warning);
-};
 
 const suspend = (account: string) => {
   isLoading.value = true;
