@@ -6,8 +6,8 @@
             <div v-if="props.screenShots.length > 0 && props.screenShots[0].fileName">
                 <div class="carousel w-full flex justify-center">
                     <div v-for="(fileName, index) in props.screenShots[0].fileName" :key="index"
-                        class="carousel-item w-full">
-                        <div v-show="!imageLoaded[index]" class="loading loading-bars loading-lg">123</div>
+                        class="carousel-item w-full flex justify-center">
+                        <div v-show="!imageLoaded[index]" class="loading loading-bars loading-lg"></div>
                         <img :src="getBattleScreenShotsLink(props.screenShots[0].host, fileName)" class="w-full"
                             v-show="imageLoaded[index]" @load="onImageLoad(index)" />
                     </div>
