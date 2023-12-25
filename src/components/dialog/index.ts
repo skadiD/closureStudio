@@ -6,11 +6,13 @@ import RealNameDialog from "./RealNameDialog.vue";
 import BattleScreenShotsDialog from "./BattleScreenShotsDialog.vue";
 import ConfigDialog from "./ConfigDialog.vue";
 import UpdateGamePasswdDialog from "./UpdateGamePasswdDialog.vue";
+import YouMayKnowDialog from "./YouMayKnowDialog.vue";
 let QQBindRef = ref();
 let BattleScreenShotsRef = ref();
 let RealNameRef = ref();
 let ConfigModelRef = ref();
 let UpdateGamePasswdRef = ref();
+let YouMayKnowRef = ref();
 export {
   QQBindDialog,
   NetworkDialog,
@@ -18,9 +20,11 @@ export {
   BattleScreenShotsDialog,
   ConfigDialog,
   UpdateGamePasswdDialog,
+  YouMayKnowDialog,
   QQBindRef,
   RealNameRef,
   BattleScreenShotsRef,
   ConfigModelRef,
   UpdateGamePasswdRef,
+  YouMayKnowRef,
 };

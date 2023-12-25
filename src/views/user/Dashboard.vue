@@ -91,6 +91,7 @@
       <GamePanel :account="selectGame" />
     </div>
   </div>
+  <YouMayKnowDialog />
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
@@ -118,7 +119,7 @@ import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
-
+import { YouMayKnowDialog } from "../../components/dialog";
 const addModel = ref();
 const show = ref(false);
 const user = userStore();
