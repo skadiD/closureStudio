@@ -7,23 +7,23 @@
       </div>
       <div v-if="!isLoading">
         <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
-          请点击下方QQ进行代码复制, 并发送到QQ官方群组中。
-          <div class="flex justify-center">
+          请点击下方QQ进行复制, 并发送到QQ官方群组中。
+        </div>
+        <div class="">
+          <div class="flex justify-center p-2 mb-3">
             <a target="_blank" @click="copyQQCodeAndOpenLink"
               href="https://qm.qq.com/cgi-bin/qm/qr?k=YNU1S-_hVFD89w3cj8-ewkPFXXSiBRbY&jump_from=webapi&authKey=BU70QS4whXzJIi62KWNd9h8HZB5Vl2FSnjlrqYYf08RL5tbxnZhf2NMr9uLJNoYu">
-              <Icon icon="bi:tencent-qq" width="48" height="48" />
+              <Icon icon="basil:qq-outline" width="48" height="48" />
             </a>
-
             <a target="_blank" @click="copyQQCodeAndOpenLink"
               href="https://qm.qq.com/cgi-bin/qm/qr?k=y4He1C5OYZQPzojywTh_wlCywlfR5r-M&jump_from=webapi&authKey=13UJLWzqSVhwTXI9BPksnM7c9eogNcIdX/TC3xo6ShTAOJPgU2vlFR2rt3DxhJ2d">
-              <Icon icon="bi:tencent-qq" width="48" height="48" />
+              <Icon icon="basil:qq-outline" width="48" height="48" />
             </a>
           </div>
+          <!-- <button @click="copyQQCode" class="btn btn-outline btn-info mb-3">{{ qqCode }}</button> -->
+          <button @click="QQBindRef.close()" class="btn btn-info btn-block mb-3">关闭</button>
         </div>
-        <p @click="copyQQCode">{{ qqCode }}</p>
-        <button @click="QQBindRef.close()" class="btn btn-info btn-block mb-3">关闭</button>
       </div>
-
     </div>
   </dialog>
 </template>
@@ -85,9 +85,11 @@ const copyQQCode = async () => {
   try {
     // 复制 qqcode 的值到剪贴板
     await navigator.clipboard.writeText(qqCode.value);
-    setMsg('QQ号已复制到剪贴板', Type.Success)
+    setMsg('绑定代码已复制到剪贴板', Type.Success);
+    await sleep(500);
+    setMsg('准备打开QQ群组', Type.Success);
   } catch (err) {
-    setMsg('复制失败', Type.Warning)
+    setMsg('复制失败', Type.Warning);
   }
 };
 
