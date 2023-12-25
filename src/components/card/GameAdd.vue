@@ -57,10 +57,10 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import {ref} from "vue";
-import {doAddGame} from "../../plugins/axios";
-import {setMsg} from "../../plugins/common";
-import {Type} from "../toast/enmu";
+import { ref } from "vue";
+import { doAddGame } from "../../plugins/axios";
+import { setMsg } from "../../plugins/common";
+import { Type } from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 
 interface AddGameForm {
@@ -74,10 +74,14 @@ interface Props {
   isFirst: boolean
   close: Function
 }
+interface LooseObject {
+  [key: string]: any;
+}
+
 const props = withDefaults(defineProps<Props>(), {
   uuid: '',
   isFirst: true,
-  close: () => {}
+  close: () => { }
 });
 const confirm = ref()
 const confirmText = ref('')
@@ -102,6 +106,7 @@ const confirmBtn = () => {
 const addGame = (token: string) => {
   doAddGame(props.uuid, token, form.value).then(res => {
     loading.value = false
+    const data: LooseObject = res.data as LooseObject;
     if (res.code === 1) {
       if (Object.hasOwnProperty.call(res.data, "err")) {
         window.captchaObj.showCaptcha();
@@ -109,8 +114,12 @@ const addGame = (token: string) => {
       setMsg('账号托管提交成功', Type.Success)
       props.close()
       return
+    } else {
+      if (data.err) {
+        setMsg(data.err, Type.Warning);
+      }
+      return
     }
-    window.captchaObj.showCaptcha();
   })
   // 有全局拦截器 catch不到东西的
 }
