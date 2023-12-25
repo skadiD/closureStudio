@@ -2,6 +2,7 @@
   <dialog ref="QQBindRef" class="modal" style="outline-width: 0">
     <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
       <h2>QQ 绑定</h2>
+      <div class="divider divider-warning"></div>
       <div class="flex justify-center">
         <span v-if="isLoading" class="loading loading-bars" />
       </div>

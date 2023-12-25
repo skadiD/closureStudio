@@ -4,10 +4,10 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from "vue";
 onMounted(() => {
-  console.log("组件已挂载");
+  console.log("geetest mounted");
 });
 
 onUnmounted(() => {
-  console.log("组件即将卸载");
+  console.log("geetest unmounted");
 });
 </script>

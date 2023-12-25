@@ -32,12 +32,13 @@
       {{ '加载更多' }}
     </button>
   </div>
-  <a class="btn btn-block btn-info mt-2">查看托管截图</a>
+  <a @click="openScreenShots()" class="btn btn-block btn-info mt-2">查看托管截图</a>
   <dialog ref="configModel" class="modal" style="outline-width: 0">
     <div class="modal-box">
       <Config :account="props.account" />
     </div>
   </dialog>
+  <BattleScreenShotsDialog :screenShots="details?.screenshot" />
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
@@ -46,6 +47,7 @@ import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import Config from "./ConfigPanel.vue";
 import { findGame } from "../../plugins/sse";
+import { BattleScreenShotsRef, BattleScreenShotsDialog } from "../../components/dialog";
 interface Props {
   account: string,
   // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -84,7 +86,13 @@ const getGameDetails = async () => {
   }
 };
 
-
+const openScreenShots = () => {
+  if (!details.value?.screenshot || details.value?.screenshot.length === 0) {
+    setMsg('暂时没有截图数据', Type.Warning)
+    return
+  }
+  BattleScreenShotsRef.value.showModal()
+}
 
 const getLogs = async () => {
   if (isLoadingGameLogs.value) return;
