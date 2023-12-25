@@ -16,9 +16,13 @@ service.interceptors.response.use(
   (response) => {
     if (response.data?.data === undefined) {
       // quota
+      let message = "成功";
+      if (response.data?.err) {
+        message = response.data?.err
+      }
       const data: any = {
-        message: response.data?.message ?? "成功",
-        code: response.data?.code ?? 1,
+        message: message,
+        code: response.data?.err ? (response.data.code ?? 0) : 1,
         data: response.data,
       };
       return data;
@@ -170,6 +174,8 @@ const doGameLogin = (token: string, account: string) =>
   captcha(`game/login/${account}`, token, null); // GameLogin
 const doAddGame = (slot: string, token: string, params: any) =>
   captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
+const doUpdateGamePasswd = (slot: string, token: string, params: any) =>
+  captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
 
 const doDelGame = (slot: string, token: string) =>
   captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
@@ -200,6 +206,6 @@ export {
   fetchUserSlots,
   fetchGameDetails,
 };
-export { doAddGame, doGameLogin, doDelGame, doUpdateGameConf,fetchQQBindCode };
+export { doAddGame, doGameLogin, doDelGame,doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { fetchGameLogs };
 export { load };

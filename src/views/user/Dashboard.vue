@@ -79,11 +79,12 @@
       <NetworkDialog />
       <dialog ref="addModel" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => {addModel.close()}" />
+          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => { addModel.close() }" />
         </div>
       </dialog>
       <RealNameDialog />
       <QQBindDialog />
+      <UpdateGamePasswdDialog :slotUUID="selectedSlotUUID" :form="selectedRegisterForm" />
     </div>
     <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
       v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
@@ -103,7 +104,7 @@ import {
 } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../../components/toast/enmu";
-import { QQBindDialog, QQBindRef, RealNameDialog, RealNameRef } from "../../components/dialog";
+import { QQBindDialog, QQBindRef, RealNameDialog, RealNameRef, UpdateGamePasswdDialog, UpdateGamePasswdRef } from "../../components/dialog";
 import {
   GameAccount,
   GameAdd,
@@ -117,11 +118,12 @@ import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
+
 const addModel = ref();
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
-
+const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update password
 // start
 startSSE(user);
 
@@ -202,22 +204,20 @@ const login = (token: string, account: string) => {
   });
 };
 
+
 const deleteGame = async (token: string, slotUUID: string) => {
   doDelGame(slotUUID, token)
     .then((res) => {
       if (res.code === 1) {
-        if (Object.hasOwnProperty.call(res.data, "err")) {
-          window.captchaObj.showCaptcha();
-        }
-        isLoading.value = false;
         setMsg("删除成功", Type.Success);
         return;
+      } else {
+        setMsg(res.message, Type.Warning);
+        window.captchaObj.showCaptcha();
       }
-      window.captchaObj.showCaptcha();
+    }).finally(() => {
+      isLoading.value = false;
     })
-    .catch((e) => {
-      setMsg("验证失败", Type.Warning);
-    });
 };
 
 const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
@@ -246,6 +246,16 @@ const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
     // window.captchaObj.showCaptcha();
   });
 };
+
+const updatePasswdOnClick = async (slotUUID: string, gameAccount: string, platform: number) => {
+  // can you delete it?
+  selectedSlotUUID.value = slotUUID;
+  selectedRegisterForm.value.account = gameAccount;
+  selectedRegisterForm.value.platform = platform;
+  selectedRegisterForm.value.password = "";
+  UpdateGamePasswdRef.value.showModal();
+};
+
 
 // geetest
 const geetestDeleteGameOnSuccess = (slotUUID: string) => {

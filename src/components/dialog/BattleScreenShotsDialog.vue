@@ -12,11 +12,11 @@
                             v-show="imageLoaded[index]" @load="onImageLoad(index)" />
                     </div>
                 </div>
-                <div class="flex justify-center w-full py-2 gap-2">
+                <div class="flex justify-center w-full py-4 gap-2">
                     <a v-for="(fileName, index) in props.screenShots[0].fileName" :key="index" :href="'#item' + (index + 1)"
                         class="btn btn-outline btn-xs">{{ index + 1 }}</a>
                 </div>
-                <button @click="BattleScreenShotsRef.close()" class="btn btn-info btn-block mb-3">关闭</button>
+                <button @click="BattleScreenShotsRef.close()" class="btn btn-error btn-outline btn-block mb-3">关闭</button>
             </div>
         </div>
     </dialog>
@@ -38,7 +38,6 @@ const onImageLoad = (index: number) => {
     imageLoaded.value[index] = true;
 }
 const getBattleScreenShotsLink = (fileName: string, host: string) => {
-    // return "https://objectstorage.ap-seoul-1.oraclecloud.com/n/cnhmkrjnefhf/b/screenshot/o/battle_fca7a2b1-43ca-7f55-0ea7-386a83258c0d_4753a871-de22-4aec-a82c-606cc23eaef5_5.webp";
     return host + fileName;
 }
 

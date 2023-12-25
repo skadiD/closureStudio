@@ -35,10 +35,17 @@
     </div>
   </div>
   <div class="flex-1 mb-4" />
-  <button class="btn btn-block btn-info disabled:text-base-content/90" :disabled="loading" @click="start">
-    <span v-if="loading" class="loading loading-bars" />
-    明日方舟，启动
-  </button>
+  <div class="grid gap-4 grid-cols-2 mt-2">
+    <button class="btn btn-block btn-outline btn-error disabled:text-base-content/90" :disabled="loading" @click="dialogClose">
+      <span v-if="loading" class="loading loading-bars" />
+      关闭
+    </button>
+    <button class="btn btn-block btn-info disabled:text-base-content/90" :disabled="loading" @click="start">
+      <span v-if="loading" class="loading loading-bars" />
+      明日方舟，启动
+    </button>
+  </div>
+
   <dialog v-if="isFirst" ref="confirm" class="modal" style="outline-width: 0">
     <div class="bg-base-100 mx-4 p-4 shadow-lg max-w-md rounded-lg">
       <div class="text-3xl text-warning font-bold text-center mt-2">温馨提示</div>
@@ -59,15 +66,9 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { doAddGame } from "../../plugins/axios";
-import { setMsg } from "../../plugins/common";
+import { setMsg, sleep } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
-
-interface AddGameForm {
-  account: string
-  password: string
-  platform: number
-}
 
 interface Props {
   uuid: string
@@ -86,7 +87,7 @@ const props = withDefaults(defineProps<Props>(), {
 const confirm = ref()
 const confirmText = ref('')
 const loading = ref(false)
-const form = ref<AddGameForm>({
+const form = ref<Registry.AddGameForm>({
   account: '',
   password: '',
   platform: 1
@@ -102,27 +103,19 @@ const confirmBtn = () => {
   }
 }
 
-
 const addGame = (token: string) => {
   doAddGame(props.uuid, token, form.value).then(res => {
     loading.value = false
-    const data: LooseObject = res.data as LooseObject;
     if (res.code === 1) {
-      if (Object.hasOwnProperty.call(res.data, "err")) {
-        window.captchaObj.showCaptcha();
-      }
       setMsg('账号托管提交成功', Type.Success)
       props.close()
-      return
     } else {
-      if (data.err) {
-        setMsg(data.err, Type.Warning);
-      }
-      return
+      setMsg(res.message, Type.Warning);
+      window.captchaObj.showCaptcha();
     }
   })
-  // 有全局拦截器 catch不到东西的
 }
+
 const start = async () => {
   loading.value = true
   if (props.isFirst && confirmText.value == '') {
@@ -138,6 +131,7 @@ const start = async () => {
     return;
   }
   updateCaptchaHandler(geetestAddGameOnSuccess(props.uuid, form.value));
+  await sleep(2000);
   window.grecaptcha?.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
     if (token === "") {
@@ -149,10 +143,14 @@ const start = async () => {
     // window.captchaObj.showCaptcha();
   })
 }
-const geetestAddGameOnSuccess = (uuid: string, form: AddGameForm) => {
+const geetestAddGameOnSuccess = (uuid: string, form: Registry.AddGameForm) => {
   return (geetestToken: string) => {
     doAddGame(uuid, geetestToken, form)
   }
+}
+
+const dialogClose = () => {
+  props.close()
 }
 
 </script>

@@ -5,20 +5,22 @@ import NetworkDialog from "./NetworkDialog.vue";
 import RealNameDialog from "./RealNameDialog.vue";
 import BattleScreenShotsDialog from "./BattleScreenShotsDialog.vue";
 import ConfigDialog from "./ConfigDialog.vue";
-
+import UpdateGamePasswdDialog from "./UpdateGamePasswdDialog.vue";
 let QQBindRef = ref();
 let BattleScreenShotsRef = ref();
 let RealNameRef = ref();
 let ConfigModelRef = ref();
-
+let UpdateGamePasswdRef = ref();
 export {
   QQBindDialog,
   NetworkDialog,
   RealNameDialog,
   BattleScreenShotsDialog,
   ConfigDialog,
+  UpdateGamePasswdDialog,
   QQBindRef,
   RealNameRef,
   BattleScreenShotsRef,
   ConfigModelRef,
+  UpdateGamePasswdRef,
 };
