@@ -25,7 +25,7 @@ export const allowGameCreate = (
   isVerify: boolean
 ) => {
   let response: canAddGameResult = {
-    message: "请完成手机绑定",
+    message: "请完成绑定",
     isLocked: true,
   };
   if (!userQuota) {
@@ -50,6 +50,10 @@ export const allowGameCreate = (
   if (slot.ruleFlags.includes("slot_user_qq_verified") && isVerify) {
     if (!userQuota.idServerQQ) {
       response.message = "请完成QQ绑定";
+      return response;
+    } else {
+      response.message = "添加游戏托管";
+      response.isLocked = false;
       return response;
     }
   }

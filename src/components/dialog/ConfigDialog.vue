@@ -65,11 +65,11 @@
                     {{ assets.getStageName(battleMap) }}
                 </button>
             </div>
-            <div class="flex justify-center space-x-4">
-                <button class="btn btn-error btn-outline w-32 mt-4" @click="dialogClose">
+            <div class="grid gap-4 grid-cols-2 mt-2">
+                <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose">
                     <span v-if="isLoading" className="loading loading-bars loading-md"></span>
                     关闭</button>
-                <button class="btn btn-info w-32 mt-4" @click="onSubmit">
+                <button class="btn btn-info btn-block mt-4" @click="onSubmit">
                     <span v-if="isLoading" className="loading loading-bars loading-md"></span>
                     递交</button>
             </div>

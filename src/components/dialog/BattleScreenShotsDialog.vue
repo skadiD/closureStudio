@@ -37,7 +37,7 @@ const imageLoaded = ref(Array(props.screenShots.length).fill(false));
 const onImageLoad = (index: number) => {
     imageLoaded.value[index] = true;
 }
-const getBattleScreenShotsLink = (fileName: string, host: string) => {
+const getBattleScreenShotsLink = (host: string, fileName: string) => {
     return host + fileName;
 }
 

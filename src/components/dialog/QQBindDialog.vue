@@ -85,7 +85,8 @@ const copyQQCodeAndOpenLink = async (event: MouseEvent) => {
 const copyQQCode = async () => {
   try {
     // 复制 qqcode 的值到剪贴板
-    await navigator.clipboard.writeText(qqCode.value);
+    const code = "verifyCode:" + qqCode.value;
+    await navigator.clipboard.writeText(code);
     setMsg('绑定代码已复制到剪贴板', Type.Success);
     await sleep(500);
     setMsg('准备打开QQ群组', Type.Success);

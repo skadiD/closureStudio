@@ -136,7 +136,7 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
   const response = allowGameCreate(
     slot,
     userQuota.value.data.value,
-    user.isVerify
+    user.isVerify // sataus code == 1 || 2
   );
   if (response.isLocked) {
     setMsg(response.message, Type.Warning);
