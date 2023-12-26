@@ -4,8 +4,9 @@ import { Type } from "../components/toast/enmu";
 import { userStore } from "../store/user";
 import { router } from "./router";
 import { userQuota } from "./quota/userQuota";
+import {gameCaptcha} from "./geetest/captcha";
 const config = ref<ApiSystem.Config>({} as ApiSystem.Config);
-const gameList = ref<ApiUser.Game[]>([]);
+const gameList = ref<ApiGame.Game[]>([]);
 let event: EventSource | null = null;
 
 const startSSE = (user: any) => {
@@ -39,6 +40,12 @@ const startSSE = (user: any) => {
     // 根据收到的消息解析操作：更新游戏列表 & 掐断链接
     event.addEventListener("game", (event) => {
       gameList.value = JSON.parse(event.data) ?? [];
+      gameList.value.forEach((game) => {
+        console.log(game.status.code, game.captcha_info)
+        if (game.status.code === 999 && game.captcha_info.challenge) {
+          gameCaptcha(game.status.account, game.captcha_info);
+        }
+      })
       userQuota.value.queryMe();
     });
     event.addEventListener("close", () => {

@@ -21,7 +21,7 @@ body {
      font-weight: 600;
      line-height: 1.2;
      margin: 1rem 0;
-     color: hsl(var(--in));
+     color: var(--fallback-in,oklch(var(--in)/var(--tw-bg-opacity)));
 }
 .blog h3 {
     font-size: 1.25rem;
@@ -39,7 +39,7 @@ body {
     line-height: 1.5;
 }
 .blog b {
-    color: hsl(var(--in));
+    color: var(--fallback-in,oklch(var(--in)/var(--tw-bg-opacity)));
 }
 .skd-title {
     display: -webkit-box;

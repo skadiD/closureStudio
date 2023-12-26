@@ -98,7 +98,7 @@ const props = withDefaults(defineProps<Props>(), {
 const isDisabled = ref(true);
 const isLoading = ref(false);
 const stageKeyWord = ref("");
-const config = ref<ApiUser.GameConfig>({
+const config = ref<ApiGame.GameConfig>({
     account: "",
     accelerate_slot: "",
     accelerate_slot_cn: "",
@@ -138,7 +138,7 @@ watch(() => {
 });
 
 const removeBattleMap = (battleMap: string) => {
-    config.value.battle_maps = config.value.battle_maps.filter(item => item !== battleMap);
+    config.value.battle_maps = config.value.battle_maps.filter((item: string) => item !== battleMap);
 };
 const onSubmit = () => {
     if (config.value.keeping_ap < 0) {

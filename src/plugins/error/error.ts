@@ -1,4 +1,4 @@
-import {setMsg} from "../../plugins/common";
+import {setMsg} from "../common";
 import { Type } from "../../components/toast/enmu";
 export const reportError = (error: unknown) => {
   if (error instanceof Error) {

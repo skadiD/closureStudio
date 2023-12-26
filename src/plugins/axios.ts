@@ -143,7 +143,7 @@ const fetchAnnounce = () => get("Common/Announcement"); // Announce
 
 const fetchGameLogs = (account: string, id: number) =>
   get<ApiGame.GameLogs>(`game/log/${account}/${id}`);
-const fetchGameList = () => get<ApiUser.Game[]>(`game`); // GameList
+const fetchGameList = () => get<ApiGame.Game[]>(`game`); // GameList
 const fetchGameScreen = (account: string, platform: string) =>
   get(`Game/Screenshot/${account}/${platform}`); // GetScreen
 const fetchDetails = (account: string, platform: string) =>
@@ -186,6 +186,10 @@ const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
   post(`game/config/${account}`, {
     config: game,
   });
+const doUpdateCaptcha = (account: string, captcha: any) =>
+    post(`game/config/${account}`, {
+      captcha_info: captcha,
+    });
 const Auth_Refresh = () => get<ApiUser.Auth>(`${AuthServer}refreshToken`); // RefreshToken
 const Auth_Verify = (code: string) => post(`${AuthServer}phone`, { code }); // RealSMS
 
@@ -194,7 +198,7 @@ const fetchQQBindCode = () => get(`${AuthServer}qq`); // QQBindCode // get qqcod
 
 const fetchUserSlots = () =>
   get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
-const fetchGameListBySSE = () => sse<ApiUser.Game[]>("sse/game"); // 实验性获取 GameList
+const fetchGameListBySSE = () => sse<ApiGame.Game[]>("sse/game"); // 实验性获取 GameList
 const fetchGameDetails = (account: string) =>
   get<ApiGame.Detail>(`game/${account}`);
 export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info, Auth_Refresh };
@@ -206,6 +210,6 @@ export {
   fetchUserSlots,
   fetchGameDetails,
 };
-export { doAddGame, doGameLogin, doDelGame,doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
-export { fetchGameLogs };
+export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
+export { doUpdateCaptcha, fetchGameLogs };
 export { load };
