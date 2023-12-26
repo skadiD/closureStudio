@@ -2,7 +2,6 @@
     <dialog ref="UpdateGamePasswdRef" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
 
-
             <div class="text-3xl text-info font-bold text-center">修改密码</div>
             <div class="divider">账号信息</div>
             <div class="w-full mb-3">
@@ -19,16 +18,24 @@
             <div class="w-full mb-3">
                 <label class="label cursor-pointer">
                     <span class="text-xl">BiliBili服</span>
-                    <input type="radio" :value="2" v-model="form.platform" id="bili" class="radio checked:bg-blue-500" />
+                    <input disabled type="radio" :value="2" v-model="form.platform" id="bili"
+                        class="radio checked:bg-blue-500" />
                 </label>
                 <label class="label cursor-pointer">
                     <span class="text-xl">官服（安卓 / IOS）</span>
-                    <input type="radio" :value="1" v-model="form.platform" id="official" class="radio checked:bg-red-500" />
+                    <input disabled type="radio" :value="1" v-model="form.platform" id="official"
+                        class="radio checked:bg-red-500" />
                 </label>
             </div>
             <div class="flex justify-center space-x-4 mb-3">
-                <button @click="dialogClose" class="btn btn-error btn-outline w-24">关闭</button>
-                <button class="btn btn-info w-24" @click="updateGamePasswdOnBtnClick">更新</button>
+                <button @click="dialogClose" class="btn btn-error btn-outline w-24">
+                    <span v-if="isLoading" class="loading loading-bars" />
+                    关闭
+                </button>
+                <button class="btn btn-info w-24" @click="updateGamePasswdOnBtnClick">
+                    <span v-if="isLoading" class="loading loading-bars" />
+                    更新
+                </button>
             </div>
         </div>
     </dialog>
@@ -38,7 +45,7 @@ import { ref } from 'vue';
 import { UpdateGamePasswdRef } from './index';
 import { setMsg } from '../../plugins/common';
 import { Type } from '../toast/enmu';
-import { doAddGame, doUpdateGamePasswd } from '../../plugins/axios';
+import { doUpdateGamePasswd } from '../../plugins/axios';
 import updateCaptchaHandler from '../../plugins/geetest/captcha';
 
 interface Props {
@@ -57,13 +64,8 @@ const props = withDefaults(defineProps<Props>(), {
     },
 });
 
-const form = ref<Registry.AddGameForm>({
-    account: props.form.account,
-    password: '',
-    platform: props.form.platform,
-})
+const form = ref<Registry.AddGameForm>(props.form)
 const isLoading = ref(false);
-
 
 const updateGamePasswdOnBtnClick = () => {
     if (props.slotUUID === '') {
@@ -75,7 +77,8 @@ const updateGamePasswdOnBtnClick = () => {
         return;
     }
 
-    updateCaptchaHandler(geetestUpdateGamePasswdOnSuccess(props.slotUUID, form.value.password));
+    updateCaptchaHandler(geetestUpdateGamePasswdOnSuccess(props.slotUUID));
+    isLoading.value = true;
     window.grecaptcha?.ready(async () => {
         const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
         if (token === "") {
@@ -88,29 +91,28 @@ const updateGamePasswdOnBtnClick = () => {
 }
 
 const updatePasswd = async (token: string, slotUUID: string) => {
-    doUpdateGamePasswd(slotUUID, token, form)
+    doUpdateGamePasswd(slotUUID, token, form.value)
         .then((res) => {
             if (res.code === 1) {
                 setMsg("修改密码成功", Type.Success);
+                dialogClose();
                 return;
             } else {
                 setMsg(res.message, Type.Warning);
                 window.captchaObj.showCaptcha();
             }
-        });
+        }).finally(() => {
+            isLoading.value = false;
+        })
 };
-
 
 const dialogClose = () => {
     UpdateGamePasswdRef.value.close();
 }
 
-const geetestUpdateGamePasswdOnSuccess = (uuid: string, password: string) => {
-    const form = {
-        password: password,
-    }
+const geetestUpdateGamePasswdOnSuccess = (uuid: string) => {
     return (geetestToken: string) => {
-        doUpdateGamePasswd(uuid, geetestToken, form)
+        doUpdateGamePasswd(uuid, geetestToken, form.value)
     }
 }
 
