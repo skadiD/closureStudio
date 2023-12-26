@@ -50,7 +50,7 @@
 
             <div class="flex py-2">
                 <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4"
-                    placeholder="-- 请输入代号\名称--" />
+                    placeholder="-- 请输入代号\名称 --" />
                 <select class="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
                     <option key="-- 请选择地图 --" value="-- 请选择地图 --">-- 请选择地图 --</option>
                     <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">

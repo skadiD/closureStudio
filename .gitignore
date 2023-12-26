@@ -26,3 +26,4 @@ dist-ssr
 item_table.json
 stage_table.json
 package-lock.json
+.vercel
