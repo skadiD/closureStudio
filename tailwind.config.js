@@ -39,12 +39,8 @@ module.exports = {
   plugins: [require("@tailwindcss/typography"), require("daisyui")],
   daisyui: {
     themes: [{
-      light: {
-        ...require("daisyui/src/theming/themes")["[data-theme=light]"],
-        info: '#5e72e4'
-      },
       halloween: {
-        ...require("daisyui/src/theming/themes")["[data-theme=halloween]"],
+        ...require("daisyui/src/theming/themes")['halloween'],
         info: '#5e72e4',
         neutral: '#5e72e4',
        'base-300': '#2a2a2a'

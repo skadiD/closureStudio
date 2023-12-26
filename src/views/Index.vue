@@ -47,7 +47,7 @@
     </div>
     <div class="flex flex-col slide-in-bottom delay-75 lg:ml-6 flex-auto">
       <div class="space-x-4 hidden lg:flex">
-        <div class="mockup-code bg-base-300 shadow-lg rounded-lg w-1/2">
+        <div class="mockup-code bg-base-300 text-base-content shadow-lg rounded-lg w-1/2">
           <pre class="font-bold text-center mb-2">你站公告</pre>
           <pre data-prefix=">"><code>2023/10/14 {{ config.announcement }}</code></pre>
         </div>
