@@ -53,21 +53,22 @@
               START
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-              <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="findGame(slot.gameAccount)?.status?.code != 0 &&
-                findGame(slot.gameAccount)?.status?.code != 1
-                " @click="
-    show = !show;
-  suspend(slot.gameAccount);
-  " :disabled="isLoading">
+
+              <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="isUpdateStatus(slot.gameAccount)"
+                :disabled="isLoading" @click.stop="updatePasswdOnClick(slot)">
+                更新
+              </button>
+
+              <button class="btn btn-outline btn-sm btn-block btn-primary" v-else="isSuspendStatus(slot.gameAccount)"
+                @click="suspendOnClick(slot.gameAccount)" :disabled="isLoading">
                 暂停
               </button>
-              <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="
-                show = !show;
-              gameLogin(slot.gameAccount);
-              " :disabled="isLoading || findGame(slot.gameAccount)?.status?.code == 1
-  ">
+
+              <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="loginOnClick(slot.gameAccount)"
+                :disabled="isLoginBtnDisabled(slot.gameAccount)">
                 启动
               </button>
+
               <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error"
                 @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">
                 删除
@@ -103,7 +104,7 @@ import {
   doGameLogin,
   doUpdateGameConf,
 } from "../../plugins/axios";
-import { setMsg } from "../../plugins/common";
+import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { Type } from "../../components/toast/enmu";
 import { QQBindDialog, QQBindRef, RealNameDialog, RealNameRef, UpdateGamePasswdDialog, UpdateGamePasswdRef } from "../../components/dialog";
 import {
@@ -144,6 +145,34 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
   }
   selectedSlotUUID.value = slotUUID;
   addModel.value.showModal();
+};
+
+const isUpdateStatus = (gameAccount: string) => {
+  const game = findGame(gameAccount);
+  if (!game) return false;
+  if (game.status.code === -1 && game.status.text.indexOf("密码错误") != -1) {
+    return true
+  }
+  return false
+};
+
+const isLoginBtnDisabled = (gameAccount: string) => {
+  const game = findGame(gameAccount);
+  if (isLoading.value) return true;
+  if (!game) return false;
+  if (game.status.code === 1) {
+    return true
+  }
+  return false
+};
+
+const suspendOnClick = (gameAccount: string) => {
+  show.value = !show.value;
+  suspend(gameAccount);
+};
+const loginOnClick = (gameAccount: string) => {
+  show.value = !show.value;
+  gameLogin(gameAccount);
 };
 
 // 计算到期时间
@@ -248,15 +277,17 @@ const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
   });
 };
 
-const updatePasswdOnClick = async (slotUUID: string, gameAccount: string, platform: number) => {
+const updatePasswdOnClick = async (slot: Registry.Slot) => {
   // can you delete it?
-  selectedSlotUUID.value = slotUUID;
-  selectedRegisterForm.value.account = gameAccount;
-  selectedRegisterForm.value.platform = platform;
+  if (!slot.gameAccount) return;
+  const game = findGame(slot.gameAccount);
+  if (!game) return;
+  selectedSlotUUID.value = slot.uuid;
+  selectedRegisterForm.value.account = getRealGameAccount(game.status.account);
+  selectedRegisterForm.value.platform = game.status.platform;
   selectedRegisterForm.value.password = "";
   UpdateGamePasswdRef.value.showModal();
 };
-
 
 // geetest
 const geetestDeleteGameOnSuccess = (slotUUID: string) => {

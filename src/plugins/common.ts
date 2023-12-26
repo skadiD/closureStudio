@@ -74,3 +74,12 @@ export function selectRandomElement<T>(arr: T[]): T | undefined {
   const randomIndex = Math.floor(Math.random() * arr.length);
   return arr[randomIndex];
 }
+
+// gameAccount format is "G1234556789"
+// return 123456789
+export function getRealGameAccount(gameAccount: string) {
+  if (gameAccount.startsWith("G") || gameAccount.startsWith("B")) {
+    return gameAccount.substring(1);
+  }
+  return gameAccount;
+}
