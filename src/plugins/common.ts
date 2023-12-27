@@ -83,3 +83,25 @@ export function getRealGameAccount(gameAccount: string) {
   }
   return gameAccount;
 }
+
+export function maskPhoneNumber(phoneNumber: string): string {
+  // 确保手机号至少有两个字符
+  if (phoneNumber.length < 2) {
+    return phoneNumber;
+  }
+
+  // 计算马赛克（星号）的长度：约为总长度的1/3
+  const numStars = Math.max(Math.floor(phoneNumber.length / 3), 1);
+
+  // 计算开始和结束的索引
+  const startIdx = Math.floor((phoneNumber.length - numStars) / 2);
+  const endIdx = startIdx + numStars;
+
+  // 构建马赛克字符串
+  const maskedPhoneNumber =
+    phoneNumber.substring(0, startIdx) +
+    "*".repeat(numStars) +
+    phoneNumber.substring(endIdx);
+
+  return maskedPhoneNumber;
+}

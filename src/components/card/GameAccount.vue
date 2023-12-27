@@ -23,7 +23,7 @@
     </div>
     <div class="mt-1 text-2xl font-zhCN">
       Dr. {{ game.status?.nick_name || "Nameless" }}
-      <span class="text-lg text-info">【{{ game.game_config?.account }}】</span>
+      <span class="text-lg text-info">【{{ maskPhoneNumber(game.game_config?.account) }}】</span>
     </div>
     <div class="grid grid-cols-3">
       <div class="flex flex-col" v-for="m in 3">
@@ -44,12 +44,13 @@
 </template>
 <script lang="ts" setup>
 import { assets } from "../../plugins/assets/assets";
+import { maskPhoneNumber } from "../../plugins/common";
 interface Props {
-  game: ApiUser.Game;
+  game: ApiGame.Game;
 }
 withDefaults(defineProps<Props>(), {
   game: () => {
-    return {} as ApiUser.Game;
+    return {} as ApiGame.Game;
   },
 });
 </script>
