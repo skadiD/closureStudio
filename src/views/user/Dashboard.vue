@@ -6,7 +6,7 @@
       ">
       <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
         <div class="text-2xl md:text-4xl font-bold text-info mt-3">
-          📢 今日特价 {{ showQQBind }}
+          📢 今日特价
         </div>
         <p v-for="k in config.announcement?.split('\n') || ['可露希尔逃跑了']">
           {{ k }}
@@ -28,7 +28,7 @@
             )
           }}】绑定认证<b class="cursor-pointer" @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
-        <p>
+        <p v-if="user.info.status === 1 && userQuota.data.value?.idServerQQ.length === 0">
           完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量
         </p>
         <p v-if="user.info.status >= 1">
