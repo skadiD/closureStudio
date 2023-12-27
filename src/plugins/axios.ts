@@ -150,20 +150,7 @@ const fetchDetails = (account: string, platform: string) =>
   get(`Game/${account}/${platform}`); // GetDetails
 const fetchGameConf = (account: string, platform: string) =>
   get(`Game/Config/${account}/${platform}`); // GetConf
-const LoadMapList = () => get("System/Maps"); // GetMapList
-const fechSystemLog = () => get("System/LogFile"); // GetLog
-const doGameDataUpdate = () => post("System/GameDataUpdate", {}); // UpdateData
-const doEditAnnounce = (params: any) => post("Common/Announcement", params); // EditAnnounce
-const fetchStatus = () => get("System/Status"); // Status
-const LoadTableStage = () => load("Stage");
-const TableStage_ = () => load("stage_table");
-const TableItems_ = () => load("item_table");
-const LoadTableItems = () => load("Items");
 
-const AdminResetPasswd = (account: string, password: string) =>
-  post(`System/Password/${account}/${password}`, {}); // ResetPasswd
-const AdminBan = (account: string, code: string) =>
-  post(`System/Account/Status/${account}/${code}`, {}); // Ban
 const apiGeetestSet = (account: string, platform: number, params: any) =>
   post(`Game/Captcha/${account}/${platform}`, params); // Geetest
 

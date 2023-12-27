@@ -6,7 +6,7 @@
       ">
       <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
         <div class="text-2xl md:text-4xl font-bold text-info mt-3">
-          📢 今日特价
+          📢 今日特价 {{ showQQBind }}
         </div>
         <p v-for="k in config.announcement?.split('\n') || ['可露希尔逃跑了']">
           {{ k }}
@@ -26,10 +26,10 @@
               /(\d{3})\d{6}(\d{2})/,
               "$1****$2"
             )
-          }}】绑定认证<b class="cursor-pointer" @click="RealNameRef.showModal()">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
+          }}】绑定认证<b class="cursor-pointer" @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
         </p>
-        <p v-if="user.info.status === 1 && userQuota.data.value?.idServerQQ.length === 0">
-          完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="QQBindRef.showModal()">👉点我解锁👈</b>提升托管数量
+        <p>
+          完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量
         </p>
         <p v-if="user.info.status >= 1">
           恭喜你完成了验证，你可以启动游戏进行托管。
@@ -53,7 +53,6 @@
               START
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-
               <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="isUpdateStatus(slot.gameAccount)"
                 :disabled="isLoading" @click.stop="updatePasswdOnClick(slot)">
                 更新
@@ -84,7 +83,7 @@
         </div>
       </dialog>
       <RealNameDialog />
-      <QQBindDialog />
+      <QQBindDialog v-if="showQQBind" @close="showQQBind = false" />
       <UpdateGamePasswdDialog :slotUUID="selectedSlotUUID" :form="selectedRegisterForm" />
     </div>
     <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
@@ -99,21 +98,11 @@ import { ref } from "vue";
 import { config, findGame, gameList, startSSE } from "../../plugins/sse";
 import "animate.css";
 import { userStore } from "../../store/user";
-import {
-  doDelGame,
-  doGameLogin,
-  doUpdateGameConf,
-} from "../../plugins/axios";
+import { doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { Type } from "../../components/toast/enmu";
-import { QQBindDialog, QQBindRef, RealNameDialog, RealNameRef, UpdateGamePasswdDialog, UpdateGamePasswdRef } from "../../components/dialog";
-import {
-  GameAccount,
-  GameAdd,
-  GameAddCard,
-  GamePanel,
-  IndexStatus,
-} from "../../components/card/index";
+import {dialogClose, dialogOpen, QQBindDialog, RealNameDialog, UpdateGamePasswdDialog} from "../../components/dialog";
+import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
 import NetworkDialog from "../../components/dialog/NetworkDialog.vue";
 import { allowGameCreate } from "../../plugins/quota/quota";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
@@ -122,6 +111,7 @@ import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
 import { YouMayKnowDialog } from "../../components/dialog";
 const addModel = ref();
+const showQQBind = ref(false);
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
@@ -137,7 +127,7 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
   const response = allowGameCreate(
     slot,
     userQuota.value.data.value,
-    user.isVerify // sataus code == 1 || 2
+    user.isVerify // status code == 1 || 2
   );
   if (response.isLocked) {
     setMsg(response.message, Type.Warning);
@@ -150,29 +140,20 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
 const isUpdateStatus = (gameAccount: string) => {
   const game = findGame(gameAccount);
   if (!game) return false;
-  if (game.status.code === -1 && game.status.text.indexOf("密码错误") != -1) {
-    return true
-  }
-  return false
+  return game.status.code === -1 && game.status.text.indexOf("密码错误") != -1;
 };
 
 const isSuspendStatus = (gameAccount: string) => {
   const game = findGame(gameAccount);
   if (!game) return false;
-  if (game.status.code === 2) {
-    return true
-  }
-  return false
+  return game.status.code === 2;
 };
 
 const isLoginBtnDisabled = (gameAccount: string) => {
   const game = findGame(gameAccount);
   if (isLoading.value) return true;
   if (!game) return false;
-  if (game.status.code === 1) {
-    return true
-  }
-  return false
+  return game.status.code === 1;
 };
 
 const suspendOnClick = (gameAccount: string) => {
@@ -281,7 +262,7 @@ const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
       setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
       return;
     }
-    deleteGame(token, slotUUID);
+    await deleteGame(token, slotUUID);
     // window.captchaObj.showCaptcha();
   });
 };
@@ -295,7 +276,7 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
   selectedRegisterForm.value.account = getRealGameAccount(game.status.account);
   selectedRegisterForm.value.platform = game.status.platform;
   selectedRegisterForm.value.password = "";
-  UpdateGamePasswdRef.value.showModal();
+  dialogClose('UpdateGamePasswd')
 };
 
 // geetest

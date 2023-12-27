@@ -1,9 +1,9 @@
 <template>
-  <dialog ref="RealNameRef" class="modal" style="outline-width: 0">
+  <dialog id="RealName" class="modal" style="outline-width: 0">
     <div class="modal-box">
       <div class="text-3xl text-info font-bold text-center">归属验证</div>
       <div class="s-combo mb-6 mt-4">
-        <input class="s-input peer focus:ring-info" v-model="smsCode" />
+        <input class="s-input peer focus:ring-info" v-model="smsCode"/>
         <label class="s-label peer-focus:text-info">请输入收到的验证码</label>
       </div>
       <button class="btn btn-block btn-info mt-2" @click="smsBtn">
@@ -13,12 +13,13 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import { ref } from "vue";
+import {ref} from "vue";
 import {Auth_Refresh, Auth_Verify} from "../../plugins/axios";
 import {setMsg} from "../../plugins/common";
 import {Type} from "../toast/enmu";
 import {userStore} from "../../store/user";
-import { RealNameRef } from "./index";
+import {dialogClose} from "./index";
+
 // 短信验证码
 const smsCode = ref("");
 const user = userStore();
@@ -29,7 +30,7 @@ const smsBtn = () => {
         setMsg("认证成功", Type.Success);
         Auth_Refresh().then((res) => {
           if (res.data) user.login(res.data.token);
-          RealNameRef.value.close();
+          dialogClose('RealName')
         });
         return;
       }

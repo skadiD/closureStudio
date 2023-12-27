@@ -16,7 +16,7 @@
       , true) }} </div>
   </template>
   <div class="divider" v-else>你的游戏尚未启动，请先配置</div>
-  <button class="btn btn-info btn-outline btn-block my-1" @click="ConfigModelRef.showModal()">托管配置</button>
+  <button class="btn btn-info btn-outline btn-block my-1" @click="dialogOpen('ConfigModel')">托管配置</button>
   <div class="divider">不实时日志</div>
   <div class="h-[calc(100vh-28rem)] overflow-y-auto">
     <table class="text-[1rem]">
@@ -42,8 +42,7 @@ import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { findGame } from "../../plugins/sse";
-import { BattleScreenShotsRef, BattleScreenShotsDialog } from "../../components/dialog";
-import { ConfigDialog, ConfigModelRef } from "../../components/dialog";
+import {ConfigDialog, BattleScreenShotsDialog, dialogOpen} from "../../components/dialog";
 interface Props {
   account: string,
   // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -93,7 +92,7 @@ const openScreenShots = () => {
     setMsg('暂时没有截图数据', Type.Warning)
     return
   }
-  BattleScreenShotsRef.value.showModal()
+  dialogOpen('BattleScreenShots')
 }
 
 const getLogs = async () => {

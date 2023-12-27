@@ -7,12 +7,19 @@ import BattleScreenShotsDialog from "./BattleScreenShotsDialog.vue";
 import ConfigDialog from "./ConfigDialog.vue";
 import UpdateGamePasswdDialog from "./UpdateGamePasswdDialog.vue";
 import YouMayKnowDialog from "./YouMayKnowDialog.vue";
-let QQBindRef = ref();
-let BattleScreenShotsRef = ref();
-let RealNameRef = ref();
-let ConfigModelRef = ref();
-let UpdateGamePasswdRef = ref();
-let YouMayKnowRef = ref();
+export const dialogClose = (name: string) => {
+  const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
+  if (dialog) dialog.close()
+}
+export const dialogOpen = (name: string) => {
+    const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
+    if (dialog) dialog.showModal()
+}
+export const dialogIsOpen = (name: string) => {
+    const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
+    if (dialog) return dialog.open
+    return false
+}
 export {
   QQBindDialog,
   NetworkDialog,
@@ -21,10 +28,4 @@ export {
   ConfigDialog,
   UpdateGamePasswdDialog,
   YouMayKnowDialog,
-  QQBindRef,
-  RealNameRef,
-  BattleScreenShotsRef,
-  ConfigModelRef,
-  UpdateGamePasswdRef,
-  YouMayKnowRef,
 };

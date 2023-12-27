@@ -88,7 +88,7 @@ const menu = [
     to: '/profile/damedane'
   }
 ]
-const gameList = ref<ApiUser.Game[]>([])
+const gameList = ref<ApiGame.Game[]>([])
 fetchGameList().then(res => {
   if (res.data) gameList.value = res.data
 })

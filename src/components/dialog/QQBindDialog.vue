@@ -1,5 +1,5 @@
 <template>
-  <dialog ref="QQBindRef" class="modal" style="outline-width: 0">
+  <dialog id="qqBind" class="modal" style="outline-width: 0">
     <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
       <h2>QQ 绑定</h2>
       <div class="divider divider-warning"></div>
@@ -10,7 +10,7 @@
         <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
           请点击下方QQ进行复制, 并发送到QQ官方群组中。
         </div>
-        <div class="">
+        <div>
           <div class="flex justify-center p-2 mb-3">
             <a target="_blank" @click="copyQQCodeAndOpenLink"
               href="https://qm.qq.com/cgi-bin/qm/qr?k=YNU1S-_hVFD89w3cj8-ewkPFXXSiBRbY&jump_from=webapi&authKey=BU70QS4whXzJIi62KWNd9h8HZB5Vl2FSnjlrqYYf08RL5tbxnZhf2NMr9uLJNoYu">
@@ -22,62 +22,38 @@
             </a>
           </div>
           <!-- <button @click="copyQQCode" class="btn btn-outline btn-info mb-3">{{ qqCode }}</button> -->
-          <button @click="QQBindRef.close()" class="btn btn-info btn-block mb-3">关闭</button>
         </div>
       </div>
+      <button @click="dialogClose('qqBind');$emit('close')" class="btn btn-info btn-block mb-3 btn-sm">关闭</button>
     </div>
   </dialog>
 </template>
 <script lang="ts" setup>
-import { watch, onMounted, onUnmounted, ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { fetchQQBindCode } from "../../plugins/axios";
-import { QQBindRef } from './index';
 import { userQuota } from '../../plugins/quota/userQuota';
 import { NOTIFY } from '../../plugins/config';
 import { setMsg, sleep } from '../../plugins/common';
 import { Type } from '../toast/enmu';
 import { Icon } from '@iconify/vue';
+import {dialogClose, dialogOpen} from "./index";
 
 const qqCode = ref('')
 const isLoading = ref(true)
-const isOpen = ref(false)
 const quota = userQuota.value.data.value
 let intervalId: number | null = null;
-let observer: MutationObserver;
-const observerConfig: MutationObserverInit = { attributes: true };
-
 onMounted(() => {
-  const dom = QQBindRef.value;
-  const callback = (mutationsList: MutationRecord[]) => {
-    mutationsList.forEach((mutation: MutationRecord) => {
-      if (mutation.type === "attributes" && mutation.attributeName === "open") {
-        isOpen.value = dom.open;
-      }
-    });
-  };
-  observer = new MutationObserver(callback);
-  if (dom) observer.observe(dom, observerConfig);
-});
-
-onUnmounted(() => {
-  if (observer) observer.disconnect();
+  dialogOpen('qqBind')
+  fetchQQBindCode()
+  intervalId = window.setInterval(getQQBindCode, 5000);
 })
-
-watch(() => isOpen.value, (isOpen) => {
-  if (isOpen) {
-    fetchQQBindCode();
-    intervalId = window.setInterval(getQQBindCode, 5000);
-  } else {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    }
-  }
-});
+onUnmounted(() => {
+  if (intervalId) clearInterval(intervalId);
+})
 const copyQQCodeAndOpenLink = async (event: MouseEvent) => {
   event.preventDefault();
   const target = event.currentTarget as HTMLAnchorElement;
-  copyQQCode();
+  await copyQQCode();
   await sleep(2000);
   window.open(target.href, '_blank');
 };
@@ -117,8 +93,5 @@ const getQQBindCode = () => {
     isLoading.value = false
   })
 }
-
-
-
 </script>
   

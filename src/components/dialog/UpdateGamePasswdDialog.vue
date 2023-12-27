@@ -1,7 +1,6 @@
 <template>
-    <dialog ref="UpdateGamePasswdRef" class="modal" style="outline-width: 0">
+    <dialog id="UpdateGamePasswd" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
-
             <div class="text-3xl text-info font-bold text-center">修改密码</div>
             <div class="divider">账号信息</div>
             <div class="w-full mb-3">
@@ -28,7 +27,7 @@
                 </label>
             </div>
             <div class="flex justify-center space-x-4 mb-3">
-                <button @click="dialogClose" class="btn btn-error btn-outline w-24">
+                <button @click="dialogClose('UpdateGamePasswd')" class="btn btn-error btn-outline w-24">
                     <span v-if="isLoading" class="loading loading-bars" />
                     关闭
                 </button>
@@ -42,11 +41,11 @@
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { UpdateGamePasswdRef } from './index';
 import { setMsg } from '../../plugins/common';
 import { Type } from '../toast/enmu';
 import { doUpdateGamePasswd } from '../../plugins/axios';
 import updateCaptchaHandler from '../../plugins/geetest/captcha';
+import {dialogClose} from "./index";
 
 interface Props {
     slotUUID: string;
@@ -95,7 +94,7 @@ const updatePasswd = async (token: string, slotUUID: string) => {
         .then((res) => {
             if (res.code === 1) {
                 setMsg("修改密码成功", Type.Success);
-                dialogClose();
+                dialogClose('UpdateGamePasswd')
                 return;
             } else {
                 setMsg(res.message, Type.Warning);
@@ -105,10 +104,6 @@ const updatePasswd = async (token: string, slotUUID: string) => {
             isLoading.value = false;
         })
 };
-
-const dialogClose = () => {
-    UpdateGamePasswdRef.value.close();
-}
 
 const geetestUpdateGamePasswdOnSuccess = (uuid: string) => {
     return (geetestToken: string) => {

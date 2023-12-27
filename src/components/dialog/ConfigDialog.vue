@@ -1,5 +1,5 @@
 <template>
-    <dialog ref="ConfigModelRef" class="modal" style="outline-width: 0">
+    <dialog id="ConfigModel" class="modal" style="outline-width: 0">
         <div class="modal-box">
             <h3 class="font-bold text-2xl">托管配置</h3>
             <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
@@ -66,7 +66,7 @@
                 </button>
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-                <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose">
+                <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose('ConfigModel')">
                     <span v-if="isLoading" className="loading loading-bars loading-md"></span>
                     关闭</button>
                 <button class="btn btn-info btn-block mt-4" @click="onSubmit">
@@ -84,9 +84,8 @@ import {
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { findGame, gameList } from "../../plugins/sse";
-import { computed } from "vue";
 import { assets } from "../../plugins/assets/assets";
-import { ConfigModelRef } from "./index";
+import {dialogClose} from "./index";
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -159,11 +158,8 @@ const onSubmit = () => {
         setMsg(res.message, Type.Info)
     }).finally(() => {
         isLoading.value = false;
-        dialogClose()
+        dialogClose('ConfigModel')
     })
 }
 
-const dialogClose = () => {
-    ConfigModelRef.value.close()
-}
 </script>
