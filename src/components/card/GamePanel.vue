@@ -32,7 +32,7 @@
       {{ '加载更多' }}
     </button>
   </div>
-  <a @click="openScreenShots()" class="btn btn-block btn-info mt-2">查看托管截图</a>
+  <button @click="openScreenShots()" class="btn btn-block btn-info mt-2">查看托管截图</button>
   <ConfigDialog :account="props.account" />
   <BattleScreenShotsDialog :screenShots="details?.screenshot" />
 </template>
@@ -43,7 +43,7 @@ import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { findGame } from "../../plugins/sse";
 import { BattleScreenShotsRef, BattleScreenShotsDialog } from "../../components/dialog";
-import { ConfigDialog,ConfigModelRef } from "../../components/dialog";
+import { ConfigDialog, ConfigModelRef } from "../../components/dialog";
 interface Props {
   account: string,
   // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -56,7 +56,8 @@ const gameLogs = ref<ApiGame.GameLogs>({
   logs: [],
   hasMore: false
 })
-const selectedGame = ref<ApiUser.Game>()
+
+const selectedGame = ref<ApiGame.Game>()
 const isLoadingGameLogs = ref(false)
 const details = ref<ApiGame.Detail>()
 const configModel = ref()

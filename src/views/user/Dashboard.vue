@@ -59,7 +59,7 @@
                 更新
               </button>
 
-              <button class="btn btn-outline btn-sm btn-block btn-primary" v-else="isSuspendStatus(slot.gameAccount)"
+              <button class="btn btn-outline btn-sm btn-block btn-primary" v-else-if="isSuspendStatus(slot.gameAccount)"
                 @click="suspendOnClick(slot.gameAccount)" :disabled="isLoading">
                 暂停
               </button>
@@ -151,6 +151,15 @@ const isUpdateStatus = (gameAccount: string) => {
   const game = findGame(gameAccount);
   if (!game) return false;
   if (game.status.code === -1 && game.status.text.indexOf("密码错误") != -1) {
+    return true
+  }
+  return false
+};
+
+const isSuspendStatus = (gameAccount: string) => {
+  const game = findGame(gameAccount);
+  if (!game) return false;
+  if (game.status.code === 2) {
     return true
   }
   return false
