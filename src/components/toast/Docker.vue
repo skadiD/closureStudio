@@ -1,5 +1,5 @@
 <template>
-  <transition-group :class="classList" name="toast" tag="ul" appear class="toast">
+  <transition-group :class="classList" name="toast" tag="ul" appear class="toast2">
     <ToastItem v-for="k in List" :key="k" :toast="k" :layout="layout" />
   </transition-group>
 </template>
@@ -26,13 +26,13 @@ const List = computed(() => {
     [cur]: toasts.value[cur],
   }), {})
 })
-const classList = computed(() => `toast--${position.value}`)
+const classList = computed(() => `toast2--${position.value}`)
 const layout = computed(() => position.value.includes(Layout.Left) ? Layout.Left : Layout.Right)
 </script>
 <style lang="scss" scoped>
 $timing-function: cubic-bezier(0.820, 0.085, 0.395, 0.895);
 
-.toast {
+.toast2 {
   position: fixed;
   z-index: 100;
   margin: 0;
@@ -172,4 +172,5 @@ $timing-function: cubic-bezier(0.820, 0.085, 0.395, 0.895);
       transition: all .6s ease-in-out;
     }
   }
-}</style>
+}
+</style>

@@ -1,8 +1,8 @@
-import { computed, ref } from "vue";
-import { setMsg } from "../common";
-import { Type } from "../../components/toast/enmu";
-import { load } from "../axios";
-import { constants } from "../config";
+import {computed, ref} from "vue";
+import {setMsg} from "../common";
+import {Type} from "../../components/toast/enmu";
+import {load} from "../axios";
+import {constants} from "../config";
 
 const itemData = ref<Gamedata.Items>({});
 const stageData = ref<Gamedata.Stages>({});
@@ -71,8 +71,7 @@ const assets = computed(() => {
 
 const loadItems = async () => {
   try {
-    const itemsData = await load<Gamedata.Items>("items");
-    itemData.value = itemsData;
+    itemData.value = await load<Gamedata.Items>("items");
   } catch (error) {
     console.error("Error loading items data:", error);
     throw error;
