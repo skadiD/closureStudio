@@ -36,10 +36,10 @@
   </div>
   <div class="flex-1 mb-4" />
   <div class="grid gap-4 grid-cols-2 mt-2">
-    <button class="btn btn-block btn-outline btn-error disabled:text-base-content/90" :disabled="loading" @click="dialogClose">
+    <label for="addModel" class="btn btn-block btn-outline btn-error disabled:text-base-content/90">
       <span v-if="loading" class="loading loading-bars" />
       关闭
-    </button>
+    </label>
     <button class="btn btn-block btn-info disabled:text-base-content/90" :disabled="loading" @click="start">
       <span v-if="loading" class="loading loading-bars" />
       明日方舟，启动
@@ -73,16 +73,10 @@ import updateCaptchaHandler from "../../plugins/geetest/captcha";
 interface Props {
   uuid: string
   isFirst: boolean
-  close: Function
 }
-interface LooseObject {
-  [key: string]: any;
-}
-
 const props = withDefaults(defineProps<Props>(), {
   uuid: '',
   isFirst: true,
-  close: () => { }
 });
 const confirm = ref()
 const confirmText = ref('')

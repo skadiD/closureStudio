@@ -1,6 +1,6 @@
 import './assets/style.css'
 import './assets/main.css'
-
+import './plugins/hook'
 import {createPinia} from "pinia";
 import {persist} from "pinia-persists";
 import BaseLayout from "./components/layout/BaseLayout.vue";

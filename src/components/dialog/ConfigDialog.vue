@@ -67,10 +67,10 @@
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
                 <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose('ConfigModel')">
-                    <span v-if="isLoading" className="loading loading-bars loading-md"></span>
+                    <span v-if="isLoading" class="loading loading-bars loading-md"></span>
                     关闭</button>
                 <button class="btn btn-info btn-block mt-4" @click="onSubmit">
-                    <span v-if="isLoading" className="loading loading-bars loading-md"></span>
+                    <span v-if="isLoading" class="loading loading-bars loading-md"></span>
                     递交</button>
             </div>
         </div>
@@ -81,9 +81,9 @@ import { ref, watch } from "vue";
 import {
     doUpdateGameConf,
 } from "../../plugins/axios";
-import { formatTime, setMsg } from "../../plugins/common";
+import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
-import { findGame, gameList } from "../../plugins/sse";
+import { findGame } from "../../plugins/sse";
 import { assets } from "../../plugins/assets/assets";
 import {dialogClose} from "./index";
 interface Props {
@@ -111,8 +111,6 @@ const config = ref<ApiGame.GameConfig>({
     map_id: "",
     allow_login_assist: false,
 });
-
-
 
 const addStageToConfig = (event: Event) => {
     const selectElement = event.target as HTMLSelectElement;
@@ -161,5 +159,4 @@ const onSubmit = () => {
         dialogClose('ConfigModel')
     })
 }
-
 </script>

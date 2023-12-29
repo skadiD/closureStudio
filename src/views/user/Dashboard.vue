@@ -77,11 +77,12 @@
         </div>
       </div>
       <NetworkDialog />
-      <dialog ref="addModel" class="modal" style="outline-width: 0">
+      <input type="checkbox" id="addModel" class="modal-toggle" />
+      <div class="modal" role="dialog">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" :close="() => { addModel.close() }" />
+          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" />
         </div>
-      </dialog>
+      </div>
       <RealNameDialog />
       <QQBindDialog v-if="showQQBind" @close="showQQBind = false" />
       <UpdateGamePasswdDialog :slotUUID="selectedSlotUUID" :form="selectedRegisterForm" />
@@ -110,7 +111,6 @@ import { userQuota } from "../../plugins/quota/userQuota";
 import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
 import { YouMayKnowDialog } from "../../components/dialog";
-const addModel = ref();
 const showQQBind = ref(false);
 const show = ref(false);
 const user = userStore();
@@ -134,7 +134,6 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
     return;
   }
   selectedSlotUUID.value = slotUUID;
-  addModel.value.showModal();
 };
 
 const isUpdateStatus = (gameAccount: string) => {
