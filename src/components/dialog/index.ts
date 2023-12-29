@@ -7,18 +7,32 @@ import BattleScreenShotsDialog from "./BattleScreenShotsDialog.vue";
 import ConfigDialog from "./ConfigDialog.vue";
 import UpdateGamePasswdDialog from "./UpdateGamePasswdDialog.vue";
 import YouMayKnowDialog from "./YouMayKnowDialog.vue";
+import { selectRandomElement } from "../../plugins/common";
+import { exitsArray } from "../../plugins/animate/animate";
+
+
 export const dialogClose = (name: string) => {
-  const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
-  if (dialog) dialog.close()
+  const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`);
+  if (dialog) {
+    dialog.close();
+  }
 }
+
 export const dialogOpen = (name: string) => {
-    const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
-    if (dialog) dialog.showModal()
+  const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`);
+  if (dialog) {
+    dialog.showModal();
+    dialog.classList.add('animate__fadeIn');
+    dialog.addEventListener('animationend', () => {
+      dialog.classList.remove('animate__fadeIn');
+    }, { once: true });
+  }
 }
+
 export const dialogIsOpen = (name: string) => {
-    const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
-    if (dialog) return dialog.open
-    return false
+  const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
+  if (dialog) return dialog.open
+  return false
 }
 export {
   QQBindDialog,

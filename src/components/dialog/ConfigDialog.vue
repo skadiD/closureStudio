@@ -1,24 +1,20 @@
 <template>
-    <dialog id="ConfigModel" class="modal" style="outline-width: 0">
+    <BaseDialog :dialogId="dialogId">
         <div class="modal-box">
             <h3 class="font-bold text-2xl">托管配置</h3>
-            <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
-                当前配置界面为究极无敌盖中盖版本，请在专家指导下使用
-            </div>
+            <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">当前配置界面为究极无敌盖中盖版本，请在专家指导下使用</div>
             <div class="flex">
                 <label class="form-control w-full max-w-xs mr-4">
                     <div class="label">
                         <span class="label-text">理智保留</span>
                     </div>
-                    <input v-model="config.keeping_ap" type="number"
-                        class="input input-sm input-bordered w-full max-w-xs" />
+                    <input v-model="config.keeping_ap" type="number" class="input input-sm input-bordered w-full max-w-xs" />
                 </label>
                 <label class="form-control w-full max-w-xs">
                     <div class="label">
                         <span class="label-text">招募卷保留</span>
                     </div>
-                    <input v-model="config.recruit_reserve" type="number"
-                        class="input input-sm input-bordered w-full max-w-xs" />
+                    <input v-model="config.recruit_reserve" type="number" class="input input-sm input-bordered w-full max-w-xs" />
                 </label>
             </div>
             <div class="divider h-0">智能开关</div>
@@ -49,54 +45,52 @@
             <div class="divider h-2">作战地图</div>
 
             <div class="flex py-2">
-                <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4"
-                    placeholder="-- 请输入代号\名称 --" />
+                <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="-- 请输入代号\名称 --" />
                 <select class="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
                     <option key="-- 请选择地图 --" value="-- 请选择地图 --">-- 请选择地图 --</option>
-                    <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">
-                        {{ stage.code }} {{ stage.name }}
-                    </option>
+                    <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">{{ stage.code }} {{ stage.name }}</option>
                 </select>
             </div>
             <div class="divider h-0">作战队列</div>
             <div class="flex flex-wrap">
-                <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap"
-                    class="btn btn-outline btn-warning btn-xs m-1">
+                <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap" class="btn btn-outline btn-warning btn-xs m-1">
                     {{ assets.getStageName(battleMap) }}
                 </button>
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-                <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose('ConfigModel')">
+                <button class="btn btn-error btn-outline btn-block mt-4" @click="close()">
                     <span v-if="isLoading" className="loading loading-bars loading-md"></span>
-                    关闭</button>
+                    关闭
+                </button>
                 <button class="btn btn-info btn-block mt-4" @click="onSubmit">
                     <span v-if="isLoading" className="loading loading-bars loading-md"></span>
-                    递交</button>
+                    递交
+                </button>
             </div>
         </div>
-    </dialog>
+    </BaseDialog>
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
-import {
-    doUpdateGameConf,
-} from "../../plugins/axios";
-import { formatTime, setMsg } from "../../plugins/common";
+import { doUpdateGameConf } from "../../plugins/axios";
+import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
-import { findGame, gameList } from "../../plugins/sse";
+import { findGame } from "../../plugins/sse";
 import { assets } from "../../plugins/assets/assets";
-import {dialogClose} from "./index";
+import { dialogClose } from "./index";
+import BaseDialog from "./base/BaseDialog.vue";
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
 }
 const props = withDefaults(defineProps<Props>(), {
-    account: "",
+    account: ""
 });
 
 const isDisabled = ref(true);
 const isLoading = ref(false);
 const stageKeyWord = ref("");
+const dialogId = ref("configModel");
 const config = ref<ApiGame.GameConfig>({
     account: "",
     accelerate_slot: "",
@@ -109,10 +103,8 @@ const config = ref<ApiGame.GameConfig>({
     recruit_ignore_robot: false,
     recruit_reserve: 0,
     map_id: "",
-    allow_login_assist: false,
+    allow_login_assist: false
 });
-
-
 
 const addStageToConfig = (event: Event) => {
     const selectElement = event.target as HTMLSelectElement;
@@ -125,16 +117,19 @@ const addStageToConfig = (event: Event) => {
     }
 };
 
-watch(() => {
-    return findGame(props.account);
-}, (newGame) => {
-    if (newGame) {
-        config.value = newGame.game_config;
-        isDisabled.value = true
-    } else {
-        isDisabled.value = false
+watch(
+    () => {
+        return findGame(props.account);
+    },
+    (newGame) => {
+        if (newGame) {
+            config.value = newGame.game_config;
+            isDisabled.value = true;
+        } else {
+            isDisabled.value = false;
+        }
     }
-});
+);
 
 const removeBattleMap = (battleMap: string) => {
     config.value.battle_maps = config.value.battle_maps.filter((item: string) => item !== battleMap);
@@ -154,12 +149,16 @@ const onSubmit = () => {
     delete copyConfig.accelerate_slot_cn;
     delete copyConfig.account;
     isLoading.value = true;
-    doUpdateGameConf(props.account, copyConfig).then(res => {
-        setMsg(res.message, Type.Info)
-    }).finally(() => {
-        isLoading.value = false;
-        dialogClose('ConfigModel')
-    })
-}
-
+    doUpdateGameConf(props.account, copyConfig)
+        .then((res) => {
+            setMsg(res.message, Type.Info);
+        })
+        .finally(() => {
+            isLoading.value = false;
+            close();
+        });
+};
+const close = () => {
+    dialogClose(dialogId.value);
+};
 </script>

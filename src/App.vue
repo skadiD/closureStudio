@@ -8,6 +8,7 @@
       <component :is="Component" />
     </keep-alive>
   </router-view>
+  <BrowserInfo />
 </template>
 <script setup lang="ts">
 import { loadTheme } from "./plugins/common";
@@ -16,6 +17,7 @@ import { config } from "./plugins/sse";
 import { fetchSytemConfig } from "./plugins/axios";
 import { loadAssets } from "./plugins/assets/assets";
 import Geetest from "./components/Geetest.vue";
+import BrowserInfo from "./components/toast/BrowserInfo.vue";
 fetchSytemConfig().then(res => {
   if (res.data) config.value = res.data
 })
