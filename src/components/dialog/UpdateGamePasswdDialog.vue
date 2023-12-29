@@ -1,5 +1,5 @@
 <template>
-    <BaseDialog :dialogId="dialogId">
+    <dialog id="UpdateGamePasswd" class="modal" style="outline-width: 0">
         <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
             <div class="text-3xl text-info font-bold text-center">修改密码</div>
             <div class="divider">账号信息</div>
@@ -27,7 +27,7 @@
                 </label>
             </div>
             <div class="flex justify-center space-x-4 mb-3">
-                <button @click="close()" class="btn btn-error btn-outline w-24">
+                <button @click="dialogClose('UpdateGamePasswd')" class="btn btn-error btn-outline w-24">
                     <span v-if="isLoading" class="loading loading-bars" />
                     关闭
                 </button>
@@ -37,7 +37,7 @@
                 </button>
             </div>
         </div>
-    </BaseDialog>
+    </dialog>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
@@ -45,8 +45,8 @@ import { setMsg } from '../../plugins/common';
 import { Type } from '../toast/enmu';
 import { doUpdateGamePasswd } from '../../plugins/axios';
 import updateCaptchaHandler from '../../plugins/geetest/captcha';
-import { dialogClose } from "./index";
-import BaseDialog from './base/BaseDialog.vue';
+import {dialogClose} from "./index";
+
 interface Props {
     slotUUID: string;
     form: Registry.AddGameForm;
@@ -65,7 +65,6 @@ const props = withDefaults(defineProps<Props>(), {
 
 const form = ref<Registry.AddGameForm>(props.form)
 const isLoading = ref(false);
-const dialogId = ref('UpdateGamePasswd')
 
 const updateGamePasswdOnBtnClick = () => {
     if (props.slotUUID === '') {
@@ -95,7 +94,7 @@ const updatePasswd = async (token: string, slotUUID: string) => {
         .then((res) => {
             if (res.code === 1) {
                 setMsg("修改密码成功", Type.Success);
-                close()
+                dialogClose('UpdateGamePasswd')
                 return;
             } else {
                 setMsg(res.message, Type.Warning);
@@ -110,10 +109,6 @@ const geetestUpdateGamePasswdOnSuccess = (uuid: string) => {
     return (geetestToken: string) => {
         doUpdateGamePasswd(uuid, geetestToken, form.value)
     }
-}
-
-const close = () => {
-  dialogClose(dialogId.value)
 }
 
 </script>

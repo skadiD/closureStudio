@@ -20,10 +20,7 @@
   </dialog>
 </template>
 <script lang="ts" setup>
-import {ref} from 'vue';
 import {dialogClose} from "./index";
-
-
 interface Props {
   screenShots: ApiGame.Screenshot[];
 }
