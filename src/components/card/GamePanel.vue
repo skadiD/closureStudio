@@ -16,7 +16,7 @@
       , true) }} </div>
   </template>
   <div class="divider" v-else>你的游戏尚未启动，请先配置</div>
-  <button class="btn btn-info btn-outline btn-block my-1" @click="dialogOpen('ConfigModel')">托管配置</button>
+  <button class="btn btn-info btn-outline btn-block my-1" @click="dialogOpen('configModel')">托管配置</button>
   <div class="divider">不实时日志</div>
   <div class="h-[calc(100vh-28rem)] overflow-y-auto">
     <table class="text-[1rem]">
@@ -59,7 +59,6 @@ const gameLogs = ref<ApiGame.GameLogs>({
 const selectedGame = ref<ApiGame.Game>()
 const isLoadingGameLogs = ref(false)
 const details = ref<ApiGame.Detail>()
-const configModel = ref()
 
 watch(() => props.account, (newVal) => {
   selectedGame.value = findGame(newVal)
@@ -92,7 +91,7 @@ const openScreenShots = () => {
     setMsg('暂时没有截图数据', Type.Warning)
     return
   }
-  dialogOpen('BattleScreenShots')
+  dialogOpen('battleScreenShots')
 }
 
 const getLogs = async () => {
