@@ -17,8 +17,8 @@
         <div class="divider my-2" />
         <ul class="w-full text-lg space-y-2">
           <li><router-link to="/" :class="{'bg-info': router.currentRoute.value.name === '首页'}">首页</router-link></li>
-          <li><a>托管账号</a></li>
-          <li><a>公开情报</a></li>
+          <li><router-link to="/dashboard">托管账号</router-link></li>
+<!--          <li><a>公开情报</a></li>-->
           <li><router-link to="/profile/account" :class="{'bg-info': router.currentRoute.value.name === '账号安全'}">账号设置</router-link></li>
         </ul>
         <div class="flex flex-1" />
