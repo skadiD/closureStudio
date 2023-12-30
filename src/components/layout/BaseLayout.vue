@@ -7,7 +7,7 @@
     </div>
     <div class="drawer-side z-50">
       <label for="drawer" class="drawer-overlay" />
-      <div class="menu p-4 w-72 min-h-screen bg-base-100 text-base-content flex flex-col flex-nowrap items-center">
+      <div class="menu p-4 w-72 h-mobile bg-base-100 text-base-content flex flex-col flex-nowrap items-center">
         <div class="hover:animate-spin avatar mt-6 mb-4">
           <div class="w-28 rounded-full">
             <img src="/assets/closure.ico" alt="closure" />

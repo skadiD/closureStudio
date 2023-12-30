@@ -51,7 +51,9 @@ body {
     overflow: hidden;
     text-overflow: ellipsis
 }
-
+.h-mobile {
+    min-height: calc(var(--vh, 1vh) * 100);
+}
 @font-face {
     font-family: 'Bender';
     src: url("./fonts/Bender-Bold.woff2");

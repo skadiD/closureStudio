@@ -63,8 +63,7 @@ export const YouMayKnowArray = [
   "作战失败的原因，游戏日志已经告诉你啦，不要再问可露希尔啦。",
   "为什么会作战失败，但是手机或者模拟器能正常作战？这个问题，可露希尔也不知道呢。",
   "请向开发团队致以崇高的敬意，他们真的很棒呢！",
-  "想要成为可露希尔们的一员吗？可露希尔工作室正在招募运维和开发工程师！别错过这个机会，快来投递简历吧！",
-  "可露希尔是不会收集任何用户信息的，大家可以放心使用。",
+  "想要成为可露希尔们的一员吗？可露希尔工作室正在招募运维和开发工程师！别错过这个机会，快来投递简历吧！"
 ];
 
 export function selectRandomElement<T>(arr: T[]): T | undefined {
@@ -98,10 +97,7 @@ export function maskPhoneNumber(phoneNumber: string): string {
   const endIdx = startIdx + numStars;
 
   // 构建马赛克字符串
-  const maskedPhoneNumber =
-    phoneNumber.substring(0, startIdx) +
-    "*".repeat(numStars) +
-    phoneNumber.substring(endIdx);
-
-  return maskedPhoneNumber;
+  return phoneNumber.substring(0, startIdx) +
+      "*".repeat(numStars) +
+      phoneNumber.substring(endIdx);
 }
