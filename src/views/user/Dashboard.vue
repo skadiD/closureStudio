@@ -78,7 +78,7 @@
       </div>
       <NetworkDialog />
       <input type="checkbox" id="addModel" class="modal-toggle" v-model="addModel" />
-      <div class="modal" role="dialog">
+      <div v-if="addModel" class="modal" role="dialog">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
           <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" @close="addModel = false" />
         </div>

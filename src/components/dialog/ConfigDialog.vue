@@ -1,6 +1,5 @@
 <template>
     <dialog id="ConfigModel" class="modal" style="outline-width: 0">
-        <Docker />
         <div class="modal-box">
             <h3 class="font-bold text-2xl">托管配置</h3>
             <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
@@ -87,7 +86,6 @@ import { Type } from "../toast/enmu";
 import { findGame } from "../../plugins/sse";
 import { assets } from "../../plugins/assets/assets";
 import {dialogClose} from "./index";
-import Docker from "../../App.vue";
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误

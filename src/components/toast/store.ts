@@ -10,7 +10,7 @@ const state = reactive({
 })
 const DURATION = 3000
 const defaultCfg = (): Toast => ({
-    id: `${Date.now()}`,
+    id: `${Date.now()}_${Math.random().toString(36).slice(-8)}`,
     message: '',
     type: Type.Info,
     showIcon: true,
@@ -32,7 +32,7 @@ export const Store = () => {
             type,
             appearance: Appearance.Dark,
         });
-
+        console.log(full.id)
         state.toasts[full.id] = full
     }
     const unset = (id: string) => {

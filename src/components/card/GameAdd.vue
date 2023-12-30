@@ -94,7 +94,7 @@ const confirmBtn = () => {
   if (confirmText.value === '我确信我的手机号可收到验证码') {
     confirm.value = false
     loading.value = false
-    setMsg('叠甲成功，提交托管信息中', Type.Info)
+    setMsg('叠甲成功，提交托管信息中', Type.Success)
     start()
   } else {
     setMsg('请输入正确的文本', Type.Warning)
@@ -102,14 +102,17 @@ const confirmBtn = () => {
 }
 
 const addGame = (token: string) => {
-  doAddGame(props.uuid, token, form.value).then(res => {
+  doAddGame(props.uuid, token, form.value).then((res: any) => {
     loading.value = false
     if (res.code === 1) {
       setMsg('账号托管提交成功', Type.Success)
       emit('close')
     } else {
-      setMsg(res.message, Type.Warning);
-      window.captchaObj.showCaptcha();
+      setMsg(`账号托管失败，返回码：${res.code}`, Type.Warning);
+      Object.values(res.data.results).forEach((value: any) => {
+        if (value.available) return
+        setMsg(`${value.ruleId}: ${value.message}`, Type.Info)
+      })
     }
   })
 }
@@ -129,7 +132,6 @@ const start = async () => {
   }
   loading.value = true
   updateCaptchaHandler(geetestAddGameOnSuccess(props.uuid, form.value));
-  await sleep(2000);
   window.grecaptcha?.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
     if (token === "") {
@@ -138,7 +140,6 @@ const start = async () => {
       return;
     }
     addGame(token)
-    // window.captchaObj.showCaptcha();
   })
 }
 const geetestAddGameOnSuccess = (uuid: string, form: Registry.AddGameForm) => {

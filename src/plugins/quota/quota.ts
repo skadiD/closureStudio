@@ -25,13 +25,12 @@ export const allowGameCreate = (
   isVerify: boolean
 ) => {
   let response: canAddGameResult = {
-    message: "请完成绑定",
+    message: "请完成手机号绑定",
     isLocked: true,
   };
   if (!userQuota) {
     return response;
   }
-
   if (
     slot.ruleFlags.includes("slot_account_format_is_phone") &&
     slot.ruleFlags.includes("slot_account_sms_verified")

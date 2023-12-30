@@ -22,7 +22,7 @@ service.interceptors.response.use(
       }
       const data: any = {
         message: message,
-        code: response.data?.err ? (response.data.code ?? 0) : 1,
+        code: (response.data?.err || !response.data?.available) ? (response.data.code ?? 0) : 1,
         data: response.data,
       };
       return data;
