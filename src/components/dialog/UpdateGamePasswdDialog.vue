@@ -1,5 +1,6 @@
 <template>
     <dialog id="UpdateGamePasswd" class="modal" style="outline-width: 0">
+      <Docker />
         <div class="bg-base-100 mx-4 px-6 py-4 shadow-lg max-w-md rounded-lg blog">
             <div class="text-3xl text-info font-bold text-center">修改密码</div>
             <div class="divider">账号信息</div>
@@ -46,6 +47,7 @@ import { Type } from '../toast/enmu';
 import { doUpdateGamePasswd } from '../../plugins/axios';
 import updateCaptchaHandler from '../../plugins/geetest/captcha';
 import {dialogClose} from "./index";
+import Docker from "../../App.vue";
 
 interface Props {
     slotUUID: string;

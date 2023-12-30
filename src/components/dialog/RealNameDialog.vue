@@ -1,5 +1,6 @@
 <template>
   <dialog id="RealName" class="modal" style="outline-width: 0">
+    <Docker />
     <div class="modal-box">
       <div class="text-3xl text-info font-bold text-center">归属验证</div>
       <div class="s-combo mb-6 mt-4">
@@ -19,6 +20,7 @@ import {setMsg} from "../../plugins/common";
 import {Type} from "../toast/enmu";
 import {userStore} from "../../store/user";
 import {dialogClose} from "./index";
+import Docker from "../../App.vue";
 
 // 短信验证码
 const smsCode = ref("");

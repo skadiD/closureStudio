@@ -77,10 +77,10 @@
         </div>
       </div>
       <NetworkDialog />
-      <input type="checkbox" id="addModel" class="modal-toggle" />
+      <input type="checkbox" id="addModel" class="modal-toggle" v-model="addModel" />
       <div class="modal" role="dialog">
         <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" />
+          <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" @close="addModel = false" />
         </div>
       </div>
       <RealNameDialog />
@@ -118,7 +118,7 @@ const selectedSlotUUID = ref("");
 const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update password
 // start
 startSSE(user);
-
+const addModel = ref(false)
 const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
   if (!userQuota.value.data.value) {
     setMsg("游戏托管槽位数据异常，无法提交", Type.Warning);

@@ -45,8 +45,8 @@
       明日方舟，启动
     </button>
   </div>
-
-  <dialog v-if="isFirst" ref="confirm" class="modal" style="outline-width: 0">
+  <input type="checkbox" id="confirmModel" class="modal-toggle" v-model="confirm"/>
+  <div v-if="isFirst" class="modal" role="dialog">
     <div class="bg-base-100 mx-4 p-4 shadow-lg max-w-md rounded-lg">
       <div class="text-3xl text-warning font-bold text-center mt-2">温馨提示</div>
       <div class="divider" />
@@ -61,7 +61,7 @@
       </div>
       <button class="btn btn-block btn-warning" @click="confirmBtn">确认</button>
     </div>
-  </dialog>
+  </div>
 </template>
 <script lang="ts" setup>
 import { ref } from "vue";
@@ -69,6 +69,8 @@ import { doAddGame } from "../../plugins/axios";
 import { setMsg, sleep } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
+import Docker from "../../App.vue";
+import {GameAdd} from "./index";
 
 interface Props {
   uuid: string
@@ -78,9 +80,10 @@ const props = withDefaults(defineProps<Props>(), {
   uuid: '',
   isFirst: true,
 });
-const confirm = ref()
+const confirm = ref(false)
 const confirmText = ref('')
 const loading = ref(false)
+const emit = defineEmits(['close'])
 const form = ref<Registry.AddGameForm>({
   account: '',
   password: '',
@@ -89,7 +92,8 @@ const form = ref<Registry.AddGameForm>({
 
 const confirmBtn = () => {
   if (confirmText.value === '我确信我的手机号可收到验证码') {
-    confirm.value.close()
+    confirm.value = false
+    loading.value = false
     setMsg('叠甲成功，提交托管信息中', Type.Info)
     start()
   } else {
@@ -102,7 +106,7 @@ const addGame = (token: string) => {
     loading.value = false
     if (res.code === 1) {
       setMsg('账号托管提交成功', Type.Success)
-      props.close()
+      emit('close')
     } else {
       setMsg(res.message, Type.Warning);
       window.captchaObj.showCaptcha();
@@ -111,9 +115,8 @@ const addGame = (token: string) => {
 }
 
 const start = async () => {
-  loading.value = true
   if (props.isFirst && confirmText.value == '') {
-    confirm.value.showModal()
+    confirm.value = true
     return
   }
   if (props.uuid === '') {
@@ -124,6 +127,7 @@ const start = async () => {
     setMsg('请填写登录信息', Type.Warning)
     return;
   }
+  loading.value = true
   updateCaptchaHandler(geetestAddGameOnSuccess(props.uuid, form.value));
   await sleep(2000);
   window.grecaptcha?.ready(async () => {
@@ -142,9 +146,4 @@ const geetestAddGameOnSuccess = (uuid: string, form: Registry.AddGameForm) => {
     doAddGame(uuid, geetestToken, form)
   }
 }
-
-const dialogClose = () => {
-  props.close()
-}
-
 </script>

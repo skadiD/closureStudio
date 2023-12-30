@@ -34,7 +34,7 @@ $timing-function: cubic-bezier(0.820, 0.085, 0.395, 0.895);
 
 .toast2 {
   position: fixed;
-  z-index: 100;
+  z-index: 1000;
   margin: 0;
   padding: 0;
   white-space: inherit;
