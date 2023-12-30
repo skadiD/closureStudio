@@ -20,7 +20,7 @@
             </div>
           </div>
           <div class="font-bold flex flex-col">
-            <span class="text-3xl">Dr.skadiD</span>
+            <span class="text-3xl">Dr.{{user.user.Info.email}}</span>
             <span class="text-base-content/50">今天是你加入可露希尔俱乐部第 {{ days }} 天!</span>
           </div>
         </div>
@@ -29,10 +29,16 @@
           <transition name="slide-fade">
             <component :is="Component" v-if="Component" />
             <div v-else>
-              <div role="alert" class="rounded border-s-4 border-success bg-info/10 p-4 mt-4">
+              <div v-if="user.user.Info.status === 1" role="alert" class="rounded border-s-4 border-success bg-info/10 p-4 mt-4">
                 <strong class="block font-bold text-lg">你已完成身份绑定，可正常使用可露希尔云服务</strong>
                 <p class="mt-4 text-sm">
                   <a class="btn btn-info btn-sm px-4 btn-outline">你的绑定手机号是：可露希尔也不知道(&gt;﹏&lt;)</a>
+                </p>
+              </div>
+              <div v-if="user.user.Info.status <= 0" role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 mt-4">
+                <strong class="block font-bold text-lg">你还没有绑定手机号，请先添加游戏/启动游戏</strong>
+                <p class="mt-4 text-sm">
+                  <router-link to="/dashboard" class="btn btn-info btn-sm px-4 btn-outline btn-block">点击传送</router-link>
                 </p>
               </div>
               <div class="divider"/>
@@ -71,7 +77,9 @@ import {useRoute} from "vue-router";
 import GameAccount from "../../components/card/GameAccount.vue";
 import {computed, ref} from "vue";
 import {fetchGameList} from "../../plugins/axios";
+import {userStore} from "../../store/user";
 const route = useRoute()
+const user = userStore()
 const levels = ['杰斯顿', '深海杰斯顿', '海上杰斯顿', '空中杰斯顿', '兽主杰斯顿']
 const menu = [
   {

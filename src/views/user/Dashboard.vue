@@ -15,7 +15,7 @@
         <!-- <p v-if="user.info.status === 0">
           o(╥﹏╥)o 你的账号已被封禁，如有疑问请联系管理员
         </p> -->
-        <p v-if="user.info.status === -1 && gameList?.length === 0">
+        <p v-if="user.info.status <= 0 && gameList?.length === 0">
           你的账号没有完成
           <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
         </p>
