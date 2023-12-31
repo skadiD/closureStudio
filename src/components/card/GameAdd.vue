@@ -111,6 +111,7 @@ const addGame = (token: string) => {
       emit('close')
     } else {
       setMsg(`账号托管失败，返回码：${res.code}`, Type.Warning);
+      if (res.message) setMsg(res.message, Type.Warning)
       Object.values(res.data.results).forEach((value: any) => {
         if (value.available) return
         setMsg(`${value.ruleId}: ${value.message}`, Type.Info)
