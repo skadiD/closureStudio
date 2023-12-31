@@ -110,7 +110,6 @@ const addGame = (token: string) => {
     } else {
       setMsg(`账号托管失败，返回码：${res.code}`, Type.Warning);
       setMsg(`账号托管失败，返回消息：${res.message}`, Type.Warning);
-      setMsg(`账号托管失败，返回数据：${res.data}`, Type.Warning);
       Object.values(res.data.results).forEach((value: any) => {
         if (value.available) return
         setMsg(`${value.ruleId}: ${value.message}`, Type.Info)
