@@ -4,7 +4,7 @@ import type { AxiosInstance, AxiosError } from "axios";
 import { handleAxiosError } from "./axiosHelper";
 import { config } from "./sse";
 export const service = axios.create({
-  baseURL: "https://api.arknights.host/",
+  baseURL: "https://api.ltsc.vip/",
 });
 const user = localStorage.getItem("closureV3_user");
 
