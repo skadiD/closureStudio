@@ -133,7 +133,11 @@ const start = async () => {
     return;
   }
   loading.value = true
-  // 先通过 recaptcha
+  // 先通过 recaptcha 加载失败的时候直接降级到 geetest
+  if (!window.grecaptcha) {
+    updateCaptchaHandler(geetestAddGameOnSuccess())
+    return;
+  }
   window.grecaptcha?.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
     if (token === "") {
