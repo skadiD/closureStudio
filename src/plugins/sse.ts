@@ -32,7 +32,7 @@ const startSSE = (user: any) => {
     return false;
   } else {
     event = new EventSource(
-        `https://api.arknights.host/sse/games?token=${user.token}`
+        `https://api.ltsc.vip/sse/games?token=${user.token}`
     );
     event.onopen = (e) => {
       setMsg("链接到服务器成功", Type.Success);
