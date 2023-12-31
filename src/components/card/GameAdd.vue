@@ -69,8 +69,6 @@ import { doAddGame } from "../../plugins/axios";
 import { setMsg, sleep } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
-import Docker from "../../App.vue";
-import {GameAdd} from "./index";
 
 interface Props {
   uuid: string
@@ -89,7 +87,6 @@ const form = ref<Registry.AddGameForm>({
   password: '',
   platform: 1
 })
-
 const confirmBtn = () => {
   if (confirmText.value === '我确信我的手机号可收到验证码') {
     confirm.value = false
@@ -104,12 +101,16 @@ const confirmBtn = () => {
 const addGame = (token: string) => {
   doAddGame(props.uuid, token, form.value).then((res: any) => {
     loading.value = false
+    if (res.code === 0) { // 通过 geetest
+      setMsg('请继续完成滑块验证', Type.Info)
+      updateCaptchaHandler(geetestAddGameOnSuccess())
+      return
+    }
     if (res.code === 1) {
       setMsg('账号托管提交成功', Type.Success)
       emit('close')
     } else {
       setMsg(`账号托管失败，返回码：${res.code}`, Type.Warning);
-      setMsg(`账号托管失败，返回消息：${res.message}`, Type.Warning);
       Object.values(res.data.results).forEach((value: any) => {
         if (value.available) return
         setMsg(`${value.ruleId}: ${value.message}`, Type.Info)
@@ -132,7 +133,7 @@ const start = async () => {
     return;
   }
   loading.value = true
-  updateCaptchaHandler(geetestAddGameOnSuccess(props.uuid, form.value));
+  // 先通过 recaptcha
   window.grecaptcha?.ready(async () => {
     const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
     if (token === "") {
@@ -143,9 +144,9 @@ const start = async () => {
     addGame(token)
   })
 }
-const geetestAddGameOnSuccess = (uuid: string, form: Registry.AddGameForm) => {
+const geetestAddGameOnSuccess = () => {
   return (geetestToken: string) => {
-    doAddGame(uuid, geetestToken, form)
+    addGame(geetestToken)
   }
 }
 </script>

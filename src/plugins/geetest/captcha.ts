@@ -13,7 +13,11 @@ const captchaConfig = {
 const updateCaptchaHandler = (onSuccess: (geetestResult: string) => void) => {
   captchaConfig.handler = (obj: any) => {
     window.captchaObj = obj;
-    obj.appendTo("#captcha").onSuccess(() => {
+    obj.appendTo("#captcha")
+    obj.onReady(() => {
+      window.captchaObj.showCaptcha()
+    })
+    obj.onSuccess(() => {
       const result: object = window.captchaObj.getValidate();
       if (!result) {
         setMsg("请完成验证", Type.Warning);
