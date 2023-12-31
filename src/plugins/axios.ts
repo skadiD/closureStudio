@@ -76,7 +76,7 @@ async function asyncRequest<T>(
 ): Promise<Service.RequestResult<T>> {
   const { url } = param;
   if (param.token) {
-    service.defaults.headers["X-Platform"] = "website";
+    service.defaults.headers["X-Platform"] = "postman";
     service.defaults.headers["token"] = param.token;
   } else {
     delete service.defaults.headers["X-Platform"];
