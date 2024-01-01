@@ -4,10 +4,12 @@ import { Type } from "../components/toast/enmu";
 import { userStore } from "../store/user";
 import { router } from "./router";
 import { userQuota } from "./quota/userQuota";
-import {gameCaptcha} from "./geetest/captcha";
+import { gameCaptcha } from "./geetest/captcha";
 const config = ref<ApiSystem.Config>({} as ApiSystem.Config);
 const gameList = ref<ApiGame.Game[]>([]);
+
 let event: EventSource | null = null;
+let timer: ReturnType<typeof setTimeout>;
 
 const startSSE = (user: any) => {
   if (event !== null) {
@@ -30,37 +32,51 @@ const startSSE = (user: any) => {
   if (typeof EventSource === "undefined") {
     setMsg("你的浏览器不支持 SSE 特性，访问托管列表将受到影响", Type.Warning);
     return false;
-  } else {
-    event = new EventSource(
-        `https://api.ltsc.vip/sse/games?token=${user.token}`
-    );
-    event.onopen = (e) => {
-      setMsg("链接到服务器成功", Type.Success);
-    };
-    // 根据收到的消息解析操作：更新游戏列表 & 掐断链接
-    event.addEventListener("game", (event) => {
-      gameList.value = JSON.parse(event.data) ?? [];
-      gameList.value.forEach((game) => {
-        console.log(game.status.code, game.captcha_info)
-        if (game.status.code === 999 && game.captcha_info.challenge) {
-          gameCaptcha(game.status.account, game.captcha_info);
-        }
-      })
-      userQuota.value.queryMe();
-    });
-    event.addEventListener("close", () => {
-      setMsg("你已在其他窗口或设备访问，本页面暂停更新", Type.Warning);
-      event?.close();
-    });
-    event.onerror = (e) => {
-      setMsg("与服务器通信中断", Type.Alert);
-    };
   }
+
+  event = new EventSource(
+    `https://api.ltsc.vip/sse/games?token=${user.token}`
+  );
+  event.onopen = (e) => {
+    clearTimeout(timer); // 清除超时定时器
+    setMsg("链接到服务器成功", Type.Success);
+  };
+
+  timer = setTimeout(sseTimeOoutWarn, 3000);
+
+  // 根据收到的消息解析操作：更新游戏列表 & 掐断链接
+  event.addEventListener("game", (event) => {
+    gameList.value = JSON.parse(event.data) ?? [];
+    gameList.value.forEach((game) => {
+      console.log(game.status.code, game.captcha_info)
+      if (game.status.code === 999 && game.captcha_info.challenge) {
+        gameCaptcha(game.status.account, game.captcha_info);
+      }
+    })
+    userQuota.value.queryMe();
+  });
+  event.addEventListener("close", () => {
+    setMsg("你已在其他窗口或设备访问，本页面暂停更新", Type.Warning);
+    event?.close();
+  });
+  event.onerror = (e) => {
+    setMsg("与服务器通信中断", Type.Alert);
+  };
 };
 const findGame = (gameAccount: string) => {
   return gameList.value.find(
-      (game) => game.status.account === gameAccount
+    (game) => game.status.account === gameAccount
   );
 };
 
-export { config, startSSE, findGame, gameList  };
+const sseTimeOoutWarn = () => {
+  if (event === null) {
+    return;
+  }
+  if (event.readyState !== EventSource.OPEN) {
+    event.close();
+    setMsg("服务器链接失败，请刷新网页", Type.Warning);
+  }
+}
+
+export { config, startSSE, findGame, gameList };
