@@ -22,7 +22,17 @@ export const userStore = defineStore("user", {
         login(token: string) {
             this.user.isLogin = true;
             this.user.Token = token;
-            this.user.Info = JSON.parse(atob(token.split('.')[1]));
+            function b64(str: string) {
+                let base64Decoded = atob(str);
+                let chars = [];
+                for (let i = 0; i < base64Decoded.length; i++) {
+                    chars.push(base64Decoded.charCodeAt(i));
+                }
+                let utf8Bytes = new Uint8Array(chars);
+                let decoder = new TextDecoder('utf-8');
+                return decoder.decode(utf8Bytes);
+            }
+            this.user.Info = JSON.parse(b64(token.split('.')[1]));
             service.defaults.headers.common['Authorization'] = "Bearer " + token;
         },
         logout() {
