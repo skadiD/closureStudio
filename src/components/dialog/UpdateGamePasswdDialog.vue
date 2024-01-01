@@ -79,6 +79,7 @@ const updateGamePasswdOnBtnClick = () => {
 
     updateCaptchaHandler(geetestUpdateGamePasswdOnSuccess(props.slotUUID));
     isLoading.value = true;
+    dialogClose('UpdateGamePasswd');
     window.grecaptcha?.ready(async () => {
         const token = await window.grecaptcha.execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
         if (token === "") {
@@ -95,7 +96,6 @@ const updatePasswd = async (token: string, slotUUID: string) => {
         .then((res) => {
             if (res.code === 1) {
                 setMsg("修改密码成功", Type.Success);
-                dialogClose('UpdateGamePasswd')
                 return;
             } else {
                 setMsg(res.message, Type.Warning);
