@@ -16,17 +16,24 @@
           o(╥﹏╥)o 你的账号已被封禁，如有疑问请联系管理员
         </p> -->
         <p v-if="user.info.status <= 0 && gameList?.length === 0">
-          你的账号没有完成
-          <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★
+          <!-- 你的账号没有完成
+          <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★ -->
+          好极了!!! 你完成了注册!!! 请添加第一个游戏账号并进行托管～(∠・ω&lt; )⌒★
         </p>
-        <p v-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0">
-          手机验证码将在托管启动成功后发送，你可以启动游戏体验<b>【{{ calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
+
+        <p v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at == 0">
+          了不起!!! 你添加了一个游戏!!! 现在你可以启动游戏进行托管!!!
+        </p>
+        
+        <p v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at != 0">
+          非常棒!!! 你托管了一个游戏!!! 手机验证码已经发送，
           完成【手机号：{{
             gameList[0]?.status.account?.replace(
               /(\d{3})\d{6}(\d{2})/,
               "$1****$2"
             )
-          }}】绑定认证<b class="cursor-pointer" @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量
+          }}】绑定认证<b class="cursor-pointer" @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量。
+          剩余托管体验时间 <b>【{{ calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
         </p>
         <p v-if="user.info.status === 1 && userQuota.data.value?.idServerQQ.length === 0">
           完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量
