@@ -282,7 +282,7 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
   selectedRegisterForm.value.account = getRealGameAccount(game.status.account);
   selectedRegisterForm.value.platform = game.status.platform;
   selectedRegisterForm.value.password = "";
-  dialogClose('UpdateGamePasswd')
+  dialogOpen('UpdateGamePasswd')
 };
 
 // geetest
