@@ -137,6 +137,13 @@ const Auth_Register = (params: {
   noise: string;
   sign: string;
 }) => post<ApiUser.Auth>(`${AuthServer}register`, params);
+
+const Auth_ResetPassword = (params: {
+  email: string;
+  phone: string;
+  newPasswd: string;
+}) => post<ApiUser.Auth>(`${AuthServer}forget`, params);
+
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
 const fetchAnnounce = () => get("Common/Announcement"); // Announce
@@ -188,7 +195,7 @@ const fetchUserSlots = () =>
 const fetchGameListBySSE = () => sse<ApiGame.Game[]>("sse/game"); // 实验性获取 GameList
 const fetchGameDetails = (account: string) =>
   get<ApiGame.Detail>(`game/${account}`);
-export { Auth_Login, Auth_Register, Auth_Verify, Auth_Info, Auth_Refresh };
+export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh };
 export {
   fetchSytemConfig,
   fetchSytemList,
