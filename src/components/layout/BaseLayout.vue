@@ -37,7 +37,7 @@
   const router = useRouter()
   const logout = () => {
     user.logout();
-    router.push('/')
     setMsg('已退出登录', Type.Success)
+    window.location.href = "/";
   }
 </script>
