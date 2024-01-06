@@ -1,4 +1,4 @@
-/** 请求超时时间 */
+/**,请求超时时间 */
 export const REQUEST_TIMEOUT = 60 * 1000;
 
 /** 错误信息的显示时间 */
@@ -50,3 +50,5 @@ export const NOTIFY = {
     NOT_ALLOW_DELETE_GAME: "你不能删除这个账号",
     ALREADY_BIND_QQ: "QQ绑定已完成",
 }
+
+export const AccelerateSlot_CN = ["顶层左","顶层中","顶层右","中层左","中层中","中层右","底层左","底层中","底层右"]

@@ -3,7 +3,7 @@
         <div class="modal-box">
             <h3 class="font-bold text-2xl">托管配置</h3>
             <div role="alert" class="rounded border-s-4 border-warning bg-warning/10 p-4 space-y-2 my-4">
-                当前配置界面为究极无敌盖中盖版本，请在专家指导下使用
+                请在专家指导下使用
             </div>
             <div class="flex">
                 <label class="form-control w-full max-w-xs mr-4">
@@ -36,7 +36,7 @@
 
             <div class="grid grid-cols-2 gap-4 h-8">
                 <label class="label cursor-pointer mb-4">
-                    <span class="label-text">忽略机器人</span>
+                    <span class="label-text">忽略小车</span>
                     <input v-model="config.recruit_ignore_robot" type="checkbox" class="toggle toggle-sm" />
                 </label>
 
@@ -45,9 +45,9 @@
                     <input v-model="config.allow_login_assist" type="checkbox" class="toggle toggle-sm" />
                 </label>
             </div>
-
+            <div class="divider h-2">无人机加速</div>
+            <BaseDesign :slot="config.accelerate_slot_cn" @updateSlot="config.accelerate_slot_cn = $event"/>
             <div class="divider h-2">作战地图</div>
-
             <div class="flex py-2">
                 <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4"
                     placeholder="-- 请输入代号\名称 --" />
@@ -85,7 +85,8 @@ import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { findGame } from "../../plugins/sse";
 import { assets } from "../../plugins/assets/assets";
-import {dialogClose} from "./index";
+import { dialogClose } from "./index";
+import BaseDesign from "../BaseDesign.vue";
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -149,7 +150,7 @@ const onSubmit = () => {
     const copyConfig = JSON.parse(JSON.stringify(config.value));
     delete copyConfig.is_stopped;
     delete copyConfig.map_id;
-    delete copyConfig.accelerate_slot_cn;
+    delete copyConfig.accelerate_slot;
     delete copyConfig.account;
     isLoading.value = true;
     doUpdateGameConf(props.account, copyConfig).then(res => {
