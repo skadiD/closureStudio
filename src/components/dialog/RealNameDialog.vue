@@ -26,9 +26,11 @@ const smsBtn = () => {
   if (smsCode.value !== "") {
     Auth_Verify(smsCode.value).then((res) => {
       if (res.code === 1) {
-        setMsg("认证成功", Type.Success);
+        setMsg("认证成功,请重新登录", Type.Success);
         Auth_Refresh().then((res) => {
-          if (res.data) user.login(res.data.token);
+          if (res.data) {
+            window.location.href = "/";
+          }
           dialogClose('RealName')
         });
         return;
