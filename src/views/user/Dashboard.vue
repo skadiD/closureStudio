@@ -35,7 +35,7 @@
           }}】绑定认证<b class="cursor-pointer" @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量。
           剩余托管体验时间 <b>【{{ calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
         </p>
-        <p v-if="user.info.status === 1 && userQuota.data.value?.idServerQQ.length === 0">
+        <p v-if="user.isVerify  && userQuota.data.value?.idServerQQ.length === 0">
           完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量
         </p>
         <p v-if="user.info.status >= 1">

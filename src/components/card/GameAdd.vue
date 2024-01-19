@@ -66,7 +66,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { doAddGame } from "../../plugins/axios";
-import { setMsg, sleep } from "../../plugins/common";
+import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 
