@@ -9,7 +9,6 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-
 import { selectRandomElement, YouMayKnowArray } from '../../plugins/common';
 const message = ref('')
 const dialog = ref()
@@ -19,4 +18,3 @@ onMounted(() => {
   dialog.value.showModal();
 })
 </script>
-  

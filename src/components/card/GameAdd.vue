@@ -148,6 +148,7 @@ const start = async () => {
     }
     addGame(token)
   })
+  
 }
 const geetestAddGameOnSuccess = () => {
   return (geetestToken: string) => {
