@@ -52,11 +52,11 @@
                 </select>
             </div>
             <div class="divider h-0">作战队列</div>
-            <VueDraggable ref="el" @start="onStart" @update="onUpdate" class="flex flex-wrap" v-model="config.battle_maps">
-                <div v-for="battleMap in config.battle_maps" :key="battleMap" @click="removeBattleMap(battleMap)" class="m-1 btn btn-outline btn-warning btn-xs">
+            <div class="flex flex-wrap">
+                <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap" class="btn btn-outline btn-warning btn-xs m-1">
                     {{ assets.getStageName(battleMap) }}
-                </div>
-            </VueDraggable>
+                </button>
+            </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
                 <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose('ConfigModel')">
                     <span v-if="isLoading" class="loading loading-bars loading-md"></span>
@@ -79,7 +79,6 @@ import { findGame } from "../../plugins/sse";
 import { assets } from "../../plugins/assets/assets";
 import { dialogClose } from "./index";
 import BaseDesign from "../BaseDesign.vue";
-import { UseDraggableReturn, VueDraggable } from "vue-draggable-plus";
 interface Props {
     account: string;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
@@ -87,7 +86,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     account: ""
 });
-const el = ref<UseDraggableReturn>();
 const isDisabled = ref(true);
 const isLoading = ref(false);
 const stageKeyWord = ref("");
@@ -106,13 +104,6 @@ const config = ref<ApiGame.GameConfig>({
     allow_login_assist: false
 });
 
-const onStart = () => {
-    console.log("start");
-};
-
-const onUpdate = () => {
-    console.log("update");
-};
 const addStageToConfig = (event: Event) => {
     const selectElement = event.target as HTMLSelectElement;
     const selectedKey = selectElement.value;
