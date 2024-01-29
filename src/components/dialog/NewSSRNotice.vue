@@ -4,11 +4,12 @@
       <div class="text-3xl text-info font-bold text-center">可露希尔又双叒叕抽到6星干员啦</div>
       <div class="text-center font-bold my-2">在过去的 {{ ((Math.floor(Date.now() / 1000) - lastReadTs) / 3600).toFixed(2) }} 小时里，全站抽取到的干员是</div>
       <div class="w-full overflow-x-auto">
-        <p class="text-center text-4xl font-extrabold overflow-y-hidden text-warning h-12 mt-4">太神奇了！一个人都没有</p>
-        <div class="flex gap-2 w-[52rem]" v-if="users.length">
-          <div class="rounded shadow-md p-5 w-[148px] h-72 ssr relative" v-for="row in users">
+        <p v-if="!users.length" class="text-center text-4xl font-extrabold overflow-y-hidden text-warning h-12 mt-4">太神奇了！一个人都没有</p>
+        <div v-else class="flex gap-2" :style="`width: ${(users.length) * 156}px`" >
+          <div class="rounded shadow-md p-5 w-[148px] h-72 ssr relative" v-for="row in users"
+               :style="`background-image:url('https://assets.closure.setonink.com/dst/charpor/${row.charId}_1.webp');`">
             <div class="absolute bottom-0 left-0 right-0 ">
-              <div class="divider text-info font-extrabold text-shadow">Dr.{{ row.nickName }}</div>
+              <div class="divider text-info font-extrabold text-shadow">{{ row.nickName }}</div>
             </div>
           </div>
         </div>
@@ -22,7 +23,6 @@
 </template>
 <style scoped>
 .ssr {
-  background-image: url('https://assets.closure.setonink.com/dst/charpor/char_1012_skadi2_1.webp');
   background-size: cover;
   background-repeat: no-repeat;
 }
