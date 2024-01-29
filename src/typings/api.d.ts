@@ -138,6 +138,14 @@ declare namespace ApiGame {
     captcha_info: CaptchaInfo;
     game_config: GameConfig;
   }
+  interface SSR {
+    account: string,
+    nickName: string,
+    avatar: ApiGame.Avatar,
+    gachaInfo: string,
+    charId: string,
+    createdAt: number
+  }
 }
 declare namespace Registry {
   interface AddGameForm {

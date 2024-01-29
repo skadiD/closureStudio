@@ -5,9 +5,10 @@ import { userStore } from "../store/user";
 import { router } from "./router";
 import { userQuota } from "./quota/userQuota";
 import { gameCaptcha } from "./geetest/captcha";
+import {dialogOpen} from "../components/dialog";
 const config = ref<ApiSystem.Config>({} as ApiSystem.Config);
 const gameList = ref<ApiGame.Game[]>([]);
-
+const globalSSR = ref<ApiGame.SSR[]>([]);
 let event: EventSource | null = null;
 let timer: ReturnType<typeof setTimeout>;
 
@@ -20,14 +21,11 @@ const startSSE = (user: any) => {
     return false;
   }
   // check this token is expired or not?
-  if (user.user.Info) {
-    // check user.user.exp is expired or not? this is utc time 1703262578
-    if (user.user.Info.exp < Math.floor(Date.now() / 1000)) {
-      setMsg("登录已过期，请重新登录", Type.Warning);
-      user.logout()
-      router.push("/");
-      return false;
-    }
+  if (user.user.Info && user.user.Info.exp < Math.floor(Date.now() / 1000)) {
+    setMsg("登录已过期，请重新登录", Type.Warning);
+    user.logout()
+    router.push("/");
+    return false;
   }
   if (typeof EventSource === "undefined") {
     setMsg("你的浏览器不支持 SSE 特性，访问托管列表将受到影响", Type.Warning);
@@ -37,12 +35,12 @@ const startSSE = (user: any) => {
   event = new EventSource(
     `https://api.ltsc.vip/sse/games?token=${user.token}`
   );
-  event.onopen = (e) => {
+  event.onopen = () => {
     clearTimeout(timer); // 清除超时定时器
     setMsg("链接到服务器成功", Type.Success);
   };
 
-  timer = setTimeout(sseTimeOoutWarn, 3000);
+  timer = setTimeout(sseTimeOutWarn, 3000);
 
   // 根据收到的消息解析操作：更新游戏列表 & 掐断链接
   event.addEventListener("game", (event) => {
@@ -59,9 +57,20 @@ const startSSE = (user: any) => {
     setMsg("你已在其他窗口或设备访问，本页面暂停更新", Type.Warning);
     event?.close();
   });
-  event.onerror = (e) => {
-    setMsg("与服务器通信中断", Type.Alert);
-  };
+  event.addEventListener("ssr", (event) => {
+    globalSSR.value = JSON.parse(event.data) ?? [];
+    const now = Math.floor(Date.now() / 1000)
+    globalSSR.value.filter(item => item.createdAt >= now)
+    if (globalSSR.value.length) {
+      setMsg("可露希尔又双叒叕抽到 6 星干员啦!!!", Type.Info);
+      dialogOpen('SSRNotice')
+    }
+  });
+  // 刷新后会弹出错误
+  // event.onerror = (e) => {
+  //   console.log(e)
+  //   setMsg("与服务器通信中断", Type.Alert);
+  // };
 };
 const findGame = (gameAccount: string) => {
   return gameList.value.find(
@@ -69,14 +78,12 @@ const findGame = (gameAccount: string) => {
   );
 };
 
-const sseTimeOoutWarn = () => {
-  if (event === null) {
-    return;
-  }
+const sseTimeOutWarn = () => {
+  if (event === null) return;
   if (event.readyState !== EventSource.OPEN) {
     event.close();
     setMsg("服务器链接失败，请刷新网页", Type.Warning);
   }
 }
 
-export { config, startSSE, findGame, gameList };
+export { config, startSSE, findGame, gameList, globalSSR };

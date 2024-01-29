@@ -101,7 +101,7 @@ const confirmBtn = () => {
 const addGame = (token: string) => {
   doAddGame(props.uuid, token, form.value).then((res: any) => {
     loading.value = false
-    if (res.code === 0) { // 通过 geetest
+    if (res.code === -1100) { // 通过 geetest
       setMsg('请继续完成滑块验证', Type.Info)
       updateCaptchaHandler(geetestAddGameOnSuccess())
       return

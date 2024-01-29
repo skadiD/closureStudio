@@ -61,11 +61,12 @@
             <GamePanel :account="selectGame" />
         </div>
     </div>
+    <NewSSRNotice :users="globalSSR" />
     <YouMayKnowDialog />
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
-import { config, findGame, gameList, startSSE } from "../../plugins/sse";
+import { config, findGame, gameList, globalSSR, startSSE } from "../../plugins/sse";
 import "animate.css";
 import { userStore } from "../../store/user";
 import { doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
@@ -81,6 +82,7 @@ import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
 import { YouMayKnowDialog } from "../../components/dialog";
 import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
+import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
 const showQQBind = ref(false);
 const show = ref(false);
 const user = userStore();
@@ -180,15 +182,16 @@ const suspend = (account: string) => {
 const login = (token: string, account: string) => {
     doGameLogin(token, account).then((res) => {
         isLoading.value = false;
+        if (res.code === -1100) { // 通过 geetest
+          setMsg('请继续完成滑块验证', Type.Info)
+          updateCaptchaHandler(geetestLoginGameOnSuccess(account))
+          return
+        }
         if (res.code === 1) {
             setMsg("启动成功", Type.Success);
             dialogOpen("geetestNotify");
             // router.go(0)
         } else {
-            if (res.message === "人机验证失败" || res.message === "reCAPTCHA认证无效") {
-                window.captchaObj.showCaptcha();
-                return;
-            }
             setMsg(res.message, Type.Warning);
         }
     });
@@ -197,13 +200,16 @@ const login = (token: string, account: string) => {
 const deleteGame = async (token: string, slotUUID: string) => {
     doDelGame(slotUUID, token)
         .then((res) => {
-            if (res.code === 1) {
-                setMsg("删除成功", Type.Success);
-                return;
-            } else {
-                setMsg(res.message, Type.Warning);
-                window.captchaObj.showCaptcha();
-            }
+          if (res.code === -1100) { // 通过 geetest
+            setMsg('请继续完成滑块验证', Type.Info)
+            updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID))
+            return
+          }
+          if (res.code === 1) {
+            setMsg("删除成功", Type.Success);
+            return;
+          }
+          setMsg(res.message, Type.Warning);
         })
         .finally(() => {
             isLoading.value = false;
@@ -270,6 +276,7 @@ const openGameConf = (account: string) => {
     selectGame.value = show.value ? "" : game.status.account;
     show.value = !show.value;
 };
+
 </script>
 <style>
 div,
