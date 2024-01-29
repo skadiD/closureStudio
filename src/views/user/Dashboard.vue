@@ -185,7 +185,7 @@ const login = (token: string, account: string) => {
             dialogOpen("geetestNotify");
             // router.go(0)
         } else {
-            if (res.message === "人机验证失败") {
+            if (res.message === "人机验证失败" || res.message === "reCAPTCHA认证无效") {
                 window.captchaObj.showCaptcha();
                 return;
             }
