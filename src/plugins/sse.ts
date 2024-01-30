@@ -59,9 +59,9 @@ const startSSE = (user: any) => {
   });
   event.addEventListener("ssr", (event) => {
     globalSSR.value = JSON.parse(event.data) ?? [];
-    const now = Math.floor(Date.now() / 1000)
-    globalSSR.value.filter(item => item.createdAt <= now)
-    if (globalSSR.value.length) {
+    const lastReadTs = Number(localStorage.getItem('lastReadTs')) || 0
+    globalSSR.value = globalSSR.value.filter((item) => item.createdAt > lastReadTs)
+    if (globalSSR.value.length > 0) {
       setMsg("可露希尔又双叒叕抽到 6 星干员啦!!!", Type.Info);
       dialogOpen('SSRNotice')
     }
