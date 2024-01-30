@@ -60,7 +60,7 @@ const startSSE = (user: any) => {
   event.addEventListener("ssr", (event) => {
     globalSSR.value = JSON.parse(event.data) ?? [];
     const now = Math.floor(Date.now() / 1000)
-    globalSSR.value.filter(item => item.createdAt >= now)
+    globalSSR.value.filter(item => item.createdAt <= now)
     if (globalSSR.value.length) {
       setMsg("可露希尔又双叒叕抽到 6 星干员啦!!!", Type.Info);
       dialogOpen('SSRNotice')
