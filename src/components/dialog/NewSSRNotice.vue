@@ -14,7 +14,7 @@
           </div>
         </div>
       </div>
-      <div class="btn btn-block btn-info mt-4 text-3xl" @click="() => { dialogClose('SSRNotice') }">
+      <div class="btn btn-block btn-info mt-4 text-3xl" @click="close">
         <span v-if="users.length">😎<span class="gradient-text">我一点都不羡慕</span>😎</span>
         <span v-else class="text-white">好好好</span>
       </div>
@@ -41,9 +41,7 @@
 </style>
 <script lang="ts" setup>
   import {dialogClose} from "./index";
-  const lastReadTs = Number(localStorage.getItem('lastReadTs'))
-  const now = Math.floor(Date.now() / 1000)
-  localStorage.setItem('lastReadTs', now.toString())
+  const lastReadTs = Number(localStorage.getItem('lastReadTs')) || 0
   interface Props {
     users: ApiGame.SSR[]
   }
@@ -52,4 +50,9 @@
       return [];
     }
   })
+  const close = () => {
+    dialogClose('SSRNotice')
+    const now = Math.floor(Date.now() / 1000)
+    localStorage.setItem('lastReadTs', now.toString())
+  }
 </script>
