@@ -24,7 +24,7 @@ fs.readFile("./ArknightsGamedataPure/excel/stage_table.json", "utf8", (err, data
         }
     }
     console.log('analysis done')
-    fs.writeFile("./public/data/stage.json", JSON.stringify(stageTable), (err) => {
+    fs.writeFile("./public/data/stages.json", JSON.stringify(stageTable), (err) => {
         if (err) {
             console.log(err)
         }
