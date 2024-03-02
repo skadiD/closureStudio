@@ -29,8 +29,9 @@ const smsBtn = () => {
         setMsg("认证成功,请重新登录", Type.Success);
         Auth_Refresh().then((res) => {
           if (res.data) {
-            window.location.href = "/";
+            user.login(res.data.token);
           }
+          window.location.reload();
           dialogClose('RealName')
         });
         return;
