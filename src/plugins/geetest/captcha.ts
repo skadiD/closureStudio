@@ -4,7 +4,7 @@ import {doUpdateCaptcha} from "../axios";
 
 const captchaConfig = {
   config: {
-    captchaId: "d8551513acc423d24401e9622cddd45c",
+    captchaId: "3d50c20b712aaf5c4390a663f1912941",
     product: "bind",
   },
   handler: (obj: any) => {},
