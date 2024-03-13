@@ -22,8 +22,8 @@ declare namespace ApiSystem {
 
 declare namespace TicketSystem {
     interface Ticket {
-        createdAt: string;
-        updatedAt: string;
+        createdAt: number;
+        updatedAt: number;
         id: string;
         replyTo: string;
         status: number;
@@ -49,6 +49,15 @@ declare namespace TicketSystem {
         id: string;
         title: string;
         content: string;
+    }
+    interface updateTicket {
+        status?: 0 | 1;
+        tags?: string[];
+        attachments?: string[];
+        isHidden?: boolean;
+        isPinned?: boolean;
+        content?: content;
+        IsAnonymous?: boolean;
     }
 }
 

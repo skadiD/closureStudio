@@ -8,7 +8,7 @@ function withOpacityValue(variable) {
     return `hsl(var(${variable}) / ${opacityValue})`;
   };
 }
-function defaultColor(variable){
+function defaultColor(variable) {
   return `var(${variable})`
 }
 module.exports = {
@@ -43,7 +43,7 @@ module.exports = {
         ...require("daisyui/src/theming/themes")['halloween'],
         info: '#5e72e4',
         neutral: '#5e72e4',
-       'base-300': '#2a2a2a'
+        'base-300': '#2a2a2a'
       }
     }],
   },
