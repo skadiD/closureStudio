@@ -16,7 +16,7 @@
                 </div>
                 <div class="flex">
                     <div v-for="(tag, key) in myTicket.tags" :key="key">
-                        <button class="btn btn-warning btn-xs px-2 m-2">{{ tag }}</button>
+                        <button class="btn btn-warning btn-xs m-1">{{ tag }}</button>
                     </div>
                 </div>
             </div>
