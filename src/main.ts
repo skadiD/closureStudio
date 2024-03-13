@@ -11,12 +11,12 @@ import {createApp} from "vue";
 import App from "./App.vue";
 import "./plugins/geetest/gt.0.4.8";
 const pinia = createPinia();
-const app = createApp(App);
 pinia.use(
     persist({
         prefix: "closureV3",
     })
 );
+const app = createApp(App);
 app.component("layout", BaseLayout);
 app.use(VueClickAway).use(router).use(pinia).mount("#app");
 

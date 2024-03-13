@@ -102,6 +102,21 @@
                 <div className="divider"></div>
             </div>
 
+            <div className="join p-1">
+                <div v-for="(author, key) in user.getGames" :key="author.key">
+                    <input
+                        className="join-item btn btn-xs"
+                        type="radio"
+                        @click="
+                            () => {
+                                setSelectAuthor(author.value);
+                            }
+                        "
+                        name="options"
+                        :aria-label="author.value.nickname"
+                    />
+                </div>
+            </div>
             <!-- // text input -->
             <textarea v-model="replyContent" placeholder="请发表您的锐评" className="textarea textarea-bordered textarea-lg w-full"></textarea>
             <div className="flex justify-end">
@@ -122,7 +137,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 import { nextTick, ref, watch } from "vue";
 import { userStore } from "../../store/user";
-import { GetReplys, GetTicketById, GetTickets, ReplyTicket, UpdateTicketById } from "../../plugins/axios";
+import { GetReplys, GetTicketById, ReplyTicket, UpdateTicketById } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 const user = userStore();
@@ -135,7 +150,7 @@ const myReplys = ref<TicketSystem.Ticket[]>([]);
 
 const replyTicketId = ref<string>("");
 const replyContent = ref<string>("");
-
+const selectedAuthor = ref<TicketSystem.Author | null>(null);
 watch(
     () => myTicket,
     (newVal) => {
@@ -145,6 +160,10 @@ watch(
         }
     }
 );
+
+const setSelectAuthor = (author: TicketSystem.Author) => {
+    selectedAuthor.value = author;
+};
 
 const getTicketOperation = () => {
     //0表示未解决，1表示已解决
@@ -212,20 +231,19 @@ const replyTicket = async () => {
         setMsg("请输入内容", Type.Warning);
         return;
     }
+    if (!selectedAuthor.value) {
+        setMsg("请选择一个游戏账号", Type.Warning);
+        return;
+    }
+    const tempAuthor = selectedAuthor.value;
+    tempAuthor.title = "斯卡蒂";
+    tempAuthor.uuid = user.info.uuid;
     const data: TicketSystem.createTicket = {
         replyTo: replyTicketId.value,
         tags: [],
         attachments: [],
         isPinned: false,
-        author: {
-            uuid: user.info.uuid,
-            nickname: "胡桃",
-            title: "斯卡蒂",
-            avatar: {
-                id: "avatar_activity_GK",
-                type: "DEFAULT"
-            }
-        },
+        author: tempAuthor,
         content: {
             id: "",
             title: "",
@@ -245,7 +263,6 @@ const replyTicket = async () => {
         await getReplys();
         replyContent.value = "";
         setMsg("大成功", Type.Success);
-
     } catch (error) {
         const err = error as Error;
         setMsg(err.message, Type.Warning);

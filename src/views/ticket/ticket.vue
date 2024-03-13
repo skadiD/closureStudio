@@ -7,24 +7,24 @@
                 <div class="divider mt-0">您的每一句话都非常重要</div>
                 <p>我们认真记录下您的每一句话</p>
             </div>
-            <div class="h-12" ></div>
+            <div class="h-12"></div>
             <div class="bg-base-300 shadow-lg rounded-lg pl-4 py-1 blog relative">
                 <Table> </Table>
             </div>
         </div>
     </div>
-
-    <NewSSRNotice :users="globalSSR" />
     <YouMayKnowDialog />
 </template>
 <script setup lang="ts">
 import { ref } from "vue";
+import { userStore } from "../../store/user";
 import Table from "../../components/tickets/Table.vue";
-import { globalSSR } from "../../plugins/sse";
+import { startSSE } from "../../plugins/sse";
 import "animate.css";
 import { YouMayKnowDialog } from "../../components/dialog";
-import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
 const show = ref(false);
+const user = userStore();
+startSSE(user);
 </script>
 
 <style>
