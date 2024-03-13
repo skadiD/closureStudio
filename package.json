@@ -9,11 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.10",
     "@types/pako": "^2.0.3",
     "animate.css": "^4.1.1",
     "axios": "^1.6.3",
     "daisyui": "^4.4.24",
+    "date-fns": "^3.4.0",
     "pako": "^2.1.0",
     "pinia": "^2.1.7",
     "pinia-persists": "^1.2.0",

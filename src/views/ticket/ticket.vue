@@ -8,7 +8,7 @@
                 <p>我们认真记录下您的每一句话</p>
             </div>
             <div class="h-12" ></div>
-            <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
+            <div class="bg-base-300 shadow-lg rounded-lg pl-4 py-1 blog relative">
                 <Table> </Table>
             </div>
         </div>

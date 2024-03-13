@@ -89,6 +89,9 @@ async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResu
 
     return res;
 }
+function put<T>(url: string, data?: any) {
+    return asyncRequest<T>({ url, method: "put", data });
+}
 function post<T>(url: string, data?: any) {
     return asyncRequest<T>({ url, method: "post", data });
 }
@@ -170,7 +173,9 @@ const fetchGameListBySSE = () => sse<ApiGame.Game[]>("sse/game"); // 实验性�
 const fetchGameDetails = (account: string) => get<ApiGame.Detail>(`game/${account}`);
 
 // ---------------------- ticket ----------------------
+const GetTicketById = (id: string) => get<TicketSystem.Ticket>(`${TicketsServer}tickets/${id}`); // getTIckets
 const GetTickets = () => get<TicketSystem.Ticket[]>(`${TicketsServer}tickets`); // getTIckets
+const UpdateTicketById = (id: string, data: TicketSystem.updateTicket) => put(`${TicketsServer}tickets/${id}`, data); // getTIckets
 
 export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh };
 export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails };
@@ -178,4 +183,4 @@ export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf
 export { doUpdateCaptcha, fetchGameLogs };
 export { load };
 
-export { GetTickets };
+export { GetTickets, UpdateTicketById, GetTicketById };
