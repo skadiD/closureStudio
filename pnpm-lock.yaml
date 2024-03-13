@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@tailwindcss/line-clamp':
+    specifier: ^0.4.4
+    version: 0.4.4(tailwindcss@3.4.0)
   '@tailwindcss/typography':
     specifier: ^0.5.10
     version: 0.5.10(tailwindcss@3.4.0)
@@ -20,6 +23,9 @@ dependencies:
   daisyui:
     specifier: ^4.4.24
     version: 4.4.24(postcss@8.4.32)
+  date-fns:
+    specifier: ^3.4.0
+    version: 3.4.0
   pako:
     specifier: ^2.1.0
     version: 2.1.0
@@ -1676,6 +1682,14 @@ packages:
       string.prototype.matchall: 4.0.8
     dev: false
 
+  /@tailwindcss/line-clamp@0.4.4(tailwindcss@3.4.0):
+    resolution: {integrity: sha512-5U6SY5z8N42VtrCrKlsTAA35gy2VSyYtHWCsg1H87NU1SXnEfekTVlrga9fzUDrrHcGi2Lb5KenUWb4lRQT5/g==}
+    peerDependencies:
+      tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
+    dependencies:
+      tailwindcss: 3.4.0
+    dev: false
+
   /@tailwindcss/typography@0.5.10(tailwindcss@3.4.0):
     resolution: {integrity: sha512-Pe8BuPJQJd3FfRnm6H0ulKIGoMEQS+Vq01R6M5aCrFB/ccR/shT+0kXLjouGC1gFLm9hopTFN+DMP0pfwRWzPw==}
     peerDependencies:
@@ -2170,6 +2184,10 @@ packages:
       postcss-js: 4.0.1(postcss@8.4.32)
     transitivePeerDependencies:
       - postcss
+    dev: false
+
+  /date-fns@3.4.0:
+    resolution: {integrity: sha512-Akz4R8J9MXBsOgF1QeWeCsbv6pntT5KCPjU0Q9prBxVmWJYPLhwAIsNg3b0QAdr0ttiozYLD3L/af7Ra0jqYXw==}
     dev: false
 
   /de-indent@1.0.2:

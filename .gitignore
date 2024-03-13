@@ -28,3 +28,5 @@ stage_table.json
 package-lock.json
 .vercel
 .prettierrc.json
+pnpm-lock.yaml
+stats.html
