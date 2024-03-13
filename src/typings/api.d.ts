@@ -59,6 +59,17 @@ declare namespace TicketSystem {
         content?: content;
         IsAnonymous?: boolean;
     }
+
+    interface createTicket {
+        replyTo: string;
+        tags: string[];
+        attachments: string[];
+        isPinned: boolean;
+        author: Author;
+        content: content;
+        isAnonymous: boolean;
+        gameAccount: string;
+    }
 }
 
 declare namespace ApiUser {

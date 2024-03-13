@@ -41,6 +41,7 @@
                                 />
                             </div>
                         </div>
+                        <div class="text-base font-bold">{{ myTicket.author?.nickname }}</div>
                         <div>
                             {{ formatTime(myTicket.updatedAt, "MM-dd") }}
                         </div>
@@ -71,12 +72,44 @@
                         </div>
                     </div>
                 </div>
-                
             </div>
             <div className="h-2"></div>
             <div className="divider"></div>
+
+            <div v-for="(reply, key) in myReplys" :key="key">
+                <div class="flex">
+                    <div class="flex-col">
+                        <div class="indicator avatar">
+                            <div class="w-12 mask mask-squircle">
+                                <img
+                                    :src="`https://assets.closure.setonink.com/dst/avatar/${reply.author?.avatar?.type || 'DEFAULT'}/${reply.author?.avatar?.id?.replace('@', '_').replace('#', '_') || 'avatar_activity_GK'}.webp`"
+                                    alt="斯卡蒂"
+                                />
+                            </div>
+                        </div>
+                        <div class="text-base font-bold">{{ reply.author?.nickname }}</div>
+                        <div>
+                            {{ formatTime(reply.updatedAt, "MM-dd") }}
+                        </div>
+                    </div>
+                    <div className="divider divider-horizontal"></div>
+                    <div class="flex">
+                        <div class="flex-col">
+                            <div>{{ reply.content.content }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div className="divider"></div>
+            </div>
+
             <!-- // text input -->
-            <div className="divider"></div>
+            <textarea v-model="replyContent" placeholder="请发表您的锐评" className="textarea textarea-bordered textarea-lg w-full"></textarea>
+            <div className="flex justify-end">
+                <button class="m-2 btn btn-info" @click="replyTicket">
+                    <span v-if="isReplying" class="loading loading-spinner"></span>
+                    提交
+                </button>
+            </div>
         </div>
     </div>
 </template>
@@ -87,24 +120,28 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     tiket: null
 });
-import { nextTick, onMounted, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { userStore } from "../../store/user";
-import { GetTicketById, GetTickets, UpdateTicketById } from "../../plugins/axios";
+import { GetReplys, GetTicketById, GetTickets, ReplyTicket, UpdateTicketById } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 const user = userStore();
 const isExpanded = ref(false);
 const isUpdating = ref(false);
+const isReplying = ref(false);
 const isAuthor = ref(false);
 const myTicket = ref<TicketSystem.Ticket | null>(null);
-onMounted(() => {
-    myTicket.value = props.tiket;
-});
+const myReplys = ref<TicketSystem.Ticket[]>([]);
+
+const replyTicketId = ref<string>("");
+const replyContent = ref<string>("");
+
 watch(
     () => myTicket,
     (newVal) => {
         if (newVal.value) {
             isAuthor.value = newVal.value.authorUUID === user.info.uuid;
+            replyTicketId.value = newVal.value.id;
         }
     }
 );
@@ -129,7 +166,6 @@ const refreshTicket = async () => {
         throw new Error(result.message);
     }
     if (result.data) {
-        console.log(result.data);
         myTicket.value = result.data;
     }
 };
@@ -157,4 +193,69 @@ const ticketOperation = async () => {
         isUpdating.value = false;
     }
 };
+
+const getReplys = async () => {
+    if (!myTicket.value) {
+        return;
+    }
+    const result = await GetReplys(myTicket.value.id);
+    if (result.code === 0) {
+        throw new Error(result.message);
+    }
+    if (result.data) {
+        myReplys.value = result.data;
+    }
+};
+
+const replyTicket = async () => {
+    if (!replyContent.value) {
+        setMsg("请输入内容", Type.Warning);
+        return;
+    }
+    const data: TicketSystem.createTicket = {
+        replyTo: replyTicketId.value,
+        tags: [],
+        attachments: [],
+        isPinned: false,
+        author: {
+            uuid: user.info.uuid,
+            nickname: "胡桃",
+            title: "斯卡蒂",
+            avatar: {
+                id: "avatar_activity_GK",
+                type: "DEFAULT"
+            }
+        },
+        content: {
+            id: "",
+            title: "",
+            content: ""
+        },
+        isAnonymous: false,
+        gameAccount: ""
+    };
+    data.content.content = replyContent.value;
+    try {
+        isReplying.value = true;
+        const result = await ReplyTicket(replyTicketId.value, data);
+        if (result.code === 0) {
+            setMsg(result.message, Type.Warning);
+            throw new Error(result.message);
+        }
+        await getReplys();
+        replyContent.value = "";
+        setMsg("大成功", Type.Success);
+
+    } catch (error) {
+        const err = error as Error;
+        setMsg(err.message, Type.Warning);
+    } finally {
+        isReplying.value = false;
+    }
+};
+
+// init
+myTicket.value = props.tiket;
+replyTicketId.value = myTicket.value?.id || "";
+getReplys();
 </script>
