@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import service from "../plugins/axios";
+import { isAdmin } from "../plugins/permission/permission";
 
 interface TicketAuthor {
     [key: string]: TicketSystem.Author;
@@ -27,10 +28,6 @@ export const userStore = defineStore("user", {
     actions: {
         setGame(gameAccount: string, nickname: string, avatar: ApiGame.Avatar) {
             const data: TicketSystem.Author = {
-                // uuid: string;
-                // title: string;
-                // nickname: string;
-                // avatar: ApiGame.Avatar;
                 uuid: "",
                 title: "",
                 nickname: nickname,
@@ -61,7 +58,7 @@ export const userStore = defineStore("user", {
     getters: {
         isLogin: (state) => state.user.isLogin,
         token: (state) => state.user.Token,
-        isAdmin: (state) => state.user.Info.isAdmin,
+        isAdmin: (state) => isAdmin(state),
         info: (state) => state.user.Info,
         isVerify: (state) => state.user.Info.status === 1 || state.user.Info.status === 2,
         getGame: (state) => (gameAccount: string) => state.games.author[gameAccount],

@@ -65,7 +65,7 @@ declare namespace TicketSystem {
         tags: string[];
         attachments: string[];
         isPinned: boolean;
-        author: Author;
+        author: Author | null;
         content: content;
         isAnonymous: boolean;
         gameAccount: string;

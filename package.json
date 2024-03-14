@@ -30,6 +30,7 @@
     "vite-plugin-pwa": "^0.17.4",
     "vue": "^3.3.13",
     "vue-router": "^4.2.5",
+    "vue-virt-list": "^1.0.7",
     "vue3-click-away": "^1.2.4",
     "workbox-core": "^7.0.0",
     "workbox-expiration": "^7.0.0",

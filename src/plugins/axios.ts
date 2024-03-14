@@ -175,9 +175,10 @@ const fetchGameDetails = (account: string) => get<ApiGame.Detail>(`game/${accoun
 // ---------------------- ticket ----------------------
 const GetTicketById = (id: string) => get<TicketSystem.Ticket>(`${TicketsServer}tickets/${id}`); // getTIckets
 const GetTickets = () => get<TicketSystem.Ticket[]>(`${TicketsServer}tickets`); // getTIckets
-const GetReplys = (id:string) => get<TicketSystem.Ticket[]>(`${TicketsServer}tickets/${id}/replies`); // getTIckets
+const GetReplys = (id: string) => get<TicketSystem.Ticket[]>(`${TicketsServer}tickets/${id}/replies`); // getTIckets
 const UpdateTicketById = (id: string, data: TicketSystem.updateTicket) => put(`${TicketsServer}tickets/${id}`, data); // getTIckets
 const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/${id}/replies`, data); // getTIckets
+const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
 export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh };
 export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails };
@@ -185,4 +186,4 @@ export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf
 export { doUpdateCaptcha, fetchGameLogs };
 export { load };
 
-export { GetTickets, UpdateTicketById, GetTicketById, ReplyTicket,GetReplys };
+export { GetTickets, UpdateTicketById, GetTicketById, ReplyTicket, GetReplys, PostTicket };
