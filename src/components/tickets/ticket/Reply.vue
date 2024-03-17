@@ -6,9 +6,11 @@
         }
             " name="options" :aria-label="author.value.nickname" />
         </div>
-        <input className="join-item btn btn-xs" type="radio" @click="() => {
+        <div>
+            <input className="join-item btn btn-xs" type="radio" @click="() => {
             setSelectAuthor(null, '')
         }" name="options" aria-label="匿名玩家" />
+        </div>
     </div>
     <Tags v-if="!props.ticket" :tags="tags" @update:tags="updateTags" />
     <!-- // text input -->

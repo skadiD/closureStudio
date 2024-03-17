@@ -1,10 +1,13 @@
 <template>
     <div class="w-full" v-if="myTicket">
         <div class="flex flex-col justify-between h-full">
-            <div>
+            <div class="relative">
                 {{ myTicket.content.content }}
+                <img v-if="myTicket.author.nickname==='欧皇大佬'" class="absolute right-4 top-0 w-28 md:w-36 opacity-10 md:opacity-50 rounded-t-full rounded-bl-full"
+                        src="../../../assets/1.png" alt="start">
             </div>
             <div>
+
                 <div v-if="(isAuthor || user.isAdmin) && !myTicket.replyTo">
                     <div class="divider divider-info p-1 m-1"></div>
                     <div v-if="isUpdating">
