@@ -3,6 +3,7 @@ export enum Type {
     Alert = 'alert',
     Warning = 'warning',
     Info = 'info',
+    Error = "Error"
 }
 export enum Appearance {
     Light = 'light',

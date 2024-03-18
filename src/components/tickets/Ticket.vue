@@ -23,6 +23,11 @@
             <div v-for="(reply, key) in myReplys" :key="reply.id">
                 <Ticket :ticket="reply" :refresh="refreshTicket" :getTickets="props.getTickets" />
             </div>
+            <div v-if="isLoading" class="flex justify-center w-full">
+                <span className="loading loading-bars loading-md text-primary"></span>
+                <span className="loading loading-bars loading-md text-primary"></span>
+                <span className="loading loading-bars loading-md text-primary"></span>
+            </div>
             <Reply :ticket="myTicket" :refresh="refreshTicket" />
         </div>
     </div>
@@ -45,7 +50,7 @@ import Ticket from "./ticket/Ticket.vue";
 import Reply from "./ticket/Reply.vue";
 const user = userStore();
 const isExpanded = ref(false);
-const isUpdating = ref(false);
+const isLoading = ref(false);
 const isAuthor = ref(false);
 const myTicket = ref<TicketSystem.Ticket | null>(null);
 const myReplys = ref<TicketSystem.Ticket[]>([]);
@@ -59,12 +64,28 @@ watch(
     }
 );
 
+watch(
+    () => isExpanded.value,
+    async (newVal) => {
+        if (newVal) {
+            await refreshTicket();
+        }
+    },
+);
+
 const refreshTicket = async () => {
     if (!myTicket.value) {
         return;
     }
+    if (isLoading.value) {
+        return;
+    }
+    isLoading.value = true;
+
     const respGetTicket = await GetTicketById(myTicket.value.id);
     if (respGetTicket.code === 0) {
+        setMsg(respGetTicket.message, Type.Error);
+        isLoading.value = false;
         throw new Error(respGetTicket.message);
     }
     if (respGetTicket.data) {
@@ -72,14 +93,16 @@ const refreshTicket = async () => {
     }
     const respGetReplys = await GetReplys(myTicket.value.id);
     if (respGetReplys.code === 0) {
+        setMsg(respGetReplys.message, Type.Error);
+        isLoading.value = false;
         throw new Error(respGetReplys.message);
     }
     if (respGetReplys.data) {
         myReplys.value = respGetReplys.data;
     }
+    isLoading.value = false;
 };
 
 // init
 myTicket.value = props.ticket;
-refreshTicket();
 </script>

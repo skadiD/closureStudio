@@ -33,7 +33,19 @@
                     <button v-if="user.isAdmin && !myTicket.replyTo && myTicket.isPinned"
                         class="btn btn-outline btn-xs m-1">取消置顶</button>
                     <button v-if="user.isAdmin" :onClick="hiddenTicket" class="btn btn-outline btn-xs m-1">隐藏</button>
+                    <button v-if="user.isAdmin" @click="() => isDisplayMoreInfo = !isDisplayMoreInfo"
+                        class="btn btn-outline btn-xs m-1">更多</button>
                 </div>
+                <div class="divider" v-if="isDisplayMoreInfo && user.isAdmin">更多详细信息</div>
+                <div v-if="isDisplayMoreInfo && user.isAdmin">
+                    <div @click="copyToClipboard(myTicket.authorUUID)">
+                        UUID: {{ myTicket.authorUUID }}
+                    </div>
+
+
+
+                </div>
+
             </div>
         </div>
     </div>
@@ -60,6 +72,7 @@ const user = userStore();
 const myTicket = ref<TicketSystem.Ticket | null>(null);
 const isUpdating = ref(false);
 const isAuthor = ref(false);
+const isDisplayMoreInfo = ref(false);
 watch(
     () => props.ticket,
     (newVal, oldVal) => {
@@ -119,5 +132,15 @@ const updateTags = (newTags: string[]) => {
     }
     myTicket.value.tags = newTags;
 };
+
+const copyToClipboard = async (text: string) => {
+    try {
+        await navigator.clipboard.writeText(text);
+        setMsg("复制成功", Type.Success);
+    } catch (err) {
+        console.error('复制到剪贴板失败', err);
+    }
+};
+
 myTicket.value = props.ticket;
 </script>
