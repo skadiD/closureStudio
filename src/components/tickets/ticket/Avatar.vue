@@ -7,9 +7,10 @@
             </div>
         </div>
         <div class="my-1 bg-base-300 btn btn-xs">{{ props.author?.nickname }}</div>
-        <button v-if="props.author?.nickname === '欧皇大佬'"
-            class="relative border-0 rounded-md bg-transparent overflow-hidden z-0 p-[1px]"> <div
-                class="block bg-base-300 rounded-md p-1 text-xs">管理员</div></button>
+        <button v-if="props.author?.title"
+            class="relative border-0 rounded-md bg-transparent overflow-hidden z-0 p-[1px]">
+            <div class="block bg-base-300 rounded-md p-1 text-xs">{{ props.author?.title }}</div>
+        </button>
         <div class="text-xs my-1">
             {{ formatTime(props.updatedAt, "MM-dd") }}
         </div>

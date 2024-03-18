@@ -81,7 +81,7 @@ export function maskPhoneNumber(phoneNumber: string): string {
 export const defaultAuthor = (): TicketSystem.Author => {
     return {
         uuid: "",
-        title: "普通玩家",
+        title: "",
         nickname: "匿名玩家",
         avatar: {
             type: "DEFAULT",

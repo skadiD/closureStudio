@@ -3,8 +3,9 @@
         <div class="flex flex-col justify-between h-full">
             <div class="relative">
                 {{ myTicket.content.content }}
-                <img v-if="myTicket.author.nickname==='欧皇大佬'" class="absolute right-4 top-0 w-28 md:w-36 opacity-10 md:opacity-50 rounded-t-full rounded-bl-full"
-                        src="../../../assets/1.png" alt="start">
+                <img v-if="myTicket.author.title"
+                    class="absolute right-4 top-0 w-28 md:w-36 opacity-10 md:opacity-50 rounded-t-full rounded-bl-full"
+                    src="../../../assets/1.png" alt="start">
             </div>
             <div>
 

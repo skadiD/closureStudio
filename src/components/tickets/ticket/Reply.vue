@@ -18,7 +18,7 @@
     <!-- // text input -->
     <input v-model="ticketTitle" v-if="!props.ticket" type="text" placeholder="标题"
         class="input input-bordered input-sm w-full my-2" />
-    <textarea :on-change="console.log(selectedAuthor)" v-model="ticketContent" placeholder="请发表您的锐评"
+    <textarea v-model="ticketContent" placeholder="请发表您的锐评"
         className="textarea textarea-bordered textarea-lg w-full my-2"></textarea>
     <div className="flex justify-start">
         <button class="m-2 btn btn-sm btn-info" @click="postTicket">
