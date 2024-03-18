@@ -46,7 +46,7 @@ import { Type } from '../toast/enmu';
 import { doUpdateGamePasswd } from '../../plugins/axios';
 import updateCaptchaHandler from '../../plugins/geetest/captcha';
 import {dialogClose} from "./index";
-import Docker from "../../App.vue";
+
 
 interface Props {
     slotUUID: string;
