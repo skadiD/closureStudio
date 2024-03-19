@@ -124,11 +124,15 @@ function load<T>(fileName: string): Promise<T> {
             .catch((error) => reject(error));
     });
 }
-
+// idServer
 const Auth_Login = (params: { email: string; password: string }) => post<ApiUser.Auth>(`${AuthServer}login`, params);
 const Auth_Register = (params: { email: string; password: string; noise: string; sign: string }) => post<ApiUser.Auth>(`${AuthServer}register`, params);
 
 const Auth_ResetPassword = (params: { email: string; phone: string; newPasswd: string }) => post<ApiUser.Auth>(`${AuthServer}forget`, params);
+
+// idServer admin
+const QueryUser = (value: string) => get<ApiUser.User[]>(`${AuthServer}admin/users/query?value=${value}`);
+const SendSMS = (params: { uuid: string; phone: string }) => post<string>(`${AuthServer}admin/users/sms`, params);
 
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
@@ -180,7 +184,7 @@ const UpdateTicketById = (id: string, data: TicketSystem.updateTicket) => put(`$
 const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/${id}/replies`, data); // getTIckets
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
-export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh };
+export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS };
 export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };

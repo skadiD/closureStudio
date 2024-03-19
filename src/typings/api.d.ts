@@ -85,6 +85,20 @@ declare namespace ApiUser {
         exp: number;
         slot: number;
     }
+    interface User {
+        ID: number;
+        UserEmail: string;
+        Password: string;
+        UUID: string;
+        Status: number;
+        IP: string;
+        Slot: number;
+        QQ: string;
+        Phone: string;
+        Permission: number;
+        CreatedTs: number;
+        UpdateTs: number;
+    }
 }
 declare namespace ApiGame {
     interface Config {
