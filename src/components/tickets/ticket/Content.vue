@@ -38,18 +38,25 @@
                 </div>
                 <div class="divider" v-if="isDisplayMoreInfo && user.isAdmin">更多详细信息</div>
                 <div v-if="isDisplayMoreInfo && user.isAdmin">
-                    <div @click="copyToClipboard(myTicket.authorUUID)">
-                        UUID: {{ myTicket.authorUUID }}
+                    <div v-if="isLoading">
+                        <span class="loading loading-bars"> </span>
+                        <span class="loading loading-bars"> </span>
+                        <span class="loading loading-bars"> </span>
                     </div>
-                    <div v-if="authorInfo">
+                    <div v-if="!isLoading && authorInfo">
+                        <div @click="copyToClipboard(myTicket.authorUUID)">
+                            UUID: {{ myTicket.authorUUID }}
+                        </div>
+
                         <div @click="copyToClipboard(authorInfo.UserEmail)">
                             email: {{ authorInfo.UserEmail }}
                         </div>
 
                         <div>
-                            phone: {{ authorInfo.Phone }} <button v-if="user.isAdmin"
-                                @click="sendSMS(authorInfo.UUID, authorInfo.Phone)"
-                                class="btn btn-outline btn-xs m-1">发送SMS</button>
+                            <span v-if="authorInfo.Phone"> phone: {{ authorInfo.Phone }}</span>
+                            <span v-if="!authorInfo.Phone"> phone: 未绑定 <button v-if="user.isAdmin"
+                                    @click="sendSMS(myTicket.authorUUID, smsSendPhone)"
+                                    class="btn btn-outline btn-xs m-1">发送SMS{{ smsSendPhone }}</button></span>
                         </div>
                         <div @click="copyToClipboard(authorInfo.QQ)">
                             QQ: {{ authorInfo.QQ }}
@@ -86,15 +93,21 @@ const props = withDefaults(defineProps<Props>(), {
     getTickets: () => { }
 });
 import { nextTick, ref, watch } from "vue";
-import { setMsg } from "../../../plugins/common";
-import { QueryUser, SendSMS, UpdateTicketById } from "../../../plugins/axios";
+import { getRealGameAccount, setMsg } from "../../../plugins/common";
+import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin } from "../../../plugins/axios";
 import { userStore } from "../../../store/user";
 import { Type } from "../../toast/enmu";
 import Tags from "./Tags.vue";
+import { getSMSSlot } from "../../../plugins/quota/userQuota";
+import { set } from "date-fns";
+import { checkMobile } from "../../../utils/regex";
 const user = userStore();
 const myTicket = ref<TicketSystem.Ticket | null>(null);
 const authorInfo = ref<ApiUser.User | null>(null);
+const authorSolts = ref<Registry.Slot[]>([]);
 const isUpdating = ref(false);
+const isLoading = ref(false);
+const smsSendPhone = ref('');
 const isAuthor = ref(false);
 const isDisplayMoreInfo = ref(false);
 
@@ -114,16 +127,31 @@ watch(
     () => isDisplayMoreInfo.value,
     async (newVal) => {
         if (newVal && myTicket.value?.authorUUID) {
-            const resp = await QueryUser(myTicket.value?.authorUUID)
-            if (resp.code === 1) {
-                const user = findAuthorInfo(myTicket.value?.authorUUID, resp.data);
+            isLoading.value = true;
+            // use async method to fetch QueryUser and fetchUserSlotsAdmin
+            const [usersInfo, usersSolts] = await Promise.all([QueryUser(myTicket.value?.authorUUID), fetchUserSlotsAdmin(myTicket.value?.authorUUID)]);
+            if (usersInfo.code === 1) {
+                const user = findAuthorInfo(myTicket.value?.authorUUID, usersInfo.data);
                 if (user) {
                     authorInfo.value = user;
-                    return;
                 }
             }
-            authorInfo.value = null;
-            setMsg("获取用户信息失败", Type.Warning);
+            console.log("usersSolts", usersSolts);
+            if (usersSolts.data && usersSolts.data?.length > 0) {
+                authorSolts.value = usersSolts.data;
+                const phone = getSMSSendPhone(usersSolts.data);
+                if (phone) {
+                    smsSendPhone.value = phone;
+                }
+            }
+            if (usersInfo.code != 1) {
+                authorInfo.value = null;
+                setMsg("获取用户信息失败: " + usersInfo.message, Type.Warning);
+            }
+            if (!usersSolts.data) {
+                setMsg("获取用户托管槽失败: " + usersSolts.message, Type.Warning);
+            }
+            isLoading.value = false;
         }
     },
     {
@@ -197,6 +225,21 @@ const sendSMS = async (uuid: string, phone: string) => {
     return;
 };
 
+const getSMSSendPhone = (slots: Registry.Slot[]) => {
+    const slot = getSMSSlot(slots);
+    if (!slot) {
+        return;
+    }
+    const gameAccount = slot.gameAccount;
+    if (!gameAccount) {
+        return;
+    }
+    const phone = getRealGameAccount(gameAccount);
+    if (!checkMobile(phone)) {
+        return;
+    }
+    return phone;
+};
 
 const findAuthorInfo = (uuid: string, users: ApiUser.User[] | null) => {
     if (!users) {

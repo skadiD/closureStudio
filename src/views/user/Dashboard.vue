@@ -1,6 +1,7 @@
 <template>
     <div class="flex h-full">
-        <div class="w-full flex-col max-w-4xl 2xl:max-w-6xl xl:mr-auto s-margin md:!flex" :class="show ? 'xl:ml-0 !hidden' : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'">
+        <div class="w-full flex-col max-w-4xl 2xl:max-w-6xl xl:mr-auto s-margin md:!flex"
+            :class="show ? 'xl:ml-0 !hidden' : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'">
             <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
                 <div class="text-2xl md:text-4xl font-bold text-info mt-3">📢 今日特价</div>
                 <p v-for="k in config.announcement?.split('\n') || ['可露希尔逃跑了']">
@@ -16,31 +17,46 @@
                     好极了!!! 你完成了注册!!! 请添加第一个游戏账号并进行托管～(∠・ω&lt; )⌒★
                 </p>
 
-                <p v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at == 0">了不起!!! 你添加了一个游戏!!! 现在你可以启动游戏进行托管!!!</p>
+                <p
+                    v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at == 0">
+                    了不起!!! 你添加了一个游戏!!! 现在你可以启动游戏进行托管!!!</p>
 
-                <p v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at != 0">
-                    非常棒!!! 你托管了一个游戏!!! 手机验证码已经发送， 完成【手机号：{{ gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/, "$1****$2") }}】绑定认证<b class="cursor-pointer" @click="dialogOpen('RealName')"
-                        >👉点我解锁👈</b
-                    >不限时游戏托管，并提升托管数量。 剩余托管体验时间 <b>【{{ calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
+                <p
+                    v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at != 0">
+                    非常棒!!! 你托管了一个游戏!!! 手机验证码已经发送， 完成【手机号：{{ gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/,
+                "$1****$2") }}】绑定认证<b class="cursor-pointer"
+                        @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量。 剩余托管体验时间 <b>【{{
+                calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
                 </p>
-                <p v-if="user.isVerify && userQuota.data.value?.idServerQQ.length === 0">完成QQ账号验证解锁更多槽位。<b class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量</p>
+                <p v-if="user.isVerify && userQuota.data.value?.idServerQQ.length === 0">完成QQ账号验证解锁更多槽位。<b
+                        class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量</p>
                 <p v-if="user.info.status >= 1">恭喜你完成了验证，你可以启动游戏进行托管。</p>
+                <p>如果你遇到问题(验证码没有收到，游戏异常等等)，使用<b class="cursor-pointer" @click="navigateToTicket">👉工单系统👈</b>请求协助。</p>
             </div>
             <IndexStatus />
-            <div class="text-2xl font-bold">我的托管（{{ userQuota.data.value?.slots.filter((slot) => slot.gameAccount !== null)?.length }} 已用 / {{ userQuota.data.value?.slots?.length }} 可用）</div>
+            <div class="text-2xl font-bold">我的托管（{{ userQuota.data.value?.slots.filter((slot) => slot.gameAccount !==
+                null)?.length }} 已用 / {{ userQuota.data.value?.slots?.length }} 可用）</div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div v-for="(slot, key) in userQuota.data.value?.slots" :key="key">
-                    <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota.data.value" :key="key" @click="addGameOnClick(slot, slot.uuid)" />
+                    <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota.data.value" :key="key"
+                        @click="addGameOnClick(slot, slot.uuid)" />
                     <GameAccount v-else :game="findGame(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
                         <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
                         <div class="grid gap-4 grid-cols-2 mt-2">
-                            <button class="btn btn-outline btn-sm btn-block btn-primary" v-if="isUpdateStatus(slot.gameAccount)" :disabled="isLoading" @click.stop="updatePasswdOnClick(slot)">更新</button>
+                            <button class="btn btn-outline btn-sm btn-block btn-primary"
+                                v-if="isUpdateStatus(slot.gameAccount)" :disabled="isLoading"
+                                @click.stop="updatePasswdOnClick(slot)">更新</button>
 
-                            <button class="btn btn-outline btn-sm btn-block btn-primary" v-else-if="isSuspendStatus(slot.gameAccount)" @click="suspendOnClick(slot.gameAccount)" :disabled="isLoading">暂停</button>
+                            <button class="btn btn-outline btn-sm btn-block btn-primary"
+                                v-else-if="isSuspendStatus(slot.gameAccount)" @click="suspendOnClick(slot.gameAccount)"
+                                :disabled="isLoading">暂停</button>
 
-                            <button class="btn btn-outline btn-sm btn-block btn-info" v-else @click="loginOnClick(slot.gameAccount)" :disabled="isLoginBtnDisabled(slot.gameAccount)">启动</button>
+                            <button class="btn btn-outline btn-sm btn-block btn-info" v-else
+                                @click="loginOnClick(slot.gameAccount)"
+                                :disabled="isLoginBtnDisabled(slot.gameAccount)">启动</button>
 
-                            <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error" @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">删除</button>
+                            <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error"
+                                @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">删除</button>
                         </div>
                     </GameAccount>
                 </div>
@@ -57,7 +73,8 @@
             <QQBindDialog v-if="showQQBind" @close="showQQBind = false" />
             <UpdateGamePasswdDialog :slotUUID="selectedSlotUUID" :form="selectedRegisterForm" />
         </div>
-        <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated" v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
+        <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
+            v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
             <GamePanel :account="selectGame" />
         </div>
     </div>
@@ -83,6 +100,7 @@ import { NOTIFY } from "../../plugins/config";
 import { YouMayKnowDialog } from "../../components/dialog";
 import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
 import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
+import { router } from "../../plugins/router";
 const showQQBind = ref(false);
 const show = ref(false);
 const user = userStore();
@@ -183,9 +201,9 @@ const login = (token: string, account: string) => {
     doGameLogin(token, account).then((res) => {
         isLoading.value = false;
         if (res.code === -1100) { // 通过 geetest
-          setMsg('请继续完成滑块验证', Type.Info)
-          updateCaptchaHandler(geetestLoginGameOnSuccess(account))
-          return
+            setMsg('请继续完成滑块验证', Type.Info)
+            updateCaptchaHandler(geetestLoginGameOnSuccess(account))
+            return
         }
         if (res.code === 1) {
             setMsg("启动成功", Type.Success);
@@ -200,16 +218,16 @@ const login = (token: string, account: string) => {
 const deleteGame = async (token: string, slotUUID: string) => {
     doDelGame(slotUUID, token)
         .then((res) => {
-          if (res.code === -1100) { // 通过 geetest
-            setMsg('请继续完成滑块验证', Type.Info)
-            updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID))
-            return
-          }
-          if (res.code === 1) {
-            setMsg("删除成功", Type.Success);
-            return;
-          }
-          setMsg(res.message, Type.Warning);
+            if (res.code === -1100) { // 通过 geetest
+                setMsg('请继续完成滑块验证', Type.Info)
+                updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID))
+                return
+            }
+            if (res.code === 1) {
+                setMsg("删除成功", Type.Success);
+                return;
+            }
+            setMsg(res.message, Type.Warning);
         })
         .finally(() => {
             isLoading.value = false;
@@ -253,6 +271,11 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
     selectedRegisterForm.value.platform = game.status.platform;
     selectedRegisterForm.value.password = "";
     dialogOpen("UpdateGamePasswd");
+};
+
+const navigateToTicket = () => {
+    // using vue-router
+    router.push("/ticket");
 };
 
 // geetest

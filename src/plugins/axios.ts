@@ -150,9 +150,9 @@ const fetchSytemConfig = () => get<ApiSystem.Config>("system/config");
 const fetchSytemList = () => get<ApiSystem.Hall[]>("system/apCostList");
 
 const doGameLogin = (token: string, account: string) => captcha(`game/login/${account}`, token, null); // GameLogin
+
 const doAddGame = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
 const doUpdateGamePasswd = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
-
 const doDelGame = (slot: string, token: string) =>
     captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
         account: null
@@ -173,6 +173,8 @@ const Auth_Verify = (code: string) => post(`${AuthServer}phone`, { code }); // R
 const fetchQQBindCode = () => get(`${AuthServer}qq`); // QQBindCode // get qqcode
 
 const fetchUserSlots = () => get<Registry.UserInfo>(`${RegistryServer}api/users/me`); // UserSlots
+const fetchUserSlotsAdmin = (uid: string) => get<Registry.Slot[]>(`${RegistryServer}api/mgm/slots/slots?uid=${uid}`); // fetch someones slots with admin
+
 const fetchGameListBySSE = () => sse<ApiGame.Game[]>("sse/game"); // 实验性获取 GameList
 const fetchGameDetails = (account: string) => get<ApiGame.Detail>(`game/${account}`);
 
@@ -185,7 +187,7 @@ const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${Tic
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
 export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS };
-export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails };
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };
 export { load };

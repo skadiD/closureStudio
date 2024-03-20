@@ -54,7 +54,10 @@ export function selectRandomElement<T>(arr: T[]): T | undefined {
 
 // gameAccount format is "G1234556789"
 // return 123456789
-export function getRealGameAccount(gameAccount: string) {
+export function getRealGameAccount(gameAccount: string | undefined) {
+    if (!gameAccount) {
+        return "";
+    }
     if (gameAccount.startsWith("G") || gameAccount.startsWith("B")) {
         return gameAccount.substring(1);
     }
