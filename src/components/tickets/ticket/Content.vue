@@ -100,7 +100,7 @@ import { Type } from "../../toast/enmu";
 import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
 import { set } from "date-fns";
-import { checkMobile } from "../../../utils/regex";
+import { checkIsMobile } from "../../../utils/regex";
 const user = userStore();
 const myTicket = ref<TicketSystem.Ticket | null>(null);
 const authorInfo = ref<ApiUser.User | null>(null);
@@ -235,7 +235,7 @@ const getSMSSendPhone = (slots: Registry.Slot[]) => {
         return;
     }
     const phone = getRealGameAccount(gameAccount);
-    if (!checkMobile(phone)) {
+    if (!checkIsMobile(phone)) {
         return;
     }
     return phone;

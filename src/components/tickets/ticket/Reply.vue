@@ -35,7 +35,7 @@ import { Type } from "../../toast/enmu";
 import { PostTicket, ReplyTicket } from "../../../plugins/axios";
 import Tags from "./Tags.vue";
 import showDialog from "../../../plugins/dialog/dialog";
-import { checkEmail, checkMobile } from "../../../utils/regex";
+import { checkIsEmail, checkIsMobile } from "../../../utils/regex";
 interface Props {
     ticket?: TicketSystem.Ticket | null;
     refresh?: () => Promise<void> | undefined;
@@ -71,19 +71,19 @@ const setSelectAuthor = (author: TicketSystem.Author | null, gameAccount: string
 };
 
 const privateInfoCheck = () => {
-    if (checkEmail(ticketContent.value)) {
+    if (checkIsEmail(ticketContent.value)) {
         setMsg("请不要在帖子中透露私人信息", Type.Warning);
         return true;
     }
-    if (checkEmail(ticketTitle.value)) {
+    if (checkIsEmail(ticketTitle.value)) {
         setMsg("请不要在帖子中透露私人信息", Type.Warning);
         return true;
     }
-    if (checkMobile(ticketContent.value)) {
+    if (checkIsMobile(ticketContent.value)) {
         setMsg("请不要在帖子中透露私人信息", Type.Warning);
         return true;
     }
-    if (checkMobile(ticketTitle.value)) {
+    if (checkIsMobile(ticketTitle.value)) {
         setMsg("请不要在帖子中透露私人信息", Type.Warning);
         return true;
     }

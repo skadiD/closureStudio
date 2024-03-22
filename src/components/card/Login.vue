@@ -113,6 +113,7 @@ import Docker from "../toast/Docker.vue";
 import { Auth_Login, Auth_Register, Auth_ResetPassword } from "../../plugins/axios";
 import { userStore } from "../../store/user";
 import { useRouter } from "vue-router";
+import { checkIsEmail, getEmailUsernameLength } from "../../utils/regex";
 // @ts-ignore
 
 enum ModelType {
@@ -159,6 +160,27 @@ const loginBtn = () => {
 };
 const regBtn = () => {
     if (isLoading.value) return;
+    // check is email format
+    if (!regParams.value.email || !regParams.value.password) {
+        setMsg("请填写完整信息", Type.Warning);
+        return;
+    }
+    if (!agreeTerms.value) {
+        setMsg("请阅读并同意用户协议", Type.Warning);
+        return;
+    }
+    if (!checkIsEmail(regParams.value.email)) {
+        setMsg("邮箱格式不正确", Type.Warning);
+        return;
+    }
+    if (getEmailUsernameLength(regParams.value.email) > 20) {
+        setMsg("邮箱用户名长度不能超过20个字符", Type.Warning);
+        return;
+    }
+    if (getEmailUsernameLength(regParams.value.email) < 6) {
+        setMsg("邮箱用户名长度不能少于6个字符", Type.Warning);
+        return;
+    }
     isLoading.value = true;
     // @ts-ignore
     regParams.value.noise = window.idaks?.join("");
