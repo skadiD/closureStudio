@@ -116,7 +116,7 @@
                             <div>
                                 <span>Game:</span> <span v-if="slot.gameAccount"> {{ slot.gameAccount }} </span><span
                                     v-if="!slot.gameAccount"> 空闲 </span> <span v-if="slot.gameAccount"> <button
-                                        @click="handleDeleteSlotBtnOnClick(myTicket.authorUUID, slot.uuid)"
+                                        @click="handleDeleteSlotBtnOnClick(myTicket.authorUUID)"
                                         class="btn btn-outline btn-xs m-1">删除</button> </span>
                             </div>
                         </div>
@@ -141,7 +141,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 import { nextTick, ref, watch } from "vue";
 import { getRealGameAccount, setMsg } from "../../../plugins/common";
-import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin } from "../../../plugins/axios";
+import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin, doDelGame } from "../../../plugins/axios";
 import { userStore } from "../../../store/user";
 import { Type } from "../../toast/enmu";
 import Tags from "./Tags.vue";
@@ -202,14 +202,10 @@ watch(
     }
 );
 
-const handleDeleteSlotBtnOnClick = async (userId: string, slotId: string) => {
+const handleDeleteSlotBtnOnClick = async (slotId: string) => {
     try {
         isLoading.value = true;
-        const params = {
-            uuid: slotId,
-            gameAccount: null
-        };
-        const resp = await DelQuotaGameAdmin(userId, params);
+        const resp = await doDelGame(slotId, "123");
         setMsg(resp.message, resp.code === 1 ? Type.Success : Type.Warning);
     } catch (error) {
         const err = error as Error;
