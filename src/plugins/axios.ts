@@ -159,6 +159,8 @@ const doDelGame = (slot: string, token: string) =>
         account: null
     });
 
+const DelQuotaGameAdmin = (userId: string, params: { uuid: string; gameAccount: string | null }) => post<string>(`${RegistryServer}api/mgm/slots/slot?uid=${userId}`, params);
+
 const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
     post(`game/config/${account}`, {
         config: game
@@ -188,7 +190,7 @@ const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${Tic
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
 export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS };
-export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin };
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };
 export { load };

@@ -34,11 +34,13 @@
                         class="btn btn-outline btn-xs m-1">取消置顶</button>
                     <button v-if="user.isAdmin" :onClick="hiddenTicket" class="btn btn-outline btn-xs m-1">隐藏</button>
                     <button v-if="user.isAdmin" @click="() => displayType = DisplayType.UserInfo"
-                        class="btn btn-outline btn-xs m-1">账号信息</button>
+                        class="btn btn-outline btn-xs m-1">通行证</button>
+                    <button v-if="user.isAdmin" @click="() => displayType = DisplayType.GameSlots"
+                        class="btn btn-outline btn-xs m-1">游戏槽</button>
                     <button v-if="user.isAdmin" @click="() => displayType = DisplayType.GameLog"
-                        class="btn btn-outline btn-xs m-1">游戏日志</button>
+                        class="btn btn-outline btn-xs m-1">日志</button>
                     <button v-if="user.isAdmin && displayType != DisplayType.None"
-                        @click="() => displayType = DisplayType.None" class="btn btn-outline btn-xs m-1">关闭更多信息</button>
+                        @click="() => displayType = DisplayType.None" class="btn btn-outline btn-xs m-1">收起</button>
                 </div>
                 <div class="divider" v-if="displayType != DisplayType.None && user.isAdmin">更多详细信息</div>
                 <div v-if="displayType == DisplayType.UserInfo && user.isAdmin">
@@ -101,6 +103,26 @@
 
                 </div>
 
+                <!-- slots -->
+                <div v-if="displayType == DisplayType.GameSlots && user.isAdmin">
+                    <div v-if="isLoading">
+                        <span class="loading loading-bars"> </span>
+                        <span class="loading loading-bars"> </span>
+                        <span class="loading loading-bars"> </span>
+                    </div>
+                    <div v-if="!isLoading && authorSolts">
+                        <div v-for="slot in authorSolts">
+
+                            <div>
+                                <span>Game:</span> <span v-if="slot.gameAccount"> {{ slot.gameAccount }} </span><span
+                                    v-if="!slot.gameAccount"> 空闲 </span> <span v-if="slot.gameAccount"> <button
+                                        @click="handleDeleteSlotBtnOnClick(myTicket.authorUUID, slot.uuid)"
+                                        class="btn btn-outline btn-xs m-1">删除</button> </span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
@@ -119,20 +141,20 @@ const props = withDefaults(defineProps<Props>(), {
 });
 import { nextTick, ref, watch } from "vue";
 import { getRealGameAccount, setMsg } from "../../../plugins/common";
-import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin, fetchGameLogsAdmin } from "../../../plugins/axios";
+import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin } from "../../../plugins/axios";
 import { userStore } from "../../../store/user";
 import { Type } from "../../toast/enmu";
 import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
-import { set } from "date-fns";
 import { checkIsMobile } from "../../../utils/regex";
 
 enum DisplayType {
     None,
     UserInfo,
+    GameLog,
+    GameSlots,
     GamesInfo,
     GameIngo,
-    GameLog
 }
 
 const user = userStore();
@@ -179,6 +201,24 @@ watch(
         immediate: false
     }
 );
+
+const handleDeleteSlotBtnOnClick = async (userId: string, slotId: string) => {
+    try {
+        isLoading.value = true;
+        const params = {
+            uuid: slotId,
+            gameAccount: null
+        };
+        const resp = await DelQuotaGameAdmin(userId, params);
+        setMsg(resp.message, resp.code === 1 ? Type.Success : Type.Warning);
+    } catch (error) {
+        const err = error as Error;
+        setMsg(err.message, Type.Warning);
+        console.log(err);
+    } finally {
+        isLoading.value = false;
+    }
+};
 
 const getAuthorInfo = async () => {
     // use async method to fetch QueryUser and fetchUserSlotsAdmin
