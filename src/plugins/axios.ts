@@ -139,6 +139,7 @@ const fetchCron = () => get("Nodes"); // Cron
 const fetchAnnounce = () => get("Common/Announcement"); // Announce
 
 const fetchGameLogs = (account: string, id: number) => get<ApiGame.GameLogs>(`game/log/${account}/${id}`);
+const fetchGameLogsAdmin = (account: string, uuid: string, id: number) => get<ApiGame.GameLogs>(`game/log/${account}/${id}?uuid=${uuid}`);
 const fetchGameList = () => get<ApiGame.Game[]>(`game`); // GameList
 const fetchGameScreen = (account: string, platform: string) => get(`Game/Screenshot/${account}/${platform}`); // GetScreen
 const fetchDetails = (account: string, platform: string) => get(`Game/${account}/${platform}`); // GetDetails
@@ -187,7 +188,7 @@ const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${Tic
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
 export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS };
-export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin };
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };
 export { load };

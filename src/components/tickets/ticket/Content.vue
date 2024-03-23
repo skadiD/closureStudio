@@ -33,11 +33,15 @@
                     <button v-if="user.isAdmin && !myTicket.replyTo && myTicket.isPinned"
                         class="btn btn-outline btn-xs m-1">取消置顶</button>
                     <button v-if="user.isAdmin" :onClick="hiddenTicket" class="btn btn-outline btn-xs m-1">隐藏</button>
-                    <button v-if="user.isAdmin" @click="() => isDisplayMoreInfo = !isDisplayMoreInfo"
-                        class="btn btn-outline btn-xs m-1">更多</button>
+                    <button v-if="user.isAdmin" @click="() => displayType = DisplayType.UserInfo"
+                        class="btn btn-outline btn-xs m-1">账号信息</button>
+                    <button v-if="user.isAdmin" @click="() => displayType = DisplayType.GameLog"
+                        class="btn btn-outline btn-xs m-1">游戏日志</button>
+                    <button v-if="user.isAdmin && displayType != DisplayType.None"
+                        @click="() => displayType = DisplayType.None" class="btn btn-outline btn-xs m-1">关闭更多信息</button>
                 </div>
-                <div class="divider" v-if="isDisplayMoreInfo && user.isAdmin">更多详细信息</div>
-                <div v-if="isDisplayMoreInfo && user.isAdmin">
+                <div class="divider" v-if="displayType != DisplayType.None && user.isAdmin">更多详细信息</div>
+                <div v-if="displayType == DisplayType.UserInfo && user.isAdmin">
                     <div v-if="isLoading">
                         <span class="loading loading-bars"> </span>
                         <span class="loading loading-bars"> </span>
@@ -47,11 +51,12 @@
                         <div @click="copyToClipboard(myTicket.authorUUID)">
                             UUID: {{ myTicket.authorUUID }}
                         </div>
-
+                        <div @click="copyToClipboard(myTicket.gameAccount)">
+                            Game: {{ myTicket.gameAccount }}
+                        </div>
                         <div @click="copyToClipboard(authorInfo.UserEmail)">
                             email: {{ authorInfo.UserEmail }}
                         </div>
-
                         <div>
                             <span v-if="authorInfo.Phone"> phone: {{ authorInfo.Phone }}</span>
                             <span v-if="!authorInfo.Phone"> phone: 未绑定 <button v-if="user.isAdmin"
@@ -75,6 +80,26 @@
                         </div>
                     </div>
                 </div>
+                <!-- Game Log -->
+                <div v-if="displayType == DisplayType.GameLog && user.isAdmin">
+                    <div v-if="isLoading">
+                        <span class="loading loading-bars"> </span>
+                        <span class="loading loading-bars"> </span>
+                        <span class="loading loading-bars"> </span>
+                    </div>
+                    <div v-if="!isLoading && authorGameLogs" class="h-[calc(100vh-28rem)] overflow-y-auto">
+                        <table class="text-[1rem]">
+                            <tbody>
+                                <tr v-for="log in authorGameLogs.logs">
+                                    <td class="text-info whitespace-nowrap">{{ new Date(log.ts * 1000).toLocaleString()
+                                        }}</td>
+                                    <td class="pl-2">{{ log.content }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
 
             </div>
         </div>
@@ -94,23 +119,33 @@ const props = withDefaults(defineProps<Props>(), {
 });
 import { nextTick, ref, watch } from "vue";
 import { getRealGameAccount, setMsg } from "../../../plugins/common";
-import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin } from "../../../plugins/axios";
+import { QueryUser, SendSMS, UpdateTicketById, fetchUserSlotsAdmin, fetchGameLogsAdmin } from "../../../plugins/axios";
 import { userStore } from "../../../store/user";
 import { Type } from "../../toast/enmu";
 import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
 import { set } from "date-fns";
 import { checkIsMobile } from "../../../utils/regex";
+
+enum DisplayType {
+    None,
+    UserInfo,
+    GamesInfo,
+    GameIngo,
+    GameLog
+}
+
 const user = userStore();
 const myTicket = ref<TicketSystem.Ticket | null>(null);
-const authorInfo = ref<ApiUser.User | null>(null);
-const authorSolts = ref<Registry.Slot[]>([]);
 const isUpdating = ref(false);
 const isLoading = ref(false);
 const smsSendPhone = ref('');
 const isAuthor = ref(false);
-const isDisplayMoreInfo = ref(false);
+const displayType = ref<DisplayType>(DisplayType.None);
 
+const authorInfo = ref<ApiUser.User | null>(null);
+const authorSolts = ref<Registry.Slot[]>([]);
+const authorGameLogs = ref<ApiGame.GameLogs>();
 watch(
     () => props.ticket,
     (newVal) => {
@@ -124,41 +159,69 @@ watch(
 );
 
 watch(
-    () => isDisplayMoreInfo.value,
-    async (newVal) => {
-        if (newVal && myTicket.value?.authorUUID) {
-            isLoading.value = true;
-            // use async method to fetch QueryUser and fetchUserSlotsAdmin
-            const [usersInfo, usersSolts] = await Promise.all([QueryUser(myTicket.value?.authorUUID), fetchUserSlotsAdmin(myTicket.value?.authorUUID)]);
-            if (usersInfo.code === 1) {
-                const user = findAuthorInfo(myTicket.value?.authorUUID, usersInfo.data);
-                if (user) {
-                    authorInfo.value = user;
-                }
-            }
-            console.log("usersSolts", usersSolts);
-            if (usersSolts.data && usersSolts.data?.length > 0) {
-                authorSolts.value = usersSolts.data;
-                const phone = getSMSSendPhone(usersSolts.data);
-                if (phone) {
-                    smsSendPhone.value = phone;
-                }
-            }
-            if (usersInfo.code != 1) {
-                authorInfo.value = null;
-                setMsg("获取用户信息失败: " + usersInfo.message, Type.Warning);
-            }
-            if (!usersSolts.data) {
-                setMsg("获取用户托管槽失败: " + usersSolts.message, Type.Warning);
-            }
-            isLoading.value = false;
+    () => displayType.value,
+    async () => {
+        isLoading.value = true;
+        switch (displayType.value) {
+            case DisplayType.UserInfo:
+                await getAuthorInfo();
+                break;
+            case DisplayType.GameLog:
+                await getAuthorGameLogs();
+                break;
+            default:
+                break;
         }
+        isLoading.value = false;
     },
     {
         deep: true,
         immediate: false
     }
 );
+
+const getAuthorInfo = async () => {
+    // use async method to fetch QueryUser and fetchUserSlotsAdmin
+    if (myTicket.value?.authorUUID) {
+        const [usersInfo, usersSolts] = await Promise.all([QueryUser(myTicket.value?.authorUUID), fetchUserSlotsAdmin(myTicket.value?.authorUUID)]);
+        if (usersInfo.code === 1) {
+            const user = findAuthorInfo(myTicket.value?.authorUUID, usersInfo.data);
+            if (user) {
+                authorInfo.value = user;
+            }
+        }
+        console.log("usersSolts", usersSolts);
+        if (usersSolts.data && usersSolts.data?.length > 0) {
+            authorSolts.value = usersSolts.data;
+            const phone = getSMSSendPhone(usersSolts.data);
+            if (phone) {
+                smsSendPhone.value = phone;
+            }
+        }
+        if (usersInfo.code != 1) {
+            authorInfo.value = null;
+            setMsg("获取用户信息失败: " + usersInfo.message, Type.Warning);
+        }
+        if (!usersSolts.data) {
+            setMsg("获取用户托管槽失败: " + usersSolts.message, Type.Warning);
+        }
+    }
+};
+
+
+const getAuthorGameLogs = async () => {
+    // use async method to fetch QueryUser and fetchUserSlotsAdmin
+    if (myTicket.value?.authorUUID && myTicket.value.gameAccount) {
+        const resp = await fetchGameLogsAdmin(myTicket.value.gameAccount, myTicket.value?.authorUUID, 0);
+        if (resp.code === 1 && resp.data) {
+            authorGameLogs.value = resp.data;
+            return;
+        }
+        setMsg("获取用户游戏日志失败: " + resp.message, Type.Warning);
+    }
+};
+
+
 
 const hiddenTicket = async () => {
     if (!myTicket.value) {
