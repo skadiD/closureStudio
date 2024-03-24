@@ -20,7 +20,21 @@
         class="input input-bordered input-sm w-full my-2" />
     <textarea v-model="ticketContent" placeholder="请发表您的锐评"
         className="textarea textarea-bordered textarea-lg w-full my-2"></textarea>
+
+    <div v-if="ticketAttachments.length > 0" className="">
+        <div v-for="(attachment, key) in ticketAttachments" :key="key" className="flex justify-start items-center">
+            <img :src="attachment" className="w-10 h-10" />
+            <span className="m-2">{attachment}</span>
+        </div>
+    </div>
+
     <div className="flex justify-start">
+        <div class="flex justify-center items-center">
+            <label>
+                <span class="m-2 btn btn-sm btn-info">上传截图</span>
+                <input type="file" class="file-input w-0 invisible" @change="uploadImage" />
+            </label>
+        </div>
         <button class="m-2 btn btn-sm btn-info" @click="postTicket">
             <span v-if="isUpdating" class="loading loading-spinner"></span>
             发表锐评
@@ -36,6 +50,7 @@ import { PostTicket, ReplyTicket } from "../../../plugins/axios";
 import Tags from "./Tags.vue";
 import showDialog from "../../../plugins/dialog/dialog";
 import { checkIsEmail, checkIsMobile } from "../../../utils/regex";
+import axios from "axios";
 interface Props {
     ticket?: TicketSystem.Ticket | null;
     refresh?: () => Promise<void> | undefined;
@@ -51,7 +66,7 @@ const ticketTitle = ref<string>("");
 const ticketContent = ref<string>("");
 const isUpdating = ref(false);
 const tags = ref<string[]>([]);
-
+const ticketAttachments = ref<string[]>([]);
 
 // const handleTestBtnOnClick = () => {
 //     showDialog("test", "test", () => { console.log("test") });
@@ -121,6 +136,7 @@ const createTicketData = () => {
     data.author = tempAuthor;
     data.tags = tags.value;
     data.gameAccount = selectedGame.value;
+    data.attachments = ticketAttachments.value;
     if (props.ticket) {
         data.replyTo = props.ticket.id;
     }
@@ -216,6 +232,38 @@ const setDefaultAuthor = () => {
 };
 const isSelectedAuthor = (nickName: string) => {
     return selectedAuthor.value?.nickname === nickName;
+};
+
+const uploadImage = async (event: Event) => {
+    const files = (event.target as HTMLInputElement).files;
+    if (files && files.length > 0) {
+        const formData = new FormData();
+        formData.append('file', files[0]);
+
+        try {
+            const response = await axios({
+                method: 'post',
+                url: 'https://wenku.baidu.com/user/api/editorimg',
+                data: formData,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.status === 200 && response.data) {
+                // 解析返回的结果
+                const result = response.data;
+                ticketAttachments.value.push(result.link);
+                setMsg('上传成功', response.data);
+            } else {
+                // 处理错误逻辑
+                setMsg('上传失败', Type.Warning);
+            }
+        } catch (error) {
+            // 处理错误逻辑
+            setMsg('上传失败', Type.Warning);
+        }
+    }
 };
 // start
 

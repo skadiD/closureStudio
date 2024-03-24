@@ -25,7 +25,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex">
+                <div class="flex flex-wrap">
                     <Tags v-if="(user.isAdmin || isAuthor) && !myTicket.replyTo" :refresh="props.refresh"
                         :tags="myTicket.tags" :ticketId="myTicket.id" @update:tags="updateTags" />
                     <button v-if="user.isAdmin && !myTicket.replyTo && !myTicket.isPinned"
@@ -92,10 +92,9 @@
                     <div v-if="!isLoading && authorGameLogs" class="h-[calc(100vh-28rem)] overflow-y-auto">
                         <table class="text-[1rem]">
                             <tbody>
-                                <tr v-for="log in authorGameLogs.logs">
-                                    <td class="text-info whitespace-nowrap">{{ new Date(log.ts * 1000).toLocaleString()
-                                        }}</td>
-                                    <td class="pl-2">{{ log.content }}</td>
+                                <tr class="text-wrap" v-for="log in authorGameLogs.logs">
+                                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "dd-mm HH:MM") }}</td>
+                                    <td class="pl-2 break-words">{{ log.content }}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -147,7 +146,7 @@ import { Type } from "../../toast/enmu";
 import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
 import { checkIsMobile } from "../../../utils/regex";
-
+import { formatTime } from "../../../plugins/common";
 enum DisplayType {
     None,
     UserInfo,
