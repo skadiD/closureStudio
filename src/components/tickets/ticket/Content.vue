@@ -51,26 +51,29 @@
                     </div>
                     <div v-if="!isLoading && authorInfo">
                         <div @click="copyToClipboard(myTicket.authorUUID)">
-                            UUID: {{ myTicket.authorUUID }}
+                            UUID: <span class="underline font-bold cursor-pointer">{{ myTicket.authorUUID }}</span>
                         </div>
                         <div @click="copyToClipboard(myTicket.gameAccount)">
-                            Game: {{ myTicket.gameAccount }}
+                            Game: <span class="underline font-bold cursor-pointer">{{ myTicket.gameAccount }}</span>
                         </div>
                         <div @click="copyToClipboard(authorInfo.UserEmail)">
-                            email: {{ authorInfo.UserEmail }}
+                            邮箱: <span class="underline font-bold cursor-pointer">{{ authorInfo.UserEmail }}</span>
                         </div>
                         <div>
-                            <span v-if="authorInfo.Phone"> phone: {{ authorInfo.Phone }}</span>
-                            <span v-if="!authorInfo.Phone"> phone: 未绑定 <button v-if="user.isAdmin"
+                            <span v-if="authorInfo.Phone"> 手机: {{ authorInfo.Phone }}</span>
+                            <span v-if="!authorInfo.Phone"> 手机: 未绑定 <button v-if="user.isAdmin"
                                     @click="sendSMS(myTicket.authorUUID, smsSendPhone)"
                                     class="btn btn-outline btn-xs m-1">发送SMS{{ smsSendPhone }}</button></span>
                         </div>
                         <div @click="copyToClipboard(authorInfo.QQ)">
-                            QQ: {{ authorInfo.QQ }}
+                            QQ: <span class="underline font-bold cursor-pointer">{{ authorInfo.QQ }}</span>
                         </div>
                         <div @click="copyToClipboard(String(authorInfo.Permission))">
-                            permission: {{ authorInfo.Permission }}
+                            权限: <button @click="displayAuthorPermission = !displayAuthorPermission"
+                                class="btn btn-outline btn-xs m-1">{{ displayAuthorPermission ? "收起" : "显示" }}</button>
                         </div>
+                        <Permission v-if="displayAuthorPermission" :userPermission="authorInfo.Permission"
+                            :uuid="authorInfo.UUID" />
                         <div @click="copyToClipboard(authorInfo.IP)">
                             IP: {{ String(authorInfo.IP) }}
                         </div>
@@ -93,7 +96,8 @@
                         <table class="text-[1rem]">
                             <tbody>
                                 <tr class="text-wrap" v-for="log in authorGameLogs.logs">
-                                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "dd-mm HH:MM") }}</td>
+                                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "dd-mm HH:MM") }}
+                                    </td>
                                     <td class="pl-2 break-words">{{ log.content }}</td>
                                 </tr>
                             </tbody>
@@ -113,9 +117,9 @@
                         <div v-for="slot in authorSolts">
 
                             <div>
-                                <span>Game:</span> <span v-if="slot.gameAccount"> {{ slot.gameAccount }} </span><span
-                                    v-if="!slot.gameAccount"> 空闲 </span> <span v-if="slot.gameAccount"> <button
-                                        @click="handleDeleteSlotBtnOnClick(myTicket.authorUUID)"
+                                <span>Game:</span> <span v-if="slot.gameAccount"> {{ slot.gameAccount }}
+                                </span><span v-if="!slot.gameAccount"> 空闲 </span> <span v-if="slot.gameAccount">
+                                    <button @click="handleDeleteSlotBtnOnClick(slot.uuid)"
                                         class="btn btn-outline btn-xs m-1">删除</button> </span>
                             </div>
                         </div>
@@ -147,6 +151,7 @@ import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
 import { checkIsMobile } from "../../../utils/regex";
 import { formatTime } from "../../../plugins/common";
+import Permission from "../../permission/Permission.vue";
 enum DisplayType {
     None,
     UserInfo,
@@ -163,7 +168,7 @@ const isLoading = ref(false);
 const smsSendPhone = ref('');
 const isAuthor = ref(false);
 const displayType = ref<DisplayType>(DisplayType.None);
-
+const displayAuthorPermission = ref(false);
 const authorInfo = ref<ApiUser.User | null>(null);
 const authorSolts = ref<Registry.Slot[]>([]);
 const authorGameLogs = ref<ApiGame.GameLogs>();
@@ -204,7 +209,7 @@ watch(
 const handleDeleteSlotBtnOnClick = async (slotId: string) => {
     try {
         isLoading.value = true;
-        const resp = await doDelGame(slotId, "123");
+        const resp = await doDelGame(slotId, "1");
         setMsg(resp.message, resp.code === 1 ? Type.Success : Type.Warning);
     } catch (error) {
         const err = error as Error;

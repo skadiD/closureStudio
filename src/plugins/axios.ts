@@ -40,7 +40,7 @@ service.interceptors.response.use(
         return fail;
     }
 );
-type RequestMethod = "get" | "post" | "put" | "delete";
+type RequestMethod = "get" | "post" | "put" | "delete" | "patch";
 interface RequestParam {
     url: string;
     method: RequestMethod;
@@ -95,6 +95,9 @@ function put<T>(url: string, data?: any) {
 function post<T>(url: string, data?: any) {
     return asyncRequest<T>({ url, method: "post", data });
 }
+function patch<T>(url: string, data?: any) {
+    return asyncRequest<T>({ url, method: "patch", data });
+}
 function get<T>(url: string) {
     return asyncRequest<T>({ url, method: "get" });
 }
@@ -133,6 +136,7 @@ const Auth_ResetPassword = (params: { email: string; phone: string; newPasswd: s
 // idServer admin
 const QueryUser = (value: string) => get<ApiUser.User[]>(`${AuthServer}admin/users/query?value=${value}`);
 const SendSMS = (params: { uuid: string; phone: string }) => post<string>(`${AuthServer}admin/users/sms`, params);
+const UpdateUserPermission = (uuid: string, permission: number) => patch(`${AuthServer}admin/permission?uuid=${uuid}&permission=${permission}`);
 
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
@@ -155,6 +159,10 @@ const doGameLogin = (token: string, account: string) => captcha(`game/login/${ac
 const doAddGame = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
 const doUpdateGamePasswd = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
 const doDelGame = (slot: string, token: string) =>
+    captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
+        account: null
+    });
+const doDelGameAdmin = (slot: string, token: string) =>
     captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
         account: null
     });
@@ -189,7 +197,7 @@ const UpdateTicketById = (id: string, data: TicketSystem.updateTicket) => put(`$
 const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/${id}/replies`, data); // getTIckets
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
-export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS };
+export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS, UpdateUserPermission };
 export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };

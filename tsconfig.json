@@ -18,7 +18,8 @@
     "skipLibCheck": true,
     "noEmit": true,
     "types": [
-      "node"
+      "node",
+      "@types/jest"
     ]
   },
   "include": [
