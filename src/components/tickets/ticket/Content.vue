@@ -96,7 +96,7 @@
                         <table class="text-[1rem]">
                             <tbody>
                                 <tr class="text-wrap" v-for="log in authorGameLogs.logs">
-                                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "dd-mm HH:MM") }}
+                                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "dd/MM HH:mm") }}
                                     </td>
                                     <td class="pl-2 break-words">{{ log.content }}</td>
                                 </tr>
