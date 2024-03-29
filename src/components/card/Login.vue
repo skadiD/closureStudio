@@ -113,7 +113,7 @@
                         <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
                                 class="s-underline">常见问题</a></span>
                         <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
-                                class="loading loading-bars"></span>查找!</a>
+                                class="loading loading-bars"></span>重置!</a>
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@
                         <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
                                 class="s-underline">常见问题</a></span>
                         <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
-                                class="loading loading-bars" />重置!</a>
+                                class="loading loading-bars" />查找!!</a>
                     </div>
                 </div>
             </div>
