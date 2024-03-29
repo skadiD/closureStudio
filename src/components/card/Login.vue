@@ -31,7 +31,7 @@
                                 class="s-underline">常见问题</a></span>
                         <a class="btn btn-block btn-info" @click="loginBtn"> <span v-if="isLoading"
                                 class="loading loading-bars"></span>登录</a>
-                        <a class="text-center underline" @click="modelType = ModelType.ForgetPassword">忘记了通行证账号?</a>
+                        <a class="text-center underline" @click="modelType = ModelType.ForgetAccount">忘记了通行证账号?</a>
                         <a class="text-center underline" @click="modelType = ModelType.ForgetPassword">忘记了通行证密码?</a>
                     </div>
                 </div>
@@ -113,6 +113,33 @@
                         <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
                                 class="s-underline">常见问题</a></span>
                         <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
+                                class="loading loading-bars"></span>查找!</a>
+                    </div>
+                </div>
+            </div>
+            <div v-else-if="modelType == ModelType.ForgetAccount" class="s-login-box">
+                <div class="text-center">
+                    <h1 class="block text-4xl font-bold text-info">找回邮箱</h1>
+                </div>
+                <div class="mt-5">
+                    <a class="btn btn-block btn-info btn-outline" @click="modelType = ModelType.Login">使用通行证登录</a>
+                    <div class="divider">OR</div>
+                    <div class="grid gap-y-4">
+                        <div class="s-combo">
+                            <input class="s-input peer focus:ring-info" v-model="forgetParams.email" />
+                            <label class="s-label peer-focus:text-info">托管游戏账号</label>
+                        </div>
+                        <div class="form-control">
+                            <label class="label cursor-pointer">
+                                <span class="label-text">我已阅读理解可露希尔小卖部
+                                    <a href="/blog/Terms&Policies" target="_blank" class="s-underline">用户协议</a>
+                                </span>
+                                <input type="checkbox" class="checkbox checkbox-info" v-model="agreeTerms" />
+                            </label>
+                        </div>
+                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
+                                class="s-underline">常见问题</a></span>
+                        <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
                                 class="loading loading-bars" />重置!</a>
                     </div>
                 </div>
@@ -139,7 +166,8 @@ import { checkIsEmail, getEmailUsernameLength } from "../../utils/regex";
 enum ModelType {
     Login,
     Register,
-    ForgetPassword
+    ForgetPassword,
+    ForgetAccount
 }
 const modelType = ref<ModelType>(ModelType.Login);
 const loginParams = ref({
