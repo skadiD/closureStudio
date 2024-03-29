@@ -11,11 +11,13 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="loginParams.email" autocomplete="email" />
+                            <input class="s-input peer focus:ring-info" v-model="loginParams.email"
+                                autocomplete="email" />
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="loginParams.password" type="password" autocomplete="current-password" />
+                            <input class="s-input peer focus:ring-info" v-model="loginParams.password" type="password"
+                                autocomplete="current-password" />
                             <label class="s-label peer-focus:text-info">密码</label>
                         </div>
 
@@ -25,9 +27,12 @@
                                 <input type="checkbox" class="checkbox checkbox-info" v-model="agreeTerms" />
                             </label>
                         </div>
-                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank" class="s-underline">常见问题</a></span>
-                        <a class="btn btn-block btn-info" @click="loginBtn"> <span v-if="isLoading" class="loading loading-bars" />登录</a>
-                        <a class="text-center underline p-1" @click="modelType = ModelType.ForgetPassword">忘记了密码?</a>
+                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
+                                class="s-underline">常见问题</a></span>
+                        <a class="btn btn-block btn-info" @click="loginBtn"> <span v-if="isLoading"
+                                class="loading loading-bars"></span>登录</a>
+                        <a class="text-center underline" @click="modelType = ModelType.ForgetPassword">忘记了通行证账号?</a>
+                        <a class="text-center underline" @click="modelType = ModelType.ForgetPassword">忘记了通行证密码?</a>
                     </div>
                 </div>
             </div>
@@ -40,25 +45,37 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="regParams.email" autocomplete="email" />
+                            <input class="s-input peer focus:ring-info" v-model="regParams.email"
+                                autocomplete="email" />
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="regParams.password" type="password" autocomplete="new-password" />
+                            <input class="s-input peer focus:ring-info" v-model="regParams.password" type="password"
+                                autocomplete="new-password" />
                             <label class="s-label peer-focus:text-info">密码</label>
                         </div>
+                        <div class="s-combo">
+                            <div class="flex space-x-2">
+                                <input class="s-input peer focus:ring-info" v-model="regParams.code" />
+                                <button @click="sendCode" class="btn btn-info btn-sm w-24"> <span
+                                        v-if="isSendCodingIsLoading" class="loading loading-bars loading-md"></span>
+                                    <span v-if="!isSendCodingIsLoading">获取验证码</span> </button>
+                            </div>
 
+                            <label class="s-label peer-focus:text-info">验证码</label>
+                        </div>
                         <div class="form-control">
                             <label class="label cursor-pointer">
-                                <span class="label-text"
-                                    >我已阅读理解可露希尔小卖部
+                                <span class="label-text">我已阅读理解可露希尔小卖部
                                     <a href="/blog/Terms&Policies" target="_blank" class="s-underline">用户协议</a>
                                 </span>
                                 <input type="checkbox" class="checkbox checkbox-info" v-model="agreeTerms" />
                             </label>
                         </div>
-                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank" class="s-underline">常见问题</a></span>
-                        <a class="btn btn-block btn-info" @click="regBtn"><span v-if="isLoading" class="loading loading-bars" />注册</a>
+                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
+                                class="s-underline">常见问题</a></span>
+                        <a class="btn btn-block btn-info" @click="regBtn"><span v-if="isLoading"
+                                class="loading loading-bars" />注册</a>
                     </div>
                 </div>
             </div>
@@ -75,25 +92,28 @@
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="forgetParams.phone" autocomplete="tel" />
+                            <input class="s-input peer focus:ring-info" v-model="forgetParams.phone"
+                                autocomplete="tel" />
                             <label class="s-label peer-focus:text-info">已绑定手机号</label>
                         </div>
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="forgetParams.newPasswd" type="password" autocomplete="new-password" />
+                            <input class="s-input peer focus:ring-info" v-model="forgetParams.newPasswd" type="password"
+                                autocomplete="new-password" />
                             <label class="s-label peer-focus:text-info">新密码</label>
                         </div>
 
                         <div class="form-control">
                             <label class="label cursor-pointer">
-                                <span class="label-text"
-                                    >我已阅读理解可露希尔小卖部
+                                <span class="label-text">我已阅读理解可露希尔小卖部
                                     <a href="/blog/Terms&Policies" target="_blank" class="s-underline">用户协议</a>
                                 </span>
                                 <input type="checkbox" class="checkbox checkbox-info" v-model="agreeTerms" />
                             </label>
                         </div>
-                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank" class="s-underline">常见问题</a></span>
-                        <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading" class="loading loading-bars" />重置!</a>
+                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
+                                class="s-underline">常见问题</a></span>
+                        <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
+                                class="loading loading-bars" />重置!</a>
                     </div>
                 </div>
             </div>
@@ -110,7 +130,7 @@ import { ref } from "vue";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import Docker from "../toast/Docker.vue";
-import { Auth_Login, Auth_Register, Auth_ResetPassword } from "../../plugins/axios";
+import { Auth_Login, Auth_Register, Auth_ResetPassword, SendCodeOnRegister } from "../../plugins/axios";
 import { userStore } from "../../store/user";
 import { useRouter } from "vue-router";
 import { checkIsEmail, getEmailUsernameLength } from "../../utils/regex";
@@ -134,6 +154,7 @@ const forgetParams = ref({
 const regParams = ref({
     email: "",
     password: "",
+    code: "",
     noise: "",
     sign: ""
 });
@@ -141,6 +162,7 @@ const user = userStore();
 const router = useRouter();
 const isLoading = ref(false);
 const agreeTerms = ref(false);
+const isSendCodingIsLoading = ref(false);
 const loginBtn = () => {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -158,10 +180,36 @@ const loginBtn = () => {
             isLoading.value = false;
         });
 };
+
+const sendCode = async () => {
+    if (isSendCodingIsLoading.value) return;
+    if (!regParams.value.email) {
+        setMsg("请填写邮箱", Type.Warning);
+        return;
+    }
+    try {
+        isSendCodingIsLoading.value = true;
+        const parm = {
+            email: regParams.value.email
+        };
+        const resp = await SendCodeOnRegister(parm);
+        if (resp.code === 0) {
+            setMsg(resp.message || "发送失败", Type.Warning);
+        } else {
+            setMsg("发送成功", Type.Success);
+        }
+    } catch (e) {
+        console.error(e);
+        setMsg("请刷新页面重试", Type.Warning);
+    } finally {
+        isSendCodingIsLoading.value = false;
+    }
+};
+
 const regBtn = () => {
     if (isLoading.value) return;
     // check is email format
-    if (!regParams.value.email || !regParams.value.password) {
+    if (!regParams.value.email || !regParams.value.password || !regParams.value.code) {
         setMsg("请填写完整信息", Type.Warning);
         return;
     }
@@ -222,6 +270,5 @@ const resetPasswordBtn = () => {
         .finally(() => {
             isLoading.value = false;
         });
-
 };
 </script>

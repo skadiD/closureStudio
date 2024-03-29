@@ -129,15 +129,15 @@ function load<T>(fileName: string): Promise<T> {
 }
 // idServer
 const Auth_Login = (params: { email: string; password: string }) => post<ApiUser.Auth>(`${AuthServer}login`, params);
-const Auth_Register = (params: { email: string; password: string; noise: string; sign: string }) => post<ApiUser.Auth>(`${AuthServer}register`, params);
+const Auth_Register = (params: { email: string; password: string; code: string; noise: string; sign: string }) => post<ApiUser.Auth>(`${AuthServer}register`, params);
 
 const Auth_ResetPassword = (params: { email: string; phone: string; newPasswd: string }) => post<ApiUser.Auth>(`${AuthServer}forget`, params);
 
 // idServer admin
 const QueryUser = (value: string) => get<ApiUser.User[]>(`${AuthServer}admin/users/query?value=${value}`);
 const SendSMS = (params: { uuid: string; phone: string }) => post<string>(`${AuthServer}admin/users/sms`, params);
-const UpdateUserPermission = (uuid: string, permission: number) => patch(`${AuthServer}admin/permission?uuid=${uuid}&permission=${permission}`);
-
+const UpdateUserPermission = (uuid: string, permission: number) => post(`${AuthServer}admin/permission?uuid=${uuid}&permission=${permission}`);
+const SendCodeOnRegister = (params: { email: string }) => post(`${AuthServer}mail/register/code`, params);
 const Auth_Info = () => get(`${AuthServer}info`);
 const fetchCron = () => get("Nodes"); // Cron
 const fetchAnnounce = () => get("Common/Announcement"); // Announce
@@ -197,7 +197,7 @@ const UpdateTicketById = (id: string, data: TicketSystem.updateTicket) => put(`$
 const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/${id}/replies`, data); // getTIckets
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
-export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS, UpdateUserPermission };
+export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS, UpdateUserPermission, SendCodeOnRegister };
 export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };
