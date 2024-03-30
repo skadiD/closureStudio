@@ -169,7 +169,7 @@ const doDelGameAdmin = (slot: string, token: string) =>
     captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
         account: null
     });
-const doFindAccount = (gameAccount: string, token: string) => captchaGet(`${RegistryServer}api/users/findEmail?gameAccount=${gameAccount}`, token);
+const doFindAccount = (gameAccount: string, token: string) => captchaPost(`${RegistryServer}api/users/findEmail?gameAccount=${gameAccount}`, token);
 const DelQuotaGameAdmin = (userId: string, params: { uuid: string; gameAccount: string | null }) => post<string>(`${RegistryServer}api/mgm/slots/slot?uid=${userId}`, params);
 
 const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
