@@ -57,9 +57,9 @@
                         <div class="s-combo">
                             <div class="flex space-x-2">
                                 <input class="s-input peer focus:ring-info" v-model="regParams.code" />
-                                <button @click="sendCode" class="btn btn-info btn-sm w-24"> <span
+                                <button @click="sendCode" class="btn btn-info btn-sm w-24"><span
                                         v-if="isSendCodingIsLoading" class="loading loading-bars loading-md"></span>
-                                    <span v-if="!isSendCodingIsLoading">获取验证码</span> </button>
+                                    <span v-if="!isSendCodingIsLoading">获取验证码</span></button>
                             </div>
 
                             <label class="s-label peer-focus:text-info">验证码</label>
@@ -126,9 +126,25 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="forgetParams.email" />
+                            <input class="s-input peer focus:ring-info" v-model="findAccountParams.gameAccount" />
                             <label class="s-label peer-focus:text-info">托管游戏账号</label>
                         </div>
+                        <div class="s-combo">
+                            <div class="w-full mb-3">
+                                <label class="label cursor-pointer">
+                                    <span class="text-xl">官服（安卓 / IOS）</span>
+                                    <input type="radio" :value="1" v-model="findAccountParams.platform" id="official"
+                                        class="radio checked:bg-red-500" />
+                                </label>
+                                <label class="label cursor-pointer">
+                                    <span class="text-xl">BiliBili服</span>
+                                    <input type="radio" :value="2" v-model="findAccountParams.platform" id="bili"
+                                        class="radio checked:bg-blue-500" />
+                                </label>
+                            </div>
+                            <div class="divider my-4">服务器选择</div>
+                        </div>
+
                         <div class="form-control">
                             <label class="label cursor-pointer">
                                 <span class="label-text">我已阅读理解可露希尔小卖部
@@ -139,8 +155,8 @@
                         </div>
                         <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
                                 class="s-underline">常见问题</a></span>
-                        <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
-                                class="loading loading-bars" />查找!!</a>
+                        <a class="btn btn-block btn-info" @click="handleFindAccountBtnOnClick"><span
+                                v-if="isFindAcccountLoading" class="loading loading-bars" />查找!</a>
                     </div>
                 </div>
             </div>
@@ -157,10 +173,11 @@ import { ref } from "vue";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import Docker from "../toast/Docker.vue";
-import { Auth_Login, Auth_Register, Auth_ResetPassword, SendCodeOnRegister } from "../../plugins/axios";
+import { Auth_Login, Auth_Register, Auth_ResetPassword, SendCodeOnRegister, doFindAccount } from "../../plugins/axios";
 import { userStore } from "../../store/user";
 import { useRouter } from "vue-router";
 import { checkIsEmail, getEmailUsernameLength } from "../../utils/regex";
+import updateCaptchaHandler from "../../plugins/geetest/captcha";
 // @ts-ignore
 
 enum ModelType {
@@ -186,11 +203,16 @@ const regParams = ref({
     noise: "",
     sign: ""
 });
+const findAccountParams = ref({
+    gameAccount: "",
+    platform: 1
+});
 const user = userStore();
 const router = useRouter();
 const isLoading = ref(false);
 const agreeTerms = ref(false);
 const isSendCodingIsLoading = ref(false);
+const isFindAcccountLoading = ref(false);
 const loginBtn = () => {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -231,6 +253,32 @@ const sendCode = async () => {
         setMsg("请刷新页面重试", Type.Warning);
     } finally {
         isSendCodingIsLoading.value = false;
+    }
+};
+
+const findAccount = async (geetestToken: string) => {
+    try {
+        isFindAcccountLoading.value = true;
+        let gameAccount = "";
+        if (findAccountParams.value.platform === 1) {
+            // 官服
+            gameAccount = "G" + findAccountParams.value.gameAccount;
+        }
+        if (findAccountParams.value.platform === 2) {
+            // B站服
+            gameAccount = "B" + findAccountParams.value.gameAccount;
+        }
+        const resp = await doFindAccount(gameAccount, geetestToken);
+        if (resp.code === 0) {
+            setMsg(resp.message || "发送失败", Type.Warning);
+        } else {
+            setMsg("发送成功", Type.Success);
+        }
+    } catch (e) {
+        console.error(e);
+        setMsg("请刷新页面重试", Type.Warning);
+    } finally {
+        isFindAcccountLoading.value = false;
     }
 };
 
@@ -298,5 +346,32 @@ const resetPasswordBtn = () => {
         .finally(() => {
             isLoading.value = false;
         });
+};
+
+const handleFindAccountBtnOnClick = async () => {
+    if (isFindAcccountLoading.value) return;
+    if (findAccountParams.value.gameAccount === "") {
+        setMsg("请填写账号", Type.Warning);
+        return;
+    }
+    // 先通过 recaptcha 加载失败的时候直接降级到 geetest
+    if (!window.grecaptcha) {
+        updateCaptchaHandler(geetestFindAccountOnSuccess());
+        return;
+    }
+    window.grecaptcha?.ready(async () => {
+        const token = await window.grecaptcha.execute("6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN", { action: "submit" });
+        if (token === "") {
+            setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
+            isFindAcccountLoading.value = false;
+            return;
+        }
+        findAccount(token);
+    });
+};
+const geetestFindAccountOnSuccess = () => {
+    return (geetestToken: string) => {
+        findAccount(geetestToken);
+    };
 };
 </script>

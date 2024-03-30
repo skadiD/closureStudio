@@ -101,7 +101,10 @@ function patch<T>(url: string, data?: any) {
 function get<T>(url: string) {
     return asyncRequest<T>({ url, method: "get" });
 }
-function captcha<T>(url: string, token: string, data?: any) {
+function captchaGet<T>(url: string, token: string, data?: any) {
+    return asyncRequest<T>({ url, method: "get", token, data });
+}
+function captchaPost<T>(url: string, token: string, data?: any) {
     return asyncRequest<T>({ url, method: "post", token, data });
 }
 function sse<T>(url: string) {
@@ -154,19 +157,19 @@ const apiGeetestSet = (account: string, platform: number, params: any) => post(`
 const fetchSytemConfig = () => get<ApiSystem.Config>("system/config");
 const fetchSytemList = () => get<ApiSystem.Hall[]>("system/apCostList");
 
-const doGameLogin = (token: string, account: string) => captcha(`game/login/${account}`, token, null); // GameLogin
+const doGameLogin = (token: string, account: string) => captchaPost(`game/login/${account}`, token, null); // GameLogin
 
-const doAddGame = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
-const doUpdateGamePasswd = (slot: string, token: string, params: any) => captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
+const doAddGame = (slot: string, token: string, params: any) => captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
+const doUpdateGamePasswd = (slot: string, token: string, params: any) => captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, params); // GameCreate
 const doDelGame = (slot: string, token: string) =>
-    captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
+    captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
         account: null
     });
 const doDelGameAdmin = (slot: string, token: string) =>
-    captcha(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
+    captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
         account: null
     });
-
+const doFindAccount = (gameAccount: string, token: string) => captchaGet(`${RegistryServer}api/users/findEmail?gameAccount=${gameAccount}`, token);
 const DelQuotaGameAdmin = (userId: string, params: { uuid: string; gameAccount: string | null }) => post<string>(`${RegistryServer}api/mgm/slots/slot?uid=${userId}`, params);
 
 const doUpdateGameConf = (account: string, game: ApiGame.Config) =>
@@ -198,7 +201,7 @@ const ReplyTicket = (id: string, data: TicketSystem.createTicket) => post(`${Tic
 const PostTicket = (data: TicketSystem.createTicket) => post(`${TicketsServer}tickets/`, data); // getTIckets
 
 export { Auth_Login, Auth_Register, Auth_ResetPassword, Auth_Verify, Auth_Info, Auth_Refresh, QueryUser, SendSMS, UpdateUserPermission, SendCodeOnRegister };
-export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin };
+export { fetchSytemConfig, fetchSytemList, fetchGameList, fetchGameListBySSE, fetchUserSlots, fetchGameDetails, fetchUserSlotsAdmin, fetchGameLogsAdmin, DelQuotaGameAdmin, doFindAccount };
 export { doAddGame, doGameLogin, doDelGame, doUpdateGamePasswd, doUpdateGameConf, fetchQQBindCode };
 export { doUpdateCaptcha, fetchGameLogs };
 export { load };
