@@ -21,7 +21,7 @@ service.interceptors.response.use(
             }
             const data: any = {
                 message: message,
-                code: response.data?.err || !response.data?.available ? response.data.code ?? 0 : 1,
+                code: response.data?.err || !response.data?.available ? response.data.code ?? 1 : 0,
                 data: response.data
             };
             return data;
@@ -68,7 +68,7 @@ async function getRequestResponse(params: { instance: AxiosInstance; method: Req
 async function asyncRequest<T>(param: RequestParam): Promise<Service.RequestResult<T>> {
     const { url } = param;
     if (param.token) {
-        service.defaults.headers["X-Platform"] = "website";
+        service.defaults.headers["X-Platform"] = "postman";
         service.defaults.headers["token"] = param.token;
     } else {
         delete service.defaults.headers["X-Platform"];
@@ -134,7 +134,7 @@ function load<T>(fileName: string): Promise<T> {
 const Auth_Login = (params: { email: string; password: string }) => post<ApiUser.Auth>(`${AuthServer}login`, params);
 const Auth_Register = (params: { email: string; password: string; code: string; noise: string; sign: string }) => post<ApiUser.Auth>(`${AuthServer}register`, params);
 
-const Auth_ResetPassword = (params: { email: string; phone: string; newPasswd: string }) => post<ApiUser.Auth>(`${AuthServer}forget`, params);
+const Auth_ResetPassword = (params: { email: string; code: string; newPasswd: string }) => post<ApiUser.Auth>(`${AuthServer}forget`, params);
 
 // idServer admin
 const QueryUser = (value: string) => get<ApiUser.User[]>(`${AuthServer}admin/users/query?value=${value}`);
@@ -169,7 +169,7 @@ const doDelGameAdmin = (slot: string, token: string) =>
     captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
         account: null
     });
-const doFindAccount = (gameAccount: string, token: string) => captchaPost(`${RegistryServer}api/users/findEmail?gameAccount=${gameAccount}`, token);
+const doFindAccount = (gameAccount: string, token: string) => captchaPost<Registry.AccountFound>(`${RegistryServer}api/users/findEmail?gameAccount=${gameAccount}`, token);
 const DelQuotaGameAdmin = (userId: string, params: { uuid: string; gameAccount: string | null }) => post<string>(`${RegistryServer}api/mgm/slots/slot?uid=${userId}`, params);
 
 const doUpdateGameConf = (account: string, game: ApiGame.Config) =>

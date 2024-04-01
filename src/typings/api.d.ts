@@ -221,6 +221,10 @@ declare namespace Registry {
         platform: number;
     }
 
+    interface AccountFound {
+        account: string;
+    }
+
     interface UserInfo {
         createdAt: number;
         idServerPermission: number;

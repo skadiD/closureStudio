@@ -92,26 +92,19 @@
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="forgetParams.phone"
-                                autocomplete="tel" />
-                            <label class="s-label peer-focus:text-info">已绑定手机号</label>
+                            <div class="flex space-x-2">
+                                <input class="s-input peer focus:ring-info" v-model="forgetParams.code" />
+                                <button @click="sendCode" class="btn btn-info btn-sm w-24"><span
+                                        v-if="isSendCodingIsLoading" class="loading loading-bars loading-md"></span>
+                                    <span v-if="!isSendCodingIsLoading">获取验证码</span></button>
+                            </div>
+                            <label class="s-label peer-focus:text-info">验证码</label>
                         </div>
                         <div class="s-combo">
                             <input class="s-input peer focus:ring-info" v-model="forgetParams.newPasswd" type="password"
                                 autocomplete="new-password" />
                             <label class="s-label peer-focus:text-info">新密码</label>
                         </div>
-
-                        <div class="form-control">
-                            <label class="label cursor-pointer">
-                                <span class="label-text">我已阅读理解可露希尔小卖部
-                                    <a href="/blog/Terms&Policies" target="_blank" class="s-underline">用户协议</a>
-                                </span>
-                                <input type="checkbox" class="checkbox checkbox-info" v-model="agreeTerms" />
-                            </label>
-                        </div>
-                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
-                                class="s-underline">常见问题</a></span>
                         <a class="btn btn-block btn-info" @click="resetPasswordBtn"><span v-if="isLoading"
                                 class="loading loading-bars"></span>重置!</a>
                     </div>
@@ -129,7 +122,7 @@
                             <input class="s-input peer focus:ring-info" v-model="findAccountParams.gameAccount" />
                             <label class="s-label peer-focus:text-info">托管游戏账号</label>
                         </div>
-                        <div class="s-combo">
+                        <div v-if="!findAccountRespData" class="s-combo">
                             <div class="w-full mb-3">
                                 <label class="label cursor-pointer">
                                     <span class="text-xl">官服（安卓 / IOS）</span>
@@ -142,19 +135,11 @@
                                         class="radio checked:bg-blue-500" />
                                 </label>
                             </div>
-                            <div class="divider my-4">服务器选择</div>
+                            <div class="divider my-2">服务器选择</div>
                         </div>
-
-                        <div class="form-control">
-                            <label class="label cursor-pointer">
-                                <span class="label-text">我已阅读理解可露希尔小卖部
-                                    <a href="/blog/Terms&Policies" target="_blank" class="s-underline">用户协议</a>
-                                </span>
-                                <input type="checkbox" class="checkbox checkbox-info" v-model="agreeTerms" />
-                            </label>
-                        </div>
-                        <span class="text-base-content/40 text-center">登录&注册有问题？点击查看 <a href="/blog/FAQ" target="_blank"
-                                class="s-underline">常见问题</a></span>
+                        <div v-if="findAccountRespData" role="alert"
+                            class="rounded border-s-4 border-warning bg-warning/10 p-4">
+                            通行证账号: {{ findAccountRespData }}</div>
                         <a class="btn btn-block btn-info" @click="handleFindAccountBtnOnClick"><span
                                 v-if="isFindAcccountLoading" class="loading loading-bars" />查找!</a>
                     </div>
@@ -193,7 +178,7 @@ const loginParams = ref({
 });
 const forgetParams = ref({
     email: "",
-    phone: "",
+    code: "",
     newPasswd: ""
 });
 const regParams = ref({
@@ -213,6 +198,7 @@ const isLoading = ref(false);
 const agreeTerms = ref(false);
 const isSendCodingIsLoading = ref(false);
 const isFindAcccountLoading = ref(false);
+const findAccountRespData = ref("")
 const loginBtn = () => {
     if (isLoading.value) return;
     isLoading.value = true;
@@ -269,10 +255,12 @@ const findAccount = async (geetestToken: string) => {
             gameAccount = "B" + findAccountParams.value.gameAccount;
         }
         const resp = await doFindAccount(gameAccount, geetestToken);
+        console.log(resp);
+        if (resp.code === 1 && resp.data) {
+            findAccountRespData.value = resp.data.account;
+        }
         if (resp.code === 0) {
-            setMsg(resp.message || "发送失败", Type.Warning);
-        } else {
-            setMsg("发送成功", Type.Success);
+            setMsg(resp.message || "查询", Type.Warning);
         }
     } catch (e) {
         console.error(e);
@@ -326,7 +314,7 @@ const regBtn = () => {
 };
 const resetPasswordBtn = () => {
     if (isLoading.value) return;
-    if (!forgetParams.value.email || !forgetParams.value.phone || !forgetParams.value.newPasswd) {
+    if (!forgetParams.value.email || !forgetParams.value.code || !forgetParams.value.newPasswd) {
         setMsg("请填写完整信息", Type.Warning);
         return;
     }
