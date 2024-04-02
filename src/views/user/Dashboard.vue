@@ -30,8 +30,10 @@
                 </p>
                 <p v-if="user.isVerify && userQuota.data.value?.idServerQQ.length === 0">完成QQ账号验证解锁更多槽位。<b
                         class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量</p>
-                <p v-if="user.info.status >= 1">恭喜你完成了验证，你可以启动游戏进行托管。</p>
-                <p>如果你遇到问题(验证码没有收到，游戏异常等等)，使用<b class="cursor-pointer" @click="navigateToTicket">👉工单系统👈</b>请求协助。</p>
+                <p>如果博士遇到问题(验证码没有收到，游戏异常等等)，使用<b class="cursor-pointer" @click="navigateToTicket">👉工单系统👈</b>请求协助。</p>
+                <p v-if="!isWXPuhserLoading && !wxPuhser">博士！！！你怎么还没有<b class="cursor-pointer"
+                        @click="navigateToWXPusher">👉绑定微信👈</b></p>
+
             </div>
             <IndexStatus />
             <div class="text-2xl font-bold">我的托管（{{ userQuota.data.value?.slots.filter((slot) => slot.gameAccount !==
@@ -82,7 +84,7 @@
     <YouMayKnowDialog />
 </template>
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { config, findGame, gameList, globalSSR, startSSE } from "../../plugins/sse";
 import "animate.css";
 import { userStore } from "../../store/user";
@@ -101,6 +103,7 @@ import { YouMayKnowDialog } from "../../components/dialog";
 import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
 import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
 import { router } from "../../plugins/router";
+import { useWXPusher } from "../../plugins/wxPusher/wxPusher";
 const showQQBind = ref(false);
 const show = ref(false);
 const user = userStore();
@@ -109,6 +112,12 @@ const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update pass
 // start
 startSSE(user);
 const addModel = ref(false);
+const { isLoading: isWXPuhserLoading, wxPuhser, queryWxPusher } = useWXPusher();
+
+onMounted(() => {
+    queryWxPusher();
+});
+
 const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
     if (!userQuota.value.data.value) {
         setMsg("游戏托管槽位数据异常，无法提交", Type.Warning);
@@ -277,7 +286,10 @@ const navigateToTicket = () => {
     // using vue-router
     router.push("/ticket");
 };
-
+const navigateToWXPusher = () => {
+    // using vue-router
+    router.push("/profile/wechat");
+};
 // geetest
 const geetestDeleteGameOnSuccess = (slotUUID: string) => {
     return (geetestToken: string) => {
