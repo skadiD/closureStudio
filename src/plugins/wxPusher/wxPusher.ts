@@ -4,12 +4,13 @@ import { setMsg } from "../common";
 import { Type } from "../../components/toast/enmu";
 
 export const useWXPusher = () => {
-    const isLoading = ref(false);
+    const isQueryWxPusher = ref(false);
+    const isCreateQRCodes = ref(false);
     const wxPuhser = ref<ApiUser.WXPusher>();
     const QRCode = ref<ApiUser.WXPusherQRCode>();
     const queryWxPusher = async () => {
-        if (isLoading.value) return;
-        isLoading.value = true;
+        if (isQueryWxPusher.value) return;
+        isQueryWxPusher.value = true;
         try {
             const res = await QueryWXPusher();
             if (res.code == 1 && res.data) {
@@ -18,11 +19,13 @@ export const useWXPusher = () => {
         } catch (error) {
             console.error(error);
         } finally {
-            isLoading.value = false;
+            isQueryWxPusher.value = false;
         }
     };
 
     const createQRCodes = async () => {
+        if (isCreateQRCodes.value) return;
+        isCreateQRCodes.value = true;
         try {
             const res = await CreateWXPusherQRCode();
             if (res.code == 1 && res.data) {
@@ -32,8 +35,10 @@ export const useWXPusher = () => {
             }
         } catch (error) {
             console.error(error);
+        } finally {
+            isCreateQRCodes.value = false;
         }
     };
 
-    return { isLoading, wxPuhser, QRCode, queryWxPusher, createQRCodes };
+    return { isQueryWxPusher, isCreateQRCodes, wxPuhser, QRCode, queryWxPusher, createQRCodes };
 };

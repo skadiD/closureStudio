@@ -31,7 +31,7 @@
                 <p v-if="user.isVerify && userQuota.data.value?.idServerQQ.length === 0">完成QQ账号验证解锁更多槽位。<b
                         class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量</p>
                 <p>如果博士遇到问题(验证码没有收到，游戏异常等等)，使用<b class="cursor-pointer" @click="navigateToTicket">👉工单系统👈</b>请求协助。</p>
-                <p v-if="!isWXPuhserLoading && !wxPuhser">博士！！！你怎么还没有<b class="cursor-pointer"
+                <p v-if="!isQueryWxPusher && !wxPuhser">博士！！！你怎么还没有<b class="cursor-pointer"
                         @click="navigateToWXPusher">👉绑定微信👈</b></p>
 
             </div>
@@ -112,7 +112,7 @@ const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update pass
 // start
 startSSE(user);
 const addModel = ref(false);
-const { isLoading: isWXPuhserLoading, wxPuhser, queryWxPusher } = useWXPusher();
+const { isQueryWxPusher, wxPuhser, queryWxPusher } = useWXPusher();
 
 onMounted(() => {
     queryWxPusher();
