@@ -43,7 +43,7 @@ export const ERROR_STATUS = {
 export const NO_ERROR_MSG_CODE: (string | number)[] = [];
 
 export const constants = {
-    AssetsHost: "https://assets.closure.setonink.com",
+    AssetsHost: "https://assets.ltsc.vip",
 };
 
 export const NOTIFY = {

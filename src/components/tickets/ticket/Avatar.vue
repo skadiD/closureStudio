@@ -2,7 +2,7 @@
     <div class="flex flex-col items-center w-24">
         <div class="indicator avatar">
             <div class="w-16 mask mask-squircle">
-                <img :src="`https://assets.closure.setonink.com/dst/avatar/${props.author?.avatar?.type || 'DEFAULT'}/${props.author?.avatar?.id?.replace('@', '_').replace('#', '_') || 'avatar_activity_GK'}.webp`"
+                <img :src="`https://assets.ltsc.vip/avatar/${props.author?.avatar?.type || 'DEFAULT'}/${props.author?.avatar?.id?.replace('@', '_').replace('#', '_') || 'avatar_activity_GK'}.png`"
                     alt="斯卡蒂" />
             </div>
         </div>

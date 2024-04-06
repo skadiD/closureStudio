@@ -4,8 +4,8 @@
     <div class="flex items-center">
       <div class="avatar mr-2">
         <div class="w-12 rounded-md">
-          <img :src="`https://assets.closure.setonink.com/dst/avatar/${game.status?.avatar.type || 'DEFAULT'
-            }/${game.status?.avatar.id || 'avatar_activity_GK'}.webp`" alt="斯卡蒂" />
+          <img :src="`https://assets.ltsc.vip/avatar/${game.status?.avatar.type || 'DEFAULT'
+            }/${game.status?.avatar.id || 'avatar_activity_GK'}.png`" alt="斯卡蒂" />
         </div>
       </div>
       <div class="flex">

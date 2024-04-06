@@ -53,9 +53,8 @@ const assets = computed(() => {
     if (!item) {
       return "";
     }
-    // https://assets.closure.setonink.com/dst/items/LIMITED_TKT_GACHA_10_2501.webp
-    return `${constants.AssetsHost}/dst/items/${item.icon}.webp`;
-
+    // https://assets.ltsc.vip/items/LIMITED_TKT_GACHA_10_2501.png
+    return `${constants.AssetsHost}/items/${item.icon}.png`;
   };
 
   return {
