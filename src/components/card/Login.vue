@@ -11,8 +11,8 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="loginParams.email"
-                                autocomplete="email" />
+                            <input placeholder="请输入您的邮箱" class="s-input peer focus:ring-info"
+                                v-model="loginParams.email" autocomplete="email" />
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
                         <div class="s-combo">
@@ -45,7 +45,7 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="regParams.email"
+                            <input placeholder="请输入您的邮箱" class="s-input peer focus:ring-info" v-model="regParams.email"
                                 autocomplete="email" />
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
@@ -88,7 +88,8 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="forgetParams.email" />
+                            <input placeholder="请输入您的邮箱" class="s-input peer focus:ring-info"
+                                v-model="forgetParams.email" />
                             <label class="s-label peer-focus:text-info">可露希尔通行证</label>
                         </div>
                         <div class="s-combo">
@@ -119,7 +120,8 @@
                     <div class="divider">OR</div>
                     <div class="grid gap-y-4">
                         <div class="s-combo">
-                            <input class="s-input peer focus:ring-info" v-model="findAccountParams.gameAccount" />
+                            <input placeholder="请输入您的游戏" class="s-input peer focus:ring-info"
+                                v-model="findAccountParams.gameAccount" />
                             <label class="s-label peer-focus:text-info">托管游戏账号</label>
                         </div>
                         <div v-if="!findAccountRespData" class="s-combo">
@@ -223,6 +225,10 @@ const sendCode = async () => {
         setMsg("请填写邮箱", Type.Warning);
         return;
     }
+    if (!checkIsEmail(regParams.value.email)) {
+        setMsg("邮箱格式不正确", Type.Warning);
+        return;
+    }
     try {
         isSendCodingIsLoading.value = true;
         const parm = {
@@ -316,6 +322,10 @@ const resetPasswordBtn = () => {
     if (isLoading.value) return;
     if (!forgetParams.value.email || !forgetParams.value.code || !forgetParams.value.newPasswd) {
         setMsg("请填写完整信息", Type.Warning);
+        return;
+    }
+    if (!checkIsEmail(forgetParams.value.email)) {
+        setMsg("邮箱格式不正确", Type.Warning);
         return;
     }
     if (!agreeTerms.value) {
