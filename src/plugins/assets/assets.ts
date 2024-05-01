@@ -32,6 +32,9 @@ const assets = computed(() => {
           value.code.includes(keyword.toUpperCase()) ||
           value.name.includes(keyword))
       ) {
+        if (key.includes("tough")) {
+          value.name += " (磨难)";
+      }
         acc[key] = value;
         count++;
       }
