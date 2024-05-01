@@ -25,24 +25,27 @@ const assets = computed(() => {
 
   const filteredStages = (keyword: string) => {
     if (!keyword.trim()) {
-      return Object.keys(stageData.value).reduce((acc, key) => {
-        if (Object.keys(acc).length < 10) {
+      return Object.keys(stageData.value).reduce((acc, key, index) => {
+        if (index < 10) {
           acc[key] = stageData.value[key];
         }
         return acc;
       }, {} as Gamedata.Stages);
     }
 
+    let count = 0;
     return Object.entries(stageData.value).reduce((acc, [key, value]) => {
-      if (Object.keys(acc).length < 10 &&
+      if (
+        count < 10 &&
         (key.includes(keyword) ||
           value.code.includes(keyword.toUpperCase()) ||
-          value.name.includes(keyword))) {
-
+          value.name.includes(keyword))
+      ) {
         if (key.includes("tough")) {
           value.name += " (磨难)";
         }
         acc[key] = value;
+        count++;
       }
       return acc;
     }, {} as Gamedata.Stages);
