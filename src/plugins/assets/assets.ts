@@ -24,15 +24,6 @@ const assets = computed(() => {
   };
 
   const filteredStages = (keyword: string) => {
-    if (!keyword.trim()) {
-      return Object.keys(stageData.value).reduce((acc, key, index) => {
-        if (index < 10) {
-          acc[key] = stageData.value[key];
-        }
-        return acc;
-      }, {} as Gamedata.Stages);
-    }
-
     let count = 0;
     return Object.entries(stageData.value).reduce((acc, [key, value]) => {
       if (
@@ -41,9 +32,6 @@ const assets = computed(() => {
           value.code.includes(keyword.toUpperCase()) ||
           value.name.includes(keyword))
       ) {
-        if (key.includes("tough")) {
-          value.name += " (磨难)";
-        }
         acc[key] = value;
         count++;
       }
