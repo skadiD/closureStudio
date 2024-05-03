@@ -328,10 +328,6 @@ const resetPasswordBtn = () => {
         setMsg("邮箱格式不正确", Type.Warning);
         return;
     }
-    if (!agreeTerms.value) {
-        setMsg("请阅读并同意用户协议", Type.Warning);
-        return;
-    }
     Auth_ResetPassword(forgetParams.value)
         .then((res) => {
             if (res.code === 0) {
