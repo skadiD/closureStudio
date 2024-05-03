@@ -57,7 +57,7 @@
                         <div class="s-combo">
                             <div class="flex space-x-2">
                                 <input class="s-input peer focus:ring-info" v-model="regParams.code" />
-                                <button @click="sendCode" class="btn btn-info btn-sm w-24"><span
+                                <button @click="sendCode(regParams.email)" class="btn btn-info btn-sm w-24"><span
                                         v-if="isSendCodingIsLoading" class="loading loading-bars loading-md"></span>
                                     <span v-if="!isSendCodingIsLoading">获取验证码</span></button>
                             </div>
@@ -95,7 +95,7 @@
                         <div class="s-combo">
                             <div class="flex space-x-2">
                                 <input class="s-input peer focus:ring-info" v-model="forgetParams.code" />
-                                <button @click="sendCode" class="btn btn-info btn-sm w-24"><span
+                                <button @click="sendCode(forgetParams.email)" class="btn btn-info btn-sm w-24"><span
                                         v-if="isSendCodingIsLoading" class="loading loading-bars loading-md"></span>
                                     <span v-if="!isSendCodingIsLoading">获取验证码</span></button>
                             </div>
@@ -219,20 +219,20 @@ const loginBtn = () => {
         });
 };
 
-const sendCode = async () => {
+const sendCode = async (email:string) => {
     if (isSendCodingIsLoading.value) return;
-    if (!regParams.value.email) {
+    if (email === "") {
         setMsg("请填写邮箱", Type.Warning);
         return;
     }
-    if (!checkIsEmail(regParams.value.email)) {
+    if (!checkIsEmail(email)) {
         setMsg("邮箱格式不正确", Type.Warning);
         return;
     }
     try {
         isSendCodingIsLoading.value = true;
         const parm = {
-            email: regParams.value.email
+            email: email
         };
         const resp = await SendCodeOnRegister(parm);
         if (resp.code === 0) {
