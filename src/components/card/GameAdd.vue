@@ -56,8 +56,7 @@
         </p>
       </div>
       <div class="s-combo mb-6 mt-4">
-        <input class="s-input peer focus:ring-warning" v-model="confirmText">
-        <label class="s-label peer-focus:text-warning">请输入【<b class="text-2xl">我确信我的手机号可收到验证码</b>】</label>
+        <label class="s-label peer-focus:text-warning">点击确认按钮表示同意【<b class="text-2xl">用户服务协议</b>】</label>
       </div>
       <button class="btn btn-block btn-warning" @click="confirmBtn">确认</button>
     </div>
@@ -79,7 +78,6 @@ const props = withDefaults(defineProps<Props>(), {
   isFirst: true,
 });
 const confirm = ref(false)
-const confirmText = ref('')
 const loading = ref(false)
 const emit = defineEmits(['close'])
 const form = ref<Registry.AddGameForm>({
@@ -88,14 +86,10 @@ const form = ref<Registry.AddGameForm>({
   platform: 1
 })
 const confirmBtn = () => {
-  if (confirmText.value === '我确信我的手机号可收到验证码') {
-    confirm.value = false
-    loading.value = false
-    setMsg('叠甲成功，提交托管信息中', Type.Success)
-    start()
-  } else {
-    setMsg('请输入正确的文本', Type.Warning)
-  }
+  loading.value = false
+  confirm.value = false
+  setMsg('叠甲成功，提交托管信息中', Type.Success)
+  start()
 }
 
 const addGame = (token: string) => {
@@ -121,7 +115,7 @@ const addGame = (token: string) => {
 }
 
 const start = async () => {
-  if (props.isFirst && confirmText.value == '') {
+  if (props.isFirst) {
     confirm.value = true
     return
   }
