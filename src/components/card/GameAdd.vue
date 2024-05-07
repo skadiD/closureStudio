@@ -115,10 +115,7 @@ const addGame = (token: string) => {
 }
 
 const start = async () => {
-  if (props.isFirst) {
-    confirm.value = true
-    return
-  }
+  if (confirm.value === true) return;
   if (props.uuid === '') {
     setMsg('请刷新页面后重试', Type.Warning)
     return;
