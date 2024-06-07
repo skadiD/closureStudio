@@ -39,13 +39,21 @@ function subscribeUser(swRegistration: ServiceWorkerRegistration) {
         });
 }
 export function initSW() {
+    // @ts-ignore
+    let deferredPrompt: BeforeInstallPromptEvent = 'init';
     window.addEventListener('load', () => {
         if ('serviceWorker' in navigator) {
             window.addEventListener('beforeinstallprompt', (event) => { // 监听到可安装事件，进行触发提醒用户
-                setTimeout(function() {
-                    //event.preventDefault()
-                }, 2500)
+                event.preventDefault();
+                if (deferredPrompt === 'init') {
+                    deferredPrompt = event;
+                }
                 console.log('your browser can install pwa')
+                window.addEventListener('click', () => {
+                    if (!deferredPrompt) return;
+                    deferredPrompt.prompt();
+                    deferredPrompt = null;
+                });
             }, { once: true })
             void navigator.serviceWorker.register('/sw.js');
             if (navigator.serviceWorker.controller) {

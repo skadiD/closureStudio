@@ -10,6 +10,7 @@ import {router} from "./plugins/router";
 import {createApp} from "vue";
 import App from "./App.vue";
 import "./plugins/geetest/gt.0.4.8";
+import {initSW} from "./swloader";
 const pinia = createPinia();
 pinia.use(
     persist({
@@ -20,3 +21,6 @@ const app = createApp(App);
 app.component("layout", BaseLayout);
 app.use(VueClickAway).use(router).use(pinia).mount("#app");
 
+if (import.meta.env.MODE !== 'development') {
+    initSW()
+}
