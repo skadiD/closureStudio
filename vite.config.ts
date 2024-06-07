@@ -23,6 +23,24 @@ export default defineConfig({
       },
       srcDir: 'src',
       injectRegister: false,
+      manifest: {
+        "name":"可露希尔小程序",
+        "short_name":"ClosurePWA",
+        "theme_color":"#212121",
+        "icons":[{
+          "src":"./assets/pwa/pwa-192x192.png","sizes":"192x192","type":"image/png", "purpose":"any"
+        }, {
+          "src":"./assets/pwa/pwa-512x512.png","sizes":"512x512","type":"image/png", "purpose":"any"
+        }, {
+          "src":"./assets/pwa/pwa-maskable-192x192.png","sizes":"192x192","type":"image/png","purpose":"maskable"
+        }, {
+          "src":"./assets/pwa/pwa-maskable-512x512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+        ],
+        "start_url":".",
+        "display":"standalone",
+        "background_color": "#212121",
+        "description": "ClosureApp"
+      }
     }),
     viteCompression({
       verbose: true,
