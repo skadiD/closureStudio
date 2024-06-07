@@ -49,7 +49,7 @@ export function initSW() {
                     deferredPrompt = event;
                 }
                 console.log('your browser can install pwa')
-                window.addEventListener('click', () => {
+                window.addEventListener('pwa', () => {
                     if (!deferredPrompt) return;
                     deferredPrompt.prompt();
                     deferredPrompt = null;
