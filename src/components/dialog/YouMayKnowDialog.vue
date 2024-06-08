@@ -19,7 +19,7 @@ onMounted(() => {
 })
 const iknow = () => {
   dialog.value.close()
-  const event = new CustomEvent('pwa');
-  window.dispatchEvent(event);
+  // const event = new CustomEvent('pwa');
+  // window.dispatchEvent(event);
 }
 </script>
