@@ -26,7 +26,7 @@ export default defineComponent({
                 },
                 responseType: 'stream'
             })
-            ;(await response).data.
+
             // const stream = response.data;
             // // `progress`, `set_text`, `delta`, `end`
 
