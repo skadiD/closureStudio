@@ -87,11 +87,6 @@ const handleSelectBtnTypeOnClick = (type: selectType) => {
     selectBtnType.value = type;
 };
 
-
-
-
-
-
 const getTickets = async () => {
     isLoading.value = true;
     const res = await GetTickets();

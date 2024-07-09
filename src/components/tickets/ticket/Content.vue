@@ -7,6 +7,11 @@
                     class="absolute right-4 top-0 w-28 md:w-36 opacity-10 md:opacity-50 rounded-t-full rounded-bl-full"
                     src="../../../assets/1.png" alt="start">
             </div>
+            <div className="flex justify-start">
+                <div>
+                    <QaSseClient />
+                </div>
+            </div>
             <div>
 
                 <div v-if="(isAuthor || user.isAdmin) && !myTicket.replyTo">
@@ -151,6 +156,7 @@ import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
 import { checkIsMobile } from "../../../utils/regex";
 import { formatTime } from "../../../plugins/common";
+import QaSseClient from "./qaApi.vue";
 import Permission from "../../permission/Permission.vue";
 enum DisplayType {
     None,
@@ -219,6 +225,7 @@ const handleDeleteSlotBtnOnClick = async (slotId: string) => {
         isLoading.value = false;
     }
 };
+
 
 const getAuthorInfo = async () => {
     // use async method to fetch QueryUser and fetchUserSlotsAdmin

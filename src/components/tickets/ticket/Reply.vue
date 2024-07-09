@@ -172,6 +172,7 @@ const postTicket = async () => {
     }
     if (!props.ticket) {
         // create
+        
         await createTicket(data);
     }
     if (props.refresh) {
