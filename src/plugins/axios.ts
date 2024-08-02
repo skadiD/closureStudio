@@ -6,6 +6,8 @@ import { config } from "./sse";
 export const service = axios.create({
     baseURL: "https://api.ltsc.vip/"
 });
+
+const version = import.meta.env.VITE_APP_VERSION;
 const user = localStorage.getItem("closureV3_user");
 
 if (user != null) {
@@ -123,9 +125,10 @@ function del(url: string, params: any) {
 }
 
 function load<T>(fileName: string): Promise<T> {
+    const url = `/data/${fileName}.json?v=${version}`;
     return new Promise((resolve, reject) => {
         axios
-            .get(`/data/${fileName}.json`)
+            .get(url)
             .then((res) => resolve(res.data as T))
             .catch((error) => reject(error));
     });

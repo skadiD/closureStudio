@@ -8,6 +8,7 @@ import { visualizer } from "rollup-plugin-visualizer";
 export default defineConfig({
   define: {
     __VUE_PROD_DEVTOOLS__: true,
+    __APP_VERSION__: process.env.VITE_APP_VERSION,
   },
   plugins: [
     vue({
