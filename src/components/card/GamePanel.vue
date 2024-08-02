@@ -21,7 +21,7 @@
         <table class="text-[1rem]">
             <tbody>
                 <tr v-for="log in gameLogs.logs">
-                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "hh:MM") }}</td>
+                    <td class="text-info whitespace-nowrap">{{ formatTime(log.ts, "HH:mm") }}</td>
                     <td class="pl-2">{{ log.content }}</td>
                 </tr>
             </tbody>
