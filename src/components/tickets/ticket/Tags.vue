@@ -5,9 +5,9 @@
         <ul tabindex="0" class="dropdown-content z-[1] menu shadow bg-base-100 rounded-box w-24">
             <li v-for="(tag, key) in defaultTags" :key="key">
                 <a :onClick="() => {
-            handleTagsOnClick(tag.name);
-        }
-            " :class="{ 'bg-info': props.tags.includes(tag.name) }" class="text-xs">{{ tag.name }}</a>
+                    handleTagsOnClick(tag.name);
+                }
+                    " :class="{ 'bg-info': props.tags.includes(tag.name) }" class="text-xs">{{ tag.name }}</a>
             </li>
         </ul>
     </div>
