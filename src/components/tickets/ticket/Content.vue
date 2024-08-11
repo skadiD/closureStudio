@@ -74,19 +74,19 @@
                             UUID:
                             <span class="underline font-bold cursor-pointer">{{
                                 myTicket.authorUUID
-                            }}</span>
+                                }}</span>
                         </div>
                         <div @click="copyToClipboard(myTicket.gameAccount)">
                             Game:
                             <span class="underline font-bold cursor-pointer">{{
                                 myTicket.gameAccount
-                            }}</span>
+                                }}</span>
                         </div>
                         <div @click="copyToClipboard(authorInfo.UserEmail)">
                             邮箱:
                             <span class="underline font-bold cursor-pointer">{{
                                 authorInfo.UserEmail
-                            }}</span>
+                                }}</span>
                         </div>
                         <div>
                             <span v-if="authorInfo.Phone"> 手机: {{ authorInfo.Phone }}</span>
@@ -101,7 +101,7 @@
                             QQ:
                             <span class="underline font-bold cursor-pointer">{{
                                 authorInfo.QQ
-                            }}</span>
+                                }}</span>
                         </div>
                         <div @click="copyToClipboard(String(authorInfo.Permission))">
                             权限:
@@ -171,7 +171,7 @@
                 </div>
                 <div v-if="QAContent">
                     <div class="divider divider-info p-1 m-1"></div>
-                    <vue-markdown :source="QAContent" />
+                    <vue-markdown :source="QAContent" :options="options" />
                 </div>
 
             </div>
@@ -231,6 +231,14 @@ const authorInfo = ref<ApiUser.User | null>(null);
 const authorSolts = ref<Registry.Slot[]>([]);
 const authorGameLogs = ref<ApiGame.GameLogs>();
 const QAContent = ref("");
+const options = {
+    html: true,
+    xhtmlOut: true,
+    breaks: true,
+    linkify: true,
+    typographer: true,
+    quotes: "“”‘’",
+};
 
 watch(
     () => props.ticket,

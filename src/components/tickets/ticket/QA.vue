@@ -133,14 +133,23 @@ const sendRequest = () => {
           const lines = fullEvent.split('\n');
           const eventType = lines[0].split(': ')[1];
           if (eventType === 'delta' || eventType === 'progress') {
-            const data = JSON.parse(lines[1].split(': ')[1]);
-            console.log('Event:', eventType, 'Data:', data);
-            if (data.msg) {
-              QAContent.value += data.msg;
-              props.updateQAContent(QAContent.value);
+            let data = "";
+            try {
+              const tempData = JSON.parse(lines[1].split(': ')[1]);
+              if (tempData.msg) {
+                data = tempData.msg;
+              }
+              if (tempData.data) {
+                data = tempData.data;
+              }
+            } catch (e) {
+              data = lines[1].split(':"')[1].slice(0, -2);
+              // remove \n
+              data = data.replace(/\\n/g, '\n');
             }
-            if (data.data) {
-              QAContent.value += data.data;
+            console.log('Event:', eventType, 'Data:', data);
+            if (data) {
+              QAContent.value += data;
               props.updateQAContent(QAContent.value);
             }
           }
@@ -149,6 +158,7 @@ const sendRequest = () => {
             props.updateQAContent(QAContent.value);
           }
           if (eventType === 'end') {
+            console.log('End of stream');
             isQuerying.value = false;
             break;
           }
