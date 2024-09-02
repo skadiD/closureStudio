@@ -1,7 +1,5 @@
 #!/bin/sh
-cd ./ArknightsGamedataPure
-git pull
-cd ..
+git submodule update --remote
 node exec.cjs
 git add .
 git commit -m "ArknightsGamedata Pureupdate"
