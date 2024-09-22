@@ -1,5 +1,5 @@
 #!/bin/sh
-git submodule update --remote
+git submodule update --init --recursive
 node exec.cjs
 git add .
 git commit -m "ArknightsGamedata Pureupdate"
