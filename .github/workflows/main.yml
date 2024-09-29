@@ -17,5 +17,5 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_SSH_PORT }}
-        script: |
-          sudo /root/buildWebsite.sh
+        script: ${{ secrets.SERVER_COMMAND }}
+
