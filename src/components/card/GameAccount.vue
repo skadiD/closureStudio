@@ -41,7 +41,7 @@ import { assets } from "../../plugins/assets/assets";
 import { maskPhoneNumber } from "../../plugins/common";
 import { ref, onMounted, onUnmounted } from "vue";
 interface Props {
-  game: ApiGame.Game;
+  game?: ApiGame.Game;
 }
 const props = withDefaults(defineProps<Props>(), {
   game: () => {
