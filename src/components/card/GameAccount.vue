@@ -1,16 +1,11 @@
 <template>
   <div
-    class="hover:scale-105 hover:shadow-lg hover:bg-info/10 active:bg-info/10 active:scale-95 duration-300 shadow-lg rounded-2xl px-4 py-3 s-pro"
-  >
+    class="hover:scale-105 hover:shadow-lg hover:bg-info/10 active:bg-info/10 active:scale-95 duration-300 shadow-lg rounded-2xl px-4 py-3 s-pro">
     <div class="flex items-center">
       <div class="avatar mr-2">
         <div class="w-12 rounded-md">
-          <img
-            :src="`https://assets.ltsc.vip/avatar/${
-              game.status?.avatar.type || 'DEFAULT'
-            }/${game.status?.avatar.id || 'avatar_activity_GK'}.png`"
-            alt="斯卡蒂"
-          />
+          <img :src="`https://assets.ltsc.vip/avatar/${game.status?.avatar.type || 'DEFAULT'
+            }/${game.status?.avatar.id || 'avatar_activity_GK'}.png`" alt="斯卡蒂" />
         </div>
       </div>
       <div class="flex">
@@ -28,14 +23,11 @@
     </div>
     <div class="mt-1 text-2xl font-zhCN">
       Dr. {{ game.status?.nick_name || "Nameless" }}
-      <span class="text-lg text-info"
-        >【{{ maskPhoneNumber(game.game_config?.account) }}】</span
-      >
+      <span class="text-lg text-info">【{{ maskPhoneNumber(game.game_config?.account) }}】</span>
     </div>
     <div class="grid grid-cols-3">
       <div class="flex flex-col" v-for="m in 3">
-        <span class="text-base-content/70"
-          >{{ ["理智", "地图", "状态"][m - 1] }}
+        <span class="text-base-content/70">{{ ["理智", "地图", "状态"][m - 1] }}
           <b class="text-info">//</b>
         </span>
         <span class="text-md font-bold font-en" v-html="getContent(m)"></span>
@@ -47,7 +39,7 @@
 <script lang="ts" setup>
 import { assets } from "../../plugins/assets/assets";
 import { maskPhoneNumber } from "../../plugins/common";
-import { ref, onMounted, onUnmounted, defineProps, withDefaults } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 interface Props {
   game: ApiGame.Game;
 }

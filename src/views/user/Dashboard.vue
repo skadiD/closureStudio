@@ -25,11 +25,11 @@
                     v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at != 0">
                     非常棒!!! 你托管了一个游戏!!! 手机验证码已经发送， 完成【手机号：{{ gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/,
                         "$1****$2") }}】绑定认证<b class="cursor-pointer"
-                        @click="dialogOpen('RealName')">👉点我解锁👈</b>不限时游戏托管，并提升托管数量。 剩余托管体验时间 <b>【{{
+                        @click="handleRealNameDialogOpen">👉点我解锁👈</b>不限时游戏托管，并提升托管数量。 剩余托管体验时间 <b>【{{
                             calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
                 </p>
                 <p v-if="user.isVerify && userQuota.data.value?.idServerQQ.length === 0">完成QQ账号验证解锁更多槽位。<b
-                        class="cursor-pointer" @click="showQQBind = true">👉点我解锁👈</b>提升托管数量</p>
+                        class="cursor-pointer" @click="handleQQBindDialogOpen()">👉点我解锁👈</b>提升托管数量</p>
                 <p>如果博士遇到问题(验证码没有收到，游戏异常等等)，使用<b class="cursor-pointer" @click="navigateToTicket">👉工单系统👈</b>请求协助。</p>
                 <p v-if="!isQueryWxPusher && !wxPuhser">博士！！！你怎么还没有<b class="cursor-pointer"
                         @click="navigateToWXPusher">👉绑定微信👈</b></p>
@@ -63,16 +63,12 @@
                     </GameAccount>
                 </div>
             </div>
-            <NetworkDialog />
             <input type="checkbox" id="addModel" class="modal-toggle" v-model="addModel" />
             <div v-if="addModel" class="modal" role="dialog">
                 <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
                     <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" @close="addModel = false" />
                 </div>
             </div>
-            <GeetestNotify />
-            <RealNameDialog />
-            <QQBindDialog v-if="showQQBind" @close="showQQBind = false" />
             <!-- <UpdateGamePasswdDialog :slotUUID="selectedSlotUUID" :form="selectedRegisterForm" /> -->
         </div>
         <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
@@ -80,7 +76,6 @@
             <GamePanel :account="selectGame" />
         </div>
     </div>
-    <NewSSRNotice :users="globalSSR" />
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
@@ -90,22 +85,21 @@ import { userStore } from "../../store/user";
 import { doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { Type } from "../../components/toast/enmu";
-import { dialogOpen, QQBindDialog, RealNameDialog } from "../../components/dialog";
 import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
-import NetworkDialog from "../../components/dialog/NetworkDialog.vue";
 import { allowGameCreate } from "../../plugins/quota/quota";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
-import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
 import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
 import { router } from "../../plugins/router";
 import { useWXPusher } from "../../plugins/wxPusher/wxPusher";
 import showDialog from "../../plugins/dialog/dialog";
 import YouMayKnow from "../../components/dialog/YouMayKnow.vue";
 import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
-const showQQBind = ref(false);
+import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
+import QQBind from "../../components/dialog/QQBind.vue";
+import RealName from "../../components/dialog/RealName.vue";
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
@@ -221,8 +215,7 @@ const login = (token: string, account: string) => {
         }
         if (res.code === 1) {
             setMsg("启动成功", Type.Success);
-            dialogOpen("geetestNotify");
-            // router.go(0)
+            showDialog(GeetestNotify);
         } else {
             setMsg(res.message, Type.Warning);
         }
@@ -284,10 +277,18 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
     selectedRegisterForm.value.account = getRealGameAccount(game.status.account);
     selectedRegisterForm.value.platform = game.status.platform;
     selectedRegisterForm.value.password = "";
-    showDialog(UpdateGamePasswd,{
+    showDialog(UpdateGamePasswd, {
         slotUUID: slot.uuid,
         form: selectedRegisterForm.value
     });
+};
+
+const handleQQBindDialogOpen = () => {
+    showDialog(QQBind);
+};
+
+const handleRealNameDialogOpen = () => {
+    showDialog(RealName);
 };
 
 const navigateToTicket = () => {

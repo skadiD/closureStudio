@@ -8,13 +8,15 @@
                     <div class="label">
                         <span class="label-text">理智保留</span>
                     </div>
-                    <input v-model="config.keeping_ap" type="number" class="input input-sm input-bordered w-full max-w-xs" />
+                    <input v-model="config.keeping_ap" type="number"
+                        class="input input-sm input-bordered w-full max-w-xs" />
                 </label>
                 <label class="form-control w-full max-w-xs">
                     <div class="label">
                         <span class="label-text">招募卷保留</span>
                     </div>
-                    <input v-model="config.recruit_reserve" type="number" class="input input-sm input-bordered w-full max-w-xs" />
+                    <input v-model="config.recruit_reserve" type="number"
+                        class="input input-sm input-bordered w-full max-w-xs" />
                 </label>
             </div>
             <div class="divider h-0">智能开关</div>
@@ -45,20 +47,23 @@
             <BaseDesign :slot="config.accelerate_slot_cn" @updateSlot="config.accelerate_slot_cn = $event" />
             <div class="divider h-2">作战地图</div>
             <div class="flex py-2">
-                <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4" placeholder="-- 请输入代号\名称 --" />
+                <input v-model="stageKeyWord" class="input input-sm input-bordered w-full max-w-xs mr-4"
+                    placeholder="-- 请输入代号\名称 --" />
                 <select class="select select-sm select-warning w-full max-w-xs" @change="addStageToConfig">
                     <option key="-- 请选择地图 --" value="-- 请选择地图 --">-- 请选择地图 --</option>
-                    <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">{{ stage.code }} {{ stage.name }}</option>
+                    <option v-for="(stage, key) in assets.filteredStages(stageKeyWord)" :key="key" :value="key">{{
+                        stage.code }} {{ stage.name }}</option>
                 </select>
             </div>
             <div class="divider h-0">作战队列</div>
             <div class="flex flex-wrap">
-                <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap" class="btn btn-outline btn-warning btn-xs m-1">
+                <button @click="removeBattleMap(battleMap)" v-for="battleMap in config.battle_maps" :key="battleMap"
+                    class="btn btn-outline btn-warning btn-xs m-1">
                     {{ assets.getStageName(battleMap) }}
                 </button>
             </div>
             <div class="grid gap-4 grid-cols-2 mt-2">
-                <button class="btn btn-error btn-outline btn-block mt-4" @click="dialogClose('ConfigModel')">
+                <button class="btn btn-error btn-outline btn-block mt-4" @click="handleCloseBtnOnClick">
                     <span v-if="isLoading" class="loading loading-bars loading-md"></span>
                     关闭
                 </button>
@@ -77,15 +82,18 @@ import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import { findGame } from "../../plugins/sse";
 import { assets } from "../../plugins/assets/assets";
-import { dialogClose } from "./index";
 import BaseDesign from "../BaseDesign.vue";
-interface Props {
+import { DialogComponentProps } from "../../plugins/dialog/dialog";
+
+interface Props extends DialogComponentProps {
     account: string;
-    // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
 }
+
 const props = withDefaults(defineProps<Props>(), {
+    dialogClose: () => { },
     account: ""
 });
+const { dialogClose, account } = props;
 const isDisabled = ref(true);
 const isLoading = ref(false);
 const stageKeyWord = ref("");
@@ -153,7 +161,11 @@ const onSubmit = () => {
         })
         .finally(() => {
             isLoading.value = false;
-            dialogClose("ConfigModel");
+            dialogClose();
         });
+};
+
+const handleCloseBtnOnClick = () => {
+    dialogClose();
 };
 </script>
