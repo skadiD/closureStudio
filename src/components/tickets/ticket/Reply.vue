@@ -49,7 +49,6 @@ import { Type } from "../../toast/enmu";
 import { PostTicket, ReplyTicket } from "../../../plugins/axios";
 import Tags from "./Tags.vue";
 import showDialog from "../../../plugins/dialog/dialog";
-import DialogTest from "../../../plugins/dialog/DialogTest.vue";
 import { checkIsEmail, checkIsMobile } from "../../../utils/regex";
 import axios from "axios";
 interface Props {
@@ -108,42 +107,40 @@ const privateInfoCheck = () => {
 
 
 const createTicketData = () => {
-    showDialog(DialogTest);
-    return null;
-    // if (!selectedAuthor.value) {
-    //     setMsg("请选择一个游戏账号", Type.Warning);
-    //     return;
-    // }
-    // if (privateInfoCheck()) {
-    //     showDialog(DialogTest);
-    //     return;
-    // }
-    // const data: TicketSystem.createTicket = {
-    //     replyTo: "",
-    //     tags: [],
-    //     attachments: [],
-    //     isPinned: false,
-    //     author: null,
-    //     content: {
-    //         id: "",
-    //         title: "",
-    //         content: ""
-    //     },
-    //     isAnonymous: false,
-    //     gameAccount: ""
-    // };
-    // const tempAuthor = selectedAuthor.value;
-    // tempAuthor.uuid = user.info.uuid;
-    // data.content.content = ticketContent.value;
-    // data.content.title = ticketTitle.value;
-    // data.author = tempAuthor;
-    // data.tags = tags.value;
-    // data.gameAccount = selectedGame.value;
-    // data.attachments = ticketAttachments.value;
-    // if (props.ticket) {
-    //     data.replyTo = props.ticket.id;
-    // }
-    // return data;
+    if (!selectedAuthor.value) {
+        setMsg("请选择一个游戏账号", Type.Warning);
+        return;
+    }
+    if (privateInfoCheck()) {
+        setMsg("请不要在帖子中透露私人信息", Type.Warning);
+        return;
+    }
+    const data: TicketSystem.createTicket = {
+        replyTo: "",
+        tags: [],
+        attachments: [],
+        isPinned: false,
+        author: null,
+        content: {
+            id: "",
+            title: "",
+            content: ""
+        },
+        isAnonymous: false,
+        gameAccount: ""
+    };
+    const tempAuthor = selectedAuthor.value;
+    tempAuthor.uuid = user.info.uuid;
+    data.content.content = ticketContent.value;
+    data.content.title = ticketTitle.value;
+    data.author = tempAuthor;
+    data.tags = tags.value;
+    data.gameAccount = selectedGame.value;
+    data.attachments = ticketAttachments.value;
+    if (props.ticket) {
+        data.replyTo = props.ticket.id;
+    }
+    return data;
 };
 
 
