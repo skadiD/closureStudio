@@ -3,8 +3,6 @@ import NetworkDialog from "./NetworkDialog.vue";
 import RealNameDialog from "./RealNameDialog.vue";
 import BattleScreenShotsDialog from "./BattleScreenShotsDialog.vue";
 import ConfigDialog from "./ConfigDialog.vue";
-import UpdateGamePasswdDialog from "./UpdateGamePasswdDialog.vue";
-import YouMayKnowDialog from "./YouMayKnowDialog.vue";
 export const dialogClose = (name: string) => {
   const dialog: HTMLDialogElement | null = document.documentElement.querySelector(`#${name}`)
   if (dialog) dialog.close()
@@ -24,6 +22,4 @@ export {
   RealNameDialog,
   BattleScreenShotsDialog,
   ConfigDialog,
-  UpdateGamePasswdDialog,
-  YouMayKnowDialog,
 };

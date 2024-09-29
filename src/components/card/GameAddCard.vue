@@ -12,8 +12,8 @@ import { computed, ref } from 'vue'
 import { userStore } from "../../store/user";
 import { allowGameCreate } from "../../plugins/quota/quota";
 interface Props {
-  slot: Registry.Slot,
-  userQuota: Registry.UserInfo,
+  slot: Registry.Slot | undefined,
+  userQuota: Registry.UserInfo | undefined
 }
 const props = withDefaults(defineProps<Props>(), {
   slot: undefined,
@@ -23,6 +23,7 @@ const user = userStore();
 const isLocked = ref(false);
 
 const message = computed(() => {
+  if (props.slot === undefined || props.userQuota === undefined) return "请稍后";
   const response = allowGameCreate(props.slot, props.userQuota, user.isVerify);
   isLocked.value = response.isLocked;
   return response.message;

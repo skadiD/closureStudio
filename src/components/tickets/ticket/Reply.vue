@@ -4,14 +4,14 @@
         <div v-for="(author, key) in user.getGames" :key="author.key">
             <input className="join-item btn btn-xs" type="radio" :checked="isSelectedAuthor(author.value.nickname)"
                 @click="() => {
-            setSelectAuthor(author.value, author.key);
-        }
-            " name="options" :aria-label="author.value.nickname" />
+                    setSelectAuthor(author.value, author.key);
+                }
+                    " name="options" :aria-label="author.value.nickname" />
         </div>
         <div>
             <input className="join-item btn btn-xs" type="radio" :checked="isSelectedAuthor('匿名玩家')" @click="() => {
-            setSelectAuthor(null, '')
-        }" name="options" aria-label="匿名玩家" />
+                setSelectAuthor(null, '')
+            }" name="options" aria-label="匿名玩家" />
         </div>
     </div>
     <Tags v-if="!props.ticket" :tags="tags" @update:tags="updateTags" />
@@ -49,6 +49,7 @@ import { Type } from "../../toast/enmu";
 import { PostTicket, ReplyTicket } from "../../../plugins/axios";
 import Tags from "./Tags.vue";
 import showDialog from "../../../plugins/dialog/dialog";
+import DialogTest from "../../../plugins/dialog/DialogTest.vue";
 import { checkIsEmail, checkIsMobile } from "../../../utils/regex";
 import axios from "axios";
 interface Props {
@@ -107,40 +108,42 @@ const privateInfoCheck = () => {
 
 
 const createTicketData = () => {
-    if (!selectedAuthor.value) {
-        setMsg("请选择一个游戏账号", Type.Warning);
-        return;
-    }
-    if (privateInfoCheck()) {
-        showDialog("噢,天啊", "请不要在帖子中透露私人信息", () => { });
-        return;
-    }
-    const data: TicketSystem.createTicket = {
-        replyTo: "",
-        tags: [],
-        attachments: [],
-        isPinned: false,
-        author: null,
-        content: {
-            id: "",
-            title: "",
-            content: ""
-        },
-        isAnonymous: false,
-        gameAccount: ""
-    };
-    const tempAuthor = selectedAuthor.value;
-    tempAuthor.uuid = user.info.uuid;
-    data.content.content = ticketContent.value;
-    data.content.title = ticketTitle.value;
-    data.author = tempAuthor;
-    data.tags = tags.value;
-    data.gameAccount = selectedGame.value;
-    data.attachments = ticketAttachments.value;
-    if (props.ticket) {
-        data.replyTo = props.ticket.id;
-    }
-    return data;
+    showDialog(DialogTest);
+    return null;
+    // if (!selectedAuthor.value) {
+    //     setMsg("请选择一个游戏账号", Type.Warning);
+    //     return;
+    // }
+    // if (privateInfoCheck()) {
+    //     showDialog(DialogTest);
+    //     return;
+    // }
+    // const data: TicketSystem.createTicket = {
+    //     replyTo: "",
+    //     tags: [],
+    //     attachments: [],
+    //     isPinned: false,
+    //     author: null,
+    //     content: {
+    //         id: "",
+    //         title: "",
+    //         content: ""
+    //     },
+    //     isAnonymous: false,
+    //     gameAccount: ""
+    // };
+    // const tempAuthor = selectedAuthor.value;
+    // tempAuthor.uuid = user.info.uuid;
+    // data.content.content = ticketContent.value;
+    // data.content.title = ticketTitle.value;
+    // data.author = tempAuthor;
+    // data.tags = tags.value;
+    // data.gameAccount = selectedGame.value;
+    // data.attachments = ticketAttachments.value;
+    // if (props.ticket) {
+    //     data.replyTo = props.ticket.id;
+    // }
+    // return data;
 };
 
 
@@ -172,7 +175,7 @@ const postTicket = async () => {
     }
     if (!props.ticket) {
         // create
-        
+
         await createTicket(data);
     }
     if (props.refresh) {

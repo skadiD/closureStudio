@@ -33,14 +33,12 @@
             <Reply :ticket="null" :refresh="getTickets" />
         </div>
     </div>
-    <YouMayKnowDialog />
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { userStore } from "../../store/user";
 import { startSSE } from "../../plugins/sse";
 import "animate.css";
-import { YouMayKnowDialog } from "../../components/dialog";
 import TicketTable from "../../components/tickets/TicketTable.vue";
 import Reply from "../../components/tickets/ticket/Reply.vue";
 import { GetTickets } from "../../plugins/axios";
