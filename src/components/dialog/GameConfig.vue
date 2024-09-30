@@ -92,10 +92,7 @@ const props = withDefaults(defineProps<Props>(), {
     account: ""
 });
 const { dialogClose, account } = props;
-const isDisabled = ref(true);
-const isLoading = ref(false);
-const stageKeyWord = ref("");
-const config = ref<ApiGame.GameConfig>({
+const initConfig = {
     account: "",
     accelerate_slot: "",
     accelerate_slot_cn: "",
@@ -108,7 +105,19 @@ const config = ref<ApiGame.GameConfig>({
     recruit_reserve: 0,
     map_id: "",
     allow_login_assist: false
-});
+};
+
+const config = ref<ApiGame.GameConfig>(initConfig);
+
+const isLoading = ref(false);
+const stageKeyWord = ref("");
+
+watch(() => findGame(account), (game) => {
+    if (game) {
+        config.value = game.game_config;
+    }
+}, { immediate: true });
+
 
 const addStageToConfig = (event: Event) => {
     const selectElement = event.target as HTMLSelectElement;
@@ -121,19 +130,6 @@ const addStageToConfig = (event: Event) => {
     }
 };
 
-watch(
-    () => {
-        return findGame(props.account);
-    },
-    (newGame) => {
-        if (newGame) {
-            config.value = newGame.game_config;
-            isDisabled.value = true;
-        } else {
-            isDisabled.value = false;
-        }
-    }
-);
 
 const removeBattleMap = (battleMap: string) => {
     config.value.battle_maps = config.value.battle_maps.filter((item: string) => item !== battleMap);
@@ -147,7 +143,7 @@ const onSubmit = () => {
         setMsg("招募卷保留不能小于0", Type.Warning);
         return;
     }
-    const copyConfig = JSON.parse(JSON.stringify(config.value));
+    const copyConfig = JSON.parse(JSON.stringify(config));
     delete copyConfig.is_stopped;
     delete copyConfig.map_id;
     delete copyConfig.accelerate_slot;

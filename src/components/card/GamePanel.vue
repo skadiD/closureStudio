@@ -34,7 +34,6 @@
         </button>
     </div>
     <button @click="openScreenShots()" class="btn btn-block btn-info mt-2">查看托管截图</button>
-    <ConfigDialog :account="props.account" />
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
