@@ -34,17 +34,19 @@ let intervalId = null; // 用于存储setInterval返回的ID
 const isLoading = ref(false);
 
 const query = async () => {
+  if (isQueryWxPusher.value) {
+    return;
+  }
   isLoading.value = true;
-  setTimeout(() => {
-    isLoading.value = false;
-  }, 1000);
+  await queryWxPusher();
+  await createQRCodes();
+  isLoading.value = false;
 };
 
-onMounted(() => {
-  queryWxPusher();
-  createQRCodes();
+onMounted(async () => {
+  await query();
   intervalId = setInterval(async () => {
-    query();
+    await query();
   }, 10000);
 });
 
