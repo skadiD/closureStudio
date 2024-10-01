@@ -13,7 +13,6 @@ export const useWXPusher = () => {
     isQueryWxPusher.value = true;
     try {
       const res = await QueryWXPusher();
-      console.log(res);
       if (res.code == 1 && res.data) {
         wxPuhser.value = res.data;
       }
