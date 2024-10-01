@@ -134,7 +134,7 @@ const addStageToConfig = (event: Event) => {
 const removeBattleMap = (battleMap: string) => {
     config.value.battle_maps = config.value.battle_maps.filter((item: string) => item !== battleMap);
 };
-const onSubmit = () => {
+const onSubmit = async () => {
     if (config.value.keeping_ap < 0) {
         setMsg("理智保留不能小于0", Type.Warning);
         return;
@@ -143,20 +143,21 @@ const onSubmit = () => {
         setMsg("招募卷保留不能小于0", Type.Warning);
         return;
     }
-    const copyConfig = JSON.parse(JSON.stringify(config));
+    const copyConfig = JSON.parse(JSON.stringify(config.value));
     delete copyConfig.is_stopped;
     delete copyConfig.map_id;
     delete copyConfig.accelerate_slot;
     delete copyConfig.account;
     isLoading.value = true;
-    doUpdateGameConf(props.account, copyConfig)
-        .then((res) => {
-            setMsg(res.message, Type.Info);
-        })
-        .finally(() => {
-            isLoading.value = false;
-            dialogClose();
-        });
+    try {
+        const result = await doUpdateGameConf(account, copyConfig);
+        setMsg(result.message, Type.Info);
+        dialogClose();
+    } catch (error) {
+        setMsg(String(error), Type.Error);
+    } finally {
+        isLoading.value = false;
+    }
 };
 
 const handleCloseBtnOnClick = () => {
