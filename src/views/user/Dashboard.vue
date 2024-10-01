@@ -55,11 +55,12 @@
 </template>
 <script setup lang="ts">
 import "animate.css";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
 import { StatusMessage } from "../../components/dashboard/user";
 import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
 import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
+import YouMayKnow from "../../components/dialog/YouMayKnow.vue";
 import { Type } from "../../components/toast/enmu";
 import { doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
@@ -79,6 +80,10 @@ const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update pass
 startSSE(user);
 const addModel = ref(false);
 
+
+onMounted(async () => {
+    showDialog(YouMayKnow);
+});
 
 const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
     if (!userQuota.value.data.value) {
