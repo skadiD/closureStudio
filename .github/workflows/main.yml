@@ -38,7 +38,7 @@ jobs:
           hash=${GITHUB_SHA:0:7}  # 获取前7位的commit hash
           commit_message="${{ github.event.commits[0].message }}"
           # 自定义消息
-          msg="#$hash - idServer 构建成功 \\n「${commit_message}」"
+          msg="#$hash - closureStudio 构建成功 \\n「${commit_message}」"
           msg=$(echo "$msg" | sed ':a;N;$!ba;s/\n/\\n/g')
 
           curl -X POST "${{ secrets.NOTIFY_API_URL }}" \
