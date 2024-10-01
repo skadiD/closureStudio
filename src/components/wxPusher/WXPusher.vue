@@ -35,13 +35,13 @@ const isLoading = ref(false);
 
 const query = async () => {
   isLoading.value = true;
-  await queryWxPusher();
   setTimeout(() => {
     isLoading.value = false;
   }, 1000);
 };
 
 onMounted(() => {
+  queryWxPusher();
   createQRCodes();
   intervalId = setInterval(async () => {
     query();
