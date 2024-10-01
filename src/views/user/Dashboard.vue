@@ -8,31 +8,7 @@
                     {{ k }}
                 </p>
                 <div class="divider mt-0">个人信息</div>
-                <!-- <p v-if="user.info.status === 0">
-          o(╥﹏╥)o 你的账号已被封禁，如有疑问请联系管理员
-        </p> -->
-                <p v-if="user.info.status <= 0 && gameList?.length === 0">
-                    <!-- 你的账号没有完成
-          <span class="text-info font-bold">【真实玩家认证】</span>，请先添加第一个游戏账号后完成绑定～(∠・ω&lt; )⌒★ -->
-                    好极了!!! 你完成了注册!!! 请添加第一个游戏账号并进行托管～(∠・ω&lt; )⌒★
-                </p>
-
-                <p
-                    v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at == 0">
-                    了不起!!! 你添加了一个游戏!!! 现在你可以启动游戏进行托管!!!</p>
-
-                <p
-                    v-else-if="user.info.status === -1 && userQuota.data.value?.idServerPhone.length === 0 && gameList[0]?.status.created_at != 0">
-                    非常棒!!! 你托管了一个游戏!!! 手机验证码已经发送， 完成【手机号：{{ gameList[0]?.status.account?.replace(/(\d{3})\d{6}(\d{2})/,
-                        "$1****$2") }}】绑定认证<b class="cursor-pointer"
-                        @click="handleRealNameDialogOpen">👉点我解锁👈</b>不限时游戏托管，并提升托管数量。 剩余托管体验时间 <b>【{{
-                            calc(gameList[0]?.status.created_at, now) }}】</b>。<br />
-                </p>
-                <p v-if="user.isVerify && userQuota.data.value?.idServerQQ.length === 0">完成QQ账号验证解锁更多槽位。<b
-                        class="cursor-pointer" @click="handleQQBindDialogOpen()">👉点我解锁👈</b>提升托管数量</p>
-                <p>如果博士遇到问题(验证码没有收到，游戏异常等等)，使用<b class="cursor-pointer" @click="navigateToTicket">👉工单系统👈</b>请求协助。</p>
-                <p v-if="!isQueryWxPusher && !wxPuhser">博士！！！你怎么还没有<b class="cursor-pointer"
-                        @click="navigateToWXPusher">👉绑定微信👈</b></p>
+                <StatusMessage />
 
             </div>
             <IndexStatus />
@@ -78,28 +54,22 @@
     </div>
 </template>
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { config, findGame, gameList, globalSSR, startSSE } from "../../plugins/sse";
 import "animate.css";
-import { userStore } from "../../store/user";
+import { ref } from "vue";
+import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
+import { StatusMessage } from "../../components/dashboard/user";
+import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
+import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
+import { Type } from "../../components/toast/enmu";
 import { doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
-import { Type } from "../../components/toast/enmu";
-import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
-import { allowGameCreate } from "../../plugins/quota/quota";
-import updateCaptchaHandler from "../../plugins/geetest/captcha";
-import { userQuota } from "../../plugins/quota/userQuota";
-import { canDeleteGame } from "../../plugins/quota/quota";
 import { NOTIFY } from "../../plugins/config";
-import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
-import { router } from "../../plugins/router";
-import { useWXPusher } from "../../plugins/wxPusher/wxPusher";
 import showDialog from "../../plugins/dialog/dialog";
-import YouMayKnow from "../../components/dialog/YouMayKnow.vue";
-import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
-import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
-import QQBind from "../../components/dialog/QQBind.vue";
-import RealName from "../../components/dialog/RealName.vue";
+import updateCaptchaHandler from "../../plugins/geetest/captcha";
+import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
+import { userQuota } from "../../plugins/quota/userQuota";
+import { config, findGame, startSSE } from "../../plugins/sse";
+import { userStore } from "../../store/user";
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
@@ -108,14 +78,7 @@ const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update pass
 // start
 startSSE(user);
 const addModel = ref(false);
-const { isQueryWxPusher, wxPuhser, queryWxPusher } = useWXPusher();
 
-
-
-onMounted(() => {
-    showDialog(YouMayKnow);
-    queryWxPusher();
-});
 
 const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
     if (!userQuota.value.data.value) {
@@ -162,17 +125,6 @@ const loginOnClick = (gameAccount: string) => {
     gameLogin(gameAccount);
 };
 
-// 计算到期时间
-const calc = (ts1: number, ts2: number) => {
-    if (!ts1) return "24小时";
-    ts1 += 86400;
-    const during = ts1 - ts2;
-    if (during <= 0) return "请先启动游戏托管";
-    const hours = Math.floor(during / (60 * 60));
-    const minutes = Math.abs(Math.floor((during % (60 * 60)) / 60));
-    return `${hours}小时${minutes}分钟`;
-};
-const now = Math.round(Date.now() / 1000);
 const isLoading = ref(false);
 
 const gameLogin = (account: string) => {
@@ -283,22 +235,6 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
     });
 };
 
-const handleQQBindDialogOpen = () => {
-    showDialog(QQBind);
-};
-
-const handleRealNameDialogOpen = () => {
-    showDialog(RealName);
-};
-
-const navigateToTicket = () => {
-    // using vue-router
-    router.push("/ticket");
-};
-const navigateToWXPusher = () => {
-    // using vue-router
-    router.push("/profile/wechat");
-};
 // geetest
 const geetestDeleteGameOnSuccess = (slotUUID: string) => {
     return (geetestToken: string) => {

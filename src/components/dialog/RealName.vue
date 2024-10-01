@@ -8,7 +8,7 @@
     <button class="btn btn-block btn-info mt-2" @click="handleCloseBtnOnClick">
       取消
     </button>
-    <button class="btn btn-block btn-info mt-2" @click="smsBtn">
+    <button class="btn btn-block btn-info mt-2" @click="handleSubmitBtnOnClick">
       确认
     </button>
   </div>
@@ -32,24 +32,30 @@ const user = userStore();
 const handleCloseBtnOnClick = () => {
   dialogClose();
 }
-const smsBtn = () => {
-  if (smsCode.value !== "") {
-    Auth_Verify(smsCode.value).then((res) => {
-      if (res.code === 1) {
-        setMsg("认证成功,请重新登录", Type.Success);
-        Auth_Refresh().then((res) => {
-          if (res.data) {
-            user.login(res.data.token);
-          }
-          window.location.reload();
-          dialogClose();
-        });
-        return;
-      }
-      setMsg(res.message, Type.Warning);
-    });
+const handleSubmitBtnOnClick = async () => {
+  if (smsCode.value === "") {
+    setMsg("请输入验证码", Type.Warning);
     return;
   }
-  setMsg("请输入验证码", Type.Warning);
+  try {
+    const authResp = await Auth_Verify(smsCode.value);
+    if (authResp.code === 1) {
+      setMsg("认证成功,请重新登录", Type.Success);
+      const res = await Auth_Refresh();
+      if (res.data) {
+        user.login(res.data.token);
+      }
+      window.location.reload();
+      dialogClose();
+      return;
+    }
+    if (authResp.code !== 1) {
+      setMsg("验证码错误", Type.Warning);
+      return;
+    }
+  } catch (error) {
+    console.error(error);
+
+  }
 };
 </script>

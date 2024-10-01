@@ -12,39 +12,39 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: SSH and Deploy
-      uses: appleboy/ssh-action@master
-      with:
-        debug: true
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        password: ${{ secrets.SERVER_PASSWORD }}
-        port: ${{ secrets.SERVER_SSH_PORT }}
-        script: ${{ secrets.SERVER_COMMAND }}
+      - name: SSH and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          debug: true
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          password: ${{ secrets.SERVER_PASSWORD }}
+          port: ${{ secrets.SERVER_SSH_PORT }}
+          script: ${{ secrets.SERVER_COMMAND }}
 
   notify:
     needs: deploy
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Send Notification
-      run: |
-        # 使用 GitHub Actions 提供的环境变量
-        hash=${GITHUB_SHA:0:7}  # 获取前7位的commit hash
-        commit_message="${{ github.event.head_commit.message }}"
-        # 自定义消息
-        msg="#$hash - closure-studio 构建成功 \n「${commit_message}」"
-        echo $msg
-        # 发送请求
-        curl -X POST "${{ secrets.NOTIFY_API_URL }}" \
-             -H "Content-Type: application/json" \
-             -d '{
-                   "token": "'"${{ secrets.NOTIFY_TOKEN }}"'",
-                   "uid": "'"${{ secrets.NOTIFY_UID }}"'",
-                   "msg": "'"$msg"'"
-                 }'
+      - name: Send Notification
+        run: |
+          # 使用 GitHub Actions 提供的环境变量
+          hash=${GITHUB_SHA:0:7}  # 获取前7位的commit hash
+          commit_message="${{ github.event.commits[0].message }}"
+          # 自定义消息
+          msg="#$hash - idServer 构建成功 \\n「${commit_message}」"
+          msg=$(echo "$msg" | sed ':a;N;$!ba;s/\n/\\n/g')
+
+          curl -X POST "${{ secrets.NOTIFY_API_URL }}" \
+              -H "Content-Type: application/json" \
+              -d '{
+                    "token": "'"${{ secrets.NOTIFY_TOKEN }}"'",
+                    "uid": "'"${{ secrets.NOTIFY_UID }}"'",
+                    "msg": "'"$msg"'"
+                  }'

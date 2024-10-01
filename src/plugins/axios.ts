@@ -139,7 +139,7 @@ const Auth_Register = (params: { email: string; password: string; code: string; 
 
 const Auth_ResetPassword = (params: { email: string; code: string; newPasswd: string }) => post<ApiUser.Auth>(`${AuthServer}forget`, params);
 const QueryWXPusher = () => get<ApiUser.WXPusher>(`${AuthServer}wxpusher`);
-const CreateWXPusherQRCode = () => post<ApiUser.WXPusherQRCode>(`${AuthServer}wxpusher`);
+const CreateWXPusherQRCode = () => post<ApiUser.WXPusherQRCode>(`${AuthServer}wechat`);
 
 // idServer admin
 const QueryUser = (value: string) => get<ApiUser.User[]>(`${AuthServer}admin/users/query?value=${value}`);
