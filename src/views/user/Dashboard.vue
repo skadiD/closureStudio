@@ -55,21 +55,21 @@
 </template>
 <script setup lang="ts">
 import "animate.css";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
 import { StatusMessage } from "../../components/dashboard/user";
 import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
 import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
 import YouMayKnow from "../../components/dialog/YouMayKnow.vue";
 import { Type } from "../../components/toast/enmu";
-import { doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
+import { Auth_Send_SMS, doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { NOTIFY } from "../../plugins/config";
 import showDialog from "../../plugins/dialog/dialog";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
-import { config, findGame, startSSE } from "../../plugins/sse";
+import { config, findGame, startSSE, getFirstGame } from "../../plugins/sse";
 import { userStore } from "../../store/user";
 const show = ref(false);
 const user = userStore();
@@ -79,7 +79,25 @@ const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update pass
 // start
 startSSE(user);
 const addModel = ref(false);
-
+const firstGame = getFirstGame;
+// 补发验证码
+watch(firstGame, (value) => {
+    if (user.isVerify) {
+        return;
+    }
+    if (!value) {
+        return;
+    }
+    if (value.status.created_at > 0) {
+        let phone = value.status.account;
+        // acount is G18319999999
+        // if the first character is not a number, split it
+        if (isNaN(parseInt(phone[0]))) {
+            phone = phone.slice(1);
+        }
+        Auth_Send_SMS({ phone: phone });
+    }
+});
 
 onMounted(async () => {
     showDialog(YouMayKnow);
