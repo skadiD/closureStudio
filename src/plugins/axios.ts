@@ -3,6 +3,13 @@ import type { Ref } from "vue";
 import type { AxiosInstance, AxiosError } from "axios";
 import { handleAxiosError } from "./axiosHelper";
 import { config } from "./sse";
+
+enum Host {
+  ArkHostServer = "api.ltsc.vip",
+  AuthServer = "passport.ltsc.vip",
+  RegistryServer = "egistry.ltsc.vip",
+}
+
 export const service = axios.create({
   baseURL: "https://api.ltsc.vip/",
 });
@@ -14,25 +21,32 @@ if (user != null) {
   service.defaults.headers.common["Authorization"] =
     "Bearer " + JSON.parse(user)?.user?.Token;
 }
+
 service.interceptors.response.use(
   (response) => {
-    if (response.data?.data === undefined) {
-      // quota
-      let message = "成功";
-      if (response.data?.err) {
-        message = response.data?.err;
-      }
-      const data: any = {
-        message: message,
-        code:
-          response.data?.err || !response.data?.available
-            ? response.data.code ?? 1
-            : 0,
-        data: response.data,
-      };
-      return data;
+    const requestUrl = response.config?.baseURL
+      ? new URL(response.config.url!, response.config.baseURL)
+      : new URL(response.config.url!);
+    const host = requestUrl.host;
+    switch (host) {
+      case Host.RegistryServer:
+        const data: any = {
+          message: "成功",
+          code: response.data.err
+            ? 0 // If there is an error, code is 0
+            : response.data.available &&
+              response.data.results !== undefined &&
+              response.data.results !== null
+            ? 1 // If available is true and results are valid, code is 1
+            : response.data.code ?? 0, // Otherwise, use the provided code or default to 0
+          data: response.data,
+        };
+        return data;
+      case Host.ArkHostServer:
+      case Host.AuthServer:
+      default:
+        return response.data;
     }
-    return response.data;
   },
   (axiosError: AxiosError) => {
     const error = handleAxiosError(axiosError);
