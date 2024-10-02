@@ -85,7 +85,6 @@ watch(firstGame, (value) => {
     if (user.isVerify) {
         return;
     }
-    console.log(value);
     if (!value) {
         return;
     }
