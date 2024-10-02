@@ -55,8 +55,6 @@ const startSSE = (user: any) => {
           game.status.avatar
         );
       }
-
-      console.log(game.status.code, game.captcha_info);
       if (game.status.code === 999 && game.captcha_info.challenge) {
         gameCaptcha(game.status.account, game.captcha_info);
       }
@@ -84,6 +82,14 @@ const startSSE = (user: any) => {
   //   setMsg("与服务器通信中断", Type.Alert);
   // };
 };
+
+const getFirstGame = computed(() => {
+  if (gameList.value.length === 0) {
+    return null;
+  }
+  return gameList.value[0];
+});
+
 const findGame = (gameAccount: string) => {
   return gameList.value.find((game) => game.status.account === gameAccount);
 };
@@ -96,4 +102,4 @@ const sseTimeOutWarn = () => {
   }
 };
 
-export { config, startSSE, findGame, gameList, globalSSR };
+export { config, startSSE, findGame, gameList, getFirstGame, globalSSR };
