@@ -7,7 +7,7 @@ import { config } from "./sse";
 enum Host {
   ArkHostServer = "api.ltsc.vip",
   AuthServer = "passport.ltsc.vip",
-  RegistryServer = "egistry.ltsc.vip",
+  RegistryServer = "registry.ltsc.vip",
 }
 
 export const service = axios.create({
