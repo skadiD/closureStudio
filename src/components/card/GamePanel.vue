@@ -40,7 +40,7 @@ import { ref, watch } from "vue";
 import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
-import { findGame } from "../../plugins/sse";
+import { findGame } from "../../plugins/gamesInfo/data";
 import showDialog from "../../plugins/dialog/dialog";
 import BattleScreenShots from "../dialog/BattleScreenShots.vue";
 import GameConfig from "../dialog/GameConfig.vue";

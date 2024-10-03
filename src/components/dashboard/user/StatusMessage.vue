@@ -18,7 +18,7 @@ import { onMounted } from "vue";
 import showDialog from "../../../plugins/dialog/dialog";
 import { userQuota } from "../../../plugins/quota/userQuota";
 import { router } from "../../../plugins/router";
-import { gameList } from "../../../plugins/sse";
+import { gameList } from "../../../plugins/gamesInfo/data";
 import { useWXPusher } from "../../../plugins/wxPusher/wxPusher";
 import { userStore } from "../../../store/user";
 import QQBind from "../../dialog/QQBind.vue";

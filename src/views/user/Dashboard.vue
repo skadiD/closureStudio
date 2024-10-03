@@ -69,15 +69,16 @@ import showDialog from "../../plugins/dialog/dialog";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
-import { config, findGame, startSSE, getFirstGame } from "../../plugins/sse";
+import {config, findGame, getFirstGame} from "../../plugins/gamesInfo/data";
 import { userStore } from "../../store/user";
+import { queryGamesInfo } from "../../plugins/gamesInfo/net";
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
 const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update password
 
 // start
-startSSE(user);
+queryGamesInfo();
 const addModel = ref(false);
 const firstGame = getFirstGame;
 // 补发验证码

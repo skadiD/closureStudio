@@ -2,7 +2,6 @@ import axios from "axios";
 import type { Ref } from "vue";
 import type { AxiosInstance, AxiosError } from "axios";
 import { handleAxiosError } from "./axiosHelper";
-import { config } from "./sse";
 
 enum Host {
   ArkHostServer = "api.ltsc.vip",
@@ -37,8 +36,8 @@ service.interceptors.response.use(
             : response.data.available &&
               response.data.results !== undefined &&
               response.data.results !== null
-            ? 1 // If available is true and results are valid, code is 1
-            : response.data.code ?? 0, // Otherwise, use the provided code or default to 0
+              ? 1 // If available is true and results are valid, code is 1
+              : response.data.code ?? 0, // Otherwise, use the provided code or default to 0
           data: response.data,
         };
         return data;
@@ -50,7 +49,6 @@ service.interceptors.response.use(
   },
   (axiosError: AxiosError) => {
     const error = handleAxiosError(axiosError);
-    config.value.isUnderMaintenance = true;
     const fail: Service.FailedResult = {
       error,
       data: null,
