@@ -11,14 +11,14 @@
   <BrowserInfo />
 </template>
 <script setup lang="ts">
-import {isLarge, loadTheme} from "./plugins/common";
+import { isLarge, loadTheme } from "./plugins/common";
 import Docker from "./components/toast/Docker.vue";
-import { config } from "./plugins/sse";
+import { config } from "./plugins/gamesInfo/data";
 import { fetchSytemConfig } from "./plugins/axios";
 import { loadAssets } from "./plugins/assets/assets";
 import Geetest from "./components/Geetest.vue";
 import BrowserInfo from "./components/toast/BrowserInfo.vue";
-import {onMounted} from "vue";
+import { onMounted } from "vue";
 fetchSytemConfig().then(res => {
   if (res.data) config.value = res.data
 })

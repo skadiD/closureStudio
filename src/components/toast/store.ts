@@ -3,7 +3,7 @@ import {
     reactive,
 } from 'vue'
 import { Toast } from './interface'
-import {Appearance, Type} from "./enmu";
+import { Appearance, Type } from "./enmu";
 
 const state = reactive({
     toasts: {} as Record<string, Toast>,
@@ -26,7 +26,7 @@ const defaultCfg = (): Toast => ({
 export const Store = () => {
     const toasts = computed(() => state.toasts)
     const toast = (id: string) => computed(() => state.toasts[id])
-    const setMsg = (message: string, type: Type) => {
+    const setMsg = (message: string | unknown, type: Type) => {
         const full: Toast = Object.assign(defaultCfg(), {
             message,
             type,

@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { userStore } from "../../store/user";
-import { startSSE } from "../../plugins/sse";
+import { queryGamesInfo } from "../../plugins/gamesInfo/net";
 import "animate.css";
 import TicketTable from "../../components/tickets/TicketTable.vue";
 import Reply from "../../components/tickets/ticket/Reply.vue";
@@ -50,7 +50,7 @@ enum selectType {
 
 const show = ref(false);
 const user = userStore();
-startSSE(user);
+queryGamesInfo();
 const isLoading = ref(true);
 const ticketList = ref<TicketSystem.Ticket[]>([]);
 const selectBtnType = ref<selectType>(selectType.waitting);
