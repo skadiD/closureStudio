@@ -30,6 +30,4 @@ export const updateGameList = (data: ApiGame.Game[]) => {
         gameCaptcha(game.status.account, game.captcha_info);
       }
     });
-    // // 更新用户配额
-    // userQuota.value.queryMe();
   };

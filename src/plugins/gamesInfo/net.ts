@@ -139,6 +139,7 @@ const queryGamesInfo = async () => {
     setMsg("链接到服务器成功", Type.Success);
     return;
   }
+  setMsg("链接到服务器失败，将使用轮询模式", Type.Warning);
   startAxios();
 };
 
