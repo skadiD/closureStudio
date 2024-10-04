@@ -40,9 +40,9 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import { setMsg } from '../../plugins/common';
-import { Type } from '../toast/enmu';
+import { Type } from '../toast/enum';
 import { doUpdateGamePasswd } from '../../plugins/axios';
-import updateCaptchaHandler from '../../plugins/geetest/captcha';
+import updateCaptchaHandler from '../../plugins/geeTest/captcha';
 import { DialogComponentProps } from '../../plugins/dialog/dialog';
 
 

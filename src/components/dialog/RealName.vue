@@ -17,7 +17,7 @@
 import { ref } from "vue";
 import { Auth_Refresh, Auth_Verify } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
+import { Type } from "../toast/enum";
 import { userStore } from "../../store/user";
 import { DialogComponentProps } from "../../plugins/dialog/dialog";
 

@@ -39,13 +39,6 @@
                     </GameAccount>
                 </div>
             </div>
-            <input type="checkbox" id="addModel" class="modal-toggle" v-model="addModel" />
-            <div v-if="addModel" class="modal" role="dialog">
-                <div class="bg-base-100 mx-4 p-6 shadow-lg max-w-xl rounded-lg">
-                    <GameAdd :is-first="!user.isVerify" :uuid="selectedSlotUUID" @close="addModel = false" />
-                </div>
-            </div>
-            <!-- <UpdateGamePasswdDialog :slotUUID="selectedSlotUUID" :form="selectedRegisterForm" /> -->
         </div>
         <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
             v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
@@ -56,17 +49,17 @@
 <script setup lang="ts">
 import "animate.css";
 import { onMounted, ref, watch } from "vue";
-import { GameAccount, GameAdd, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
+import { GameAccount, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
 import { StatusMessage } from "../../components/dashboard/user";
-import GeetestNotify from "../../components/dialog/GeetestNotify.vue";
+import GeeTestNotify from "../../components/dialog/GeeTestNotify.vue";
 import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
 import YouMayKnow from "../../components/dialog/YouMayKnow.vue";
-import { Type } from "../../components/toast/enmu";
+import { Type } from "../../components/toast/enum";
 import { Auth_Send_SMS, doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { NOTIFY } from "../../plugins/config";
 import showDialog from "../../plugins/dialog/dialog";
-import updateCaptchaHandler from "../../plugins/geetest/captcha";
+import updateCaptchaHandler from "../../plugins/geeTest/captcha";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { config, findGame, getFirstGame } from "../../plugins/gamesInfo/data";
@@ -80,7 +73,6 @@ const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update pass
 
 // start
 queryGamesInfo();
-const addModel = ref(false);
 const firstGame = getFirstGame;
 // 补发验证码
 watch(firstGame, (value) => {
@@ -92,7 +84,7 @@ watch(firstGame, (value) => {
     }
     if (value.status.created_at > 0) {
         let phone = value.status.account;
-        // acount is G18319999999
+        // account is G18319999999
         // if the first character is not a number, split it
         if (isNaN(parseInt(phone[0]))) {
             phone = phone.slice(1);
@@ -119,10 +111,10 @@ const createGameButtonOnClick = (slot: Registry.Slot, slotUUID: string) => {
         setMsg(response.message, Type.Warning);
         return;
     }
-
     showDialog(CreateGame, {
-        soltUUID: slotUUID,
+        slotUUID: slotUUID,
         isFirst: !user.isVerify,
+        loginFunc: gameLogin
     });
 };
 
@@ -156,24 +148,35 @@ const loginOnClick = (gameAccount: string) => {
 
 const isLoading = ref(false);
 
-const gameLogin = (account: string) => {
+const gameLogin = async (account: string) => {
     isLoading.value = true;
-    // 先通过 recaptcha 加载失败的时候直接降级到 geetest
+    // 先通过 recaptcha 加载失败的时候直接降级到 geeTest
     if (!window.grecaptcha) {
-        updateCaptchaHandler(geetestLoginGameOnSuccess(account));
+        await startCaptcha(geeTestLoginGameOnSuccess(account));
+        isLoading.value = false;
         return;
     }
-    window.grecaptcha.ready(async () => {
-        const token = await window.grecaptcha.execute("6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN", { action: "submit" });
-        if (token === "") {
-            setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
-            isLoading.value = false;
-            return;
-        }
-        login(token, account);
-        // window.captchaObj.showCaptcha();
+
+    // 使用 Promise 包装 grecaptcha.ready 和 execute 操作
+    const token = await new Promise<string>((resolve) => {
+        window.grecaptcha.ready(() => {
+            window.grecaptcha
+                .execute("6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN", { action: "submit" })
+                .then((res) => resolve(res || "")); // 确保返回值为字符串，即使为空也返回 ""
+        });
     });
+
+    // 检查 token 是否为空
+    if (token === "") {
+        setMsg("图灵测试エロ,请检查你的 Network", Type.Warning);
+        isLoading.value = false;
+        return;
+    }
+    // 进行登录
+    await login(token, account);
+    isLoading.value = false;
 };
+
 
 const suspend = (account: string) => {
     isLoading.value = true;
@@ -186,29 +189,33 @@ const suspend = (account: string) => {
     });
 };
 
-const login = (token: string, account: string) => {
-    doGameLogin(token, account).then((res) => {
+const login = async (token: string, account: string) => {
+    try {
         isLoading.value = false;
-        if (res.code === -1100) { // 通过 geetest
-            setMsg('请继续完成滑块验证', Type.Info)
-            updateCaptchaHandler(geetestLoginGameOnSuccess(account))
-            return
+        const resp = await doGameLogin(token, account);
+        if (resp.code === -1100) {
+            setMsg("请继续完成滑块验证", Type.Info);
+            updateCaptchaHandler(geeTestLoginGameOnSuccess(account));
+            return;
         }
-        if (res.code === 1) {
+        if (resp.code === 1) {
             setMsg("启动成功", Type.Success);
-            showDialog(GeetestNotify);
+            showDialog(GeeTestNotify);
         } else {
-            setMsg(res.message, Type.Warning);
+            setMsg(resp.message, Type.Warning);
         }
-    });
+    } catch (e) {
+    } finally {
+        isLoading.value = false;
+    }
 };
 
 const deleteGame = async (token: string, slotUUID: string) => {
     doDelGame(slotUUID, token)
         .then((res) => {
-            if (res.code === -1100) { // 通过 geetest
+            if (res.code === -1100) { // 通过 geeTest
                 setMsg('请继续完成滑块验证', Type.Info)
-                updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID))
+                updateCaptchaHandler(geeTestDeleteGameOnSuccess(slotUUID))
                 return
             }
             if (res.code === 1) {
@@ -235,7 +242,7 @@ const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
     }
     isLoading.value = true;
     if (!window.grecaptcha) {
-        updateCaptchaHandler(geetestDeleteGameOnSuccess(slotUUID));
+        updateCaptchaHandler(geeTestDeleteGameOnSuccess(slotUUID));
         return;
     }
     window.grecaptcha.ready(async () => {
@@ -264,15 +271,15 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
     });
 };
 
-// geetest
-const geetestDeleteGameOnSuccess = (slotUUID: string) => {
-    return (geetestToken: string) => {
-        deleteGame(geetestToken, slotUUID);
+// geeTest
+const geeTestDeleteGameOnSuccess = (slotUUID: string) => {
+    return (geeTestToken: string) => {
+        deleteGame(geeTestToken, slotUUID);
     };
 };
-const geetestLoginGameOnSuccess = (gameAccount: string) => {
-    return (geetestToken: string) => {
-        doGameLogin(geetestToken, gameAccount);
+const geeTestLoginGameOnSuccess = (gameAccount: string) => {
+    return async (geeTestToken: string) => {
+        await doGameLogin(geeTestToken, gameAccount);
     };
 };
 
@@ -286,6 +293,10 @@ const openGameConf = (account: string) => {
     show.value = !show.value;
 };
 
+
+function startCaptcha(arg0: (geeTestToken: string) => void) {
+    throw new Error("Function not implemented.");
+}
 </script>
 <style>
 div,

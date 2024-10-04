@@ -202,7 +202,7 @@ import {
     doDelGame,
 } from "../../../plugins/axios";
 import { userStore } from "../../../store/user";
-import { Type } from "../../toast/enmu";
+import { Type } from "../../toast/enum";
 import Tags from "./Tags.vue";
 import { getSMSSlot } from "../../../plugins/quota/userQuota";
 import { checkIsMobile } from "../../../utils/regex";

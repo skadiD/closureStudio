@@ -9,7 +9,7 @@
 import { ref } from "vue";
 import { defaultTags, setMsg } from "../../../plugins/common";
 import { UpdateTicketById } from "../../../plugins/axios";
-import { Type } from "../../toast/enmu";
+import { Type } from "../../toast/enum";
 import axios from "axios";
 
 interface SSEData {

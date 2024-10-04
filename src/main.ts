@@ -9,7 +9,7 @@ import VueClickAway from "vue3-click-away";
 import { router } from "./plugins/router";
 import { createApp } from "vue";
 import App from "./App.vue";
-import "./plugins/geetest/gt.0.4.8";
+import "./plugins/geeTest/gt.0.4.8";
 import { initSW } from "./swloader";
 
 const pinia = createPinia();

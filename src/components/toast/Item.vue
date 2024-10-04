@@ -13,7 +13,7 @@
 <script setup lang="ts">
   import {ref, PropType, computed, onMounted} from "vue";
   import {Toast} from './interface'
-  import {Layout, Type, Appearance} from './enmu'
+  import {Layout, Type, Appearance} from './enum'
   import {Store} from "./store";
   const props = defineProps({
     toast: {

@@ -45,7 +45,7 @@
 import { ref } from "vue";
 import { defaultAuthor, setMsg } from "../../../plugins/common";
 import { userStore } from "../../../store/user";
-import { Type } from "../../toast/enmu";
+import { Type } from "../../toast/enum";
 import { PostTicket, ReplyTicket } from "../../../plugins/axios";
 import Tags from "./Tags.vue";
 import showDialog from "../../../plugins/dialog/dialog";

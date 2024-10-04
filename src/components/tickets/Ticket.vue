@@ -45,7 +45,7 @@ import { nextTick, ref, watch } from "vue";
 import { userStore } from "../../store/user";
 import { GetReplys, GetTicketById, UpdateTicketById } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
+import { Type } from "../toast/enum";
 import Ticket from "./ticket/Ticket.vue";
 import Reply from "./ticket/Reply.vue";
 const user = userStore();

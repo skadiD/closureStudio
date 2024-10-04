@@ -1,6 +1,6 @@
 import {
     Appearance, Type
-} from "./enmu";
+} from "./enum";
 
 interface ToastDismiss  {
     automatically: boolean;
