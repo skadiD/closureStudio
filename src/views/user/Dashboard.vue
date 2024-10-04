@@ -17,7 +17,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div v-for="(slot, key) in userQuota.data.value?.slots" :key="key">
                     <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota.data.value" :key="key"
-                        @click="addGameOnClick(slot, slot.uuid)" />
+                        @click="createGameButtonOnClick(slot, slot.uuid)" />
                     <GameAccount v-else :game="findGame(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
                         <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
                         <div class="grid gap-4 grid-cols-2 mt-2">
@@ -69,9 +69,10 @@ import showDialog from "../../plugins/dialog/dialog";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
-import {config, findGame, getFirstGame} from "../../plugins/gamesInfo/data";
+import { config, findGame, getFirstGame } from "../../plugins/gamesInfo/data";
 import { userStore } from "../../store/user";
 import { queryGamesInfo } from "../../plugins/gamesInfo/net";
+import CreateGame from "../../components/dialog/CreateGame.vue";
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
@@ -104,7 +105,7 @@ onMounted(async () => {
     showDialog(YouMayKnow);
 });
 
-const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
+const createGameButtonOnClick = (slot: Registry.Slot, slotUUID: string) => {
     if (!userQuota.value.data.value) {
         setMsg("游戏托管槽位数据异常，无法提交", Type.Warning);
         return;
@@ -118,7 +119,11 @@ const addGameOnClick = (slot: Registry.Slot, slotUUID: string) => {
         setMsg(response.message, Type.Warning);
         return;
     }
-    selectedSlotUUID.value = slotUUID;
+
+    showDialog(CreateGame, {
+        soltUUID: slotUUID,
+        isFirst: !user.isVerify,
+    });
 };
 
 const isUpdateStatus = (gameAccount: string) => {

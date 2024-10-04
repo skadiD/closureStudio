@@ -91,6 +91,8 @@ const props = withDefaults(defineProps<Props>(), {
     dialogClose: () => { },
     account: ""
 });
+
+
 const { dialogClose, account } = props;
 const initConfig = {
     account: "",

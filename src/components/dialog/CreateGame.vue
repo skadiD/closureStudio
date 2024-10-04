@@ -18,7 +18,7 @@
       <input type="radio" :value="2" v-model="form.platform" id="bili" class="radio checked:bg-blue-500" />
     </label>
     <label class="label cursor-pointer">
-      <span class="text-xl">官服（安卓 / IOS）</span>
+      <span class="text-xl">官服(安卓 / IOS)</span>
       <input type="radio" :value="1" v-model="form.platform" id="official" class="radio checked:bg-red-500" />
     </label>
   </div>
@@ -45,7 +45,7 @@
       明日方舟，启动
     </button>
   </div>
-  <input type="checkbox" id="confirmModel" class="modal-toggle" v-model="confirm"/>
+  <input type="checkbox" id="confirmModel" class="modal-toggle" v-model="confirm" />
   <div v-if="isFirst" class="modal" role="dialog">
     <div class="bg-base-100 mx-4 p-4 shadow-lg max-w-md rounded-lg">
       <div class="text-3xl text-warning font-bold text-center mt-2">温馨提示</div>
@@ -68,18 +68,21 @@ import { doAddGame } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enmu";
 import updateCaptchaHandler from "../../plugins/geetest/captcha";
+import { DialogComponentProps } from "../../plugins/dialog/dialog";
 
-interface Props {
-  uuid: string
+interface Props extends DialogComponentProps {
+  soltUUID: string
   isFirst: boolean
+  loginFunc: () => void
 }
-const props = withDefaults(defineProps<Props>(), {
-  uuid: '',
-  isFirst: true,
-});
+
+const props = defineProps<Props>();
+
+const { dialogClose, soltUUID, isFirst, loginFunc } = props
+
 const confirm = ref(false)
 const loading = ref(false)
-const emit = defineEmits(['close'])
+
 const form = ref<Registry.AddGameForm>({
   account: '',
   password: '',
@@ -102,7 +105,6 @@ const addGame = (token: string) => {
     }
     if (res.code === 1) {
       setMsg('账号托管提交成功', Type.Success)
-      emit('close')
     } else {
       setMsg(`账号托管失败，返回码：${res.code}`, Type.Warning);
       if (res.message) setMsg(res.message, Type.Warning)
@@ -140,7 +142,6 @@ const start = async () => {
     addGame(token)
   })
 }
-
 
 const geetestAddGameOnSuccess = () => {
   return (geetestToken: string) => {
