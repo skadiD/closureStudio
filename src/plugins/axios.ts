@@ -29,15 +29,10 @@ service.interceptors.response.use(
     const host = requestUrl.host;
     switch (host) {
       case Host.RegistryServer:
+        const code = buildCodeFromRegisterResp(response)
         const data: any = {
-          message: "成功",
-          code: response.data.err
-            ? 0 // If there is an error, code is 0
-            : response.data.available &&
-              response.data.results !== undefined &&
-              response.data.results !== null
-              ? 1 // If available is true and results are valid, code is 1
-              : response.data.code ?? 0, // Otherwise, use the provided code or default to 0
+          message: code === 0 ? (response.data.err ? response.data.err : "大失败") : "成功",
+          code: buildCodeFromRegisterResp(response),
           data: response.data,
         };
         return data;
@@ -278,6 +273,17 @@ const ReplyTicket = (id: string, data: TicketSystem.createTicket) =>
 const PostTicket = (data: TicketSystem.createTicket) =>
   post(`${TicketsServer}tickets/`, data); // getTIckets
 
+
+const buildCodeFromRegisterResp = (resp: any): number => {
+  if (!resp.data.err && !resp.data.code) return 1
+  return (resp.data.err || resp.data.code != 1)
+    ? 0 // If there is an error, code is 0
+    : resp.data.available &&
+      resp.data.results !== undefined &&
+      resp.data.results !== null
+      ? 1 // If available is true and results are valid, code is 1
+      : resp.data.code ?? 0 // Otherwise, use the provided code or default to 0
+}
 export {
   Auth_Login,
   Auth_Register,

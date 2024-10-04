@@ -38,7 +38,7 @@ import { fetchQQBindCode } from "../../plugins/axios";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { NOTIFY } from "../../plugins/config";
 import { setMsg, sleep } from "../../plugins/common";
-import { Type } from "../toast/enmu";
+import { Type } from "../toast/enum";
 import { Icon } from "@iconify/vue";
 import { DialogComponentProps } from "../../plugins/dialog/dialog";
 

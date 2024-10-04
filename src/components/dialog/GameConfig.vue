@@ -77,7 +77,7 @@
 import { ref, watch } from "vue";
 import { doUpdateGameConf } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
+import { Type } from "../toast/enum";
 import { findGame } from "../../plugins/gamesInfo/data";
 import { assets } from "../../plugins/assets/assets";
 import BaseDesign from "../BaseDesign.vue";
@@ -91,6 +91,8 @@ const props = withDefaults(defineProps<Props>(), {
     dialogClose: () => { },
     account: ""
 });
+
+
 const { dialogClose, account } = props;
 const initConfig = {
     account: "",

@@ -3,7 +3,7 @@ import {
     reactive,
 } from 'vue'
 import { Toast } from './interface'
-import { Appearance, Type } from "./enmu";
+import { Appearance, Type } from "./enum";
 
 const state = reactive({
     toasts: {} as Record<string, Toast>,
@@ -32,7 +32,6 @@ export const Store = () => {
             type,
             appearance: Appearance.Dark,
         });
-        console.log(full.id)
         state.toasts[full.id] = full
     }
     const unset = (id: string) => {

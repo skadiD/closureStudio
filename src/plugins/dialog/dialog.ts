@@ -6,7 +6,6 @@ export interface DialogComponentProps {
   dialogClose: () => void;
 }
 
-// 定义一个泛型 T，要求它是一个带有 props 的组件，并且 props 必须包含 dialogClose
 const showDialog = <T extends DialogComponentProps>(
   Component: new () => { $props: T },
   componentProps: Partial<T> = {}

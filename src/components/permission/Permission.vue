@@ -24,7 +24,7 @@ import { ref, watch } from "vue";
 import { getPermissionName, Permission, hasPermission, addPermission, removePermission } from "../../plugins/permission/permission";
 import { UpdateUserPermission } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
+import { Type } from "../toast/enum";
 
 const props = withDefaults(defineProps<Props>(), {
     userPermission: 0,

@@ -158,13 +158,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
+import { Type } from "../toast/enum";
 import Docker from "../toast/Docker.vue";
 import { Auth_Login, Auth_Register, Auth_ResetPassword, SendCodeOnRegister, doFindAccount } from "../../plugins/axios";
 import { userStore } from "../../store/user";
 import { useRouter } from "vue-router";
 import { checkIsEmail, getEmailUsernameLength } from "../../utils/regex";
-import updateCaptchaHandler from "../../plugins/geetest/captcha";
+import updateCaptchaHandler from "../../plugins/geeTest/captcha";
 // @ts-ignore
 
 enum ModelType {
@@ -219,7 +219,7 @@ const loginBtn = () => {
         });
 };
 
-const sendCode = async (email:string) => {
+const sendCode = async (email: string) => {
     if (isSendCodingIsLoading.value) return;
     if (email === "") {
         setMsg("请填写邮箱", Type.Warning);

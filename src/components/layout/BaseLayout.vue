@@ -33,7 +33,7 @@
   import {userStore} from "../../store/user";
   import {useRouter} from "vue-router";
   import {setMsg} from "../../plugins/common";
-  import {Type} from "../toast/enmu";
+  import {Type} from "../toast/enum";
   const user = userStore()
   const router = useRouter()
   const logout = () => {

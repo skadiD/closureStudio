@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { CreateWXPusherQRCode, QueryWXPusher } from "../axios";
 import { setMsg } from "../common";
-import { Type } from "../../components/toast/enmu";
+import { Type } from "../../components/toast/enum";
 
 export const useWXPusher = () => {
   const isQueryWxPusher = ref(false);

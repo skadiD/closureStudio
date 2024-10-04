@@ -1,5 +1,5 @@
 import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
-import { Type } from "../../components/toast/enmu";
+import { Type } from "../../components/toast/enum";
 import { userStore } from "../../store/user";
 import { fetchGameList } from "../axios";
 import { setMsg } from "../common";
@@ -134,12 +134,14 @@ const startAxios = () => {
 };
 
 const queryGamesInfo = async () => {
-  const sseResult = await startSSE();
-  if (sseResult) {
-    setMsg("链接到服务器成功", Type.Success);
-    return;
-  }
-  setMsg("链接到服务器失败，将使用轮询模式", Type.Warning);
+  // const sseResult = await startSSE();
+  // if (sseResult) {
+  //   setMsg("链接到服务器成功", Type.Success);
+  //   return;
+  // }
+  // setMsg("链接到服务器失败，将使用轮询模式", Type.Warning);
+  // startAxios();
+  startSSE();
   startAxios();
 };
 
