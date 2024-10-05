@@ -76,13 +76,14 @@ const getContent = (m: number): string => {
 
   switch (m) {
     case 1:
-      return props.game.status.ap.toString();
+      return props.game?.status?.ap?.toString() ?? "0";
+
     case 2:
-      return (
-        assets.value.getStageName(props.game.game_config.map_id) || "未选择"
-      );
+      return assets.value.getStageName(props.game?.game_config?.map_id ?? "") || "未选择";
+
     case 3:
-      return props.game.status.text;
+      return props.game?.status?.text ?? "未知";
+
     default:
       return "";
   }
