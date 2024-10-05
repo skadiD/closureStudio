@@ -205,7 +205,7 @@ const fetchSytemConfig = () => get<ApiSystem.Config>("system/config");
 const fetchSytemList = () => get<ApiSystem.Hall[]>("system/apCostList");
 
 const doGameLogin = (token: string, account: string) =>
-  captchaPost(`game/login/${account}`, token, null); // GameLogin
+  captchaPost<void>(`game/login/${account}`, token, null); // GameLogin
 
 const doAddGame = (slot: string, token: string, params: any) =>
   captchaPost(

@@ -59,7 +59,7 @@ import { Auth_Send_SMS, doDelGame, doGameLogin, doUpdateGameConf } from "../../p
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { NOTIFY } from "../../plugins/config";
 import showDialog from "../../plugins/dialog/dialog";
-import updateCaptchaHandler from "../../plugins/geeTest/captcha";
+import updateCaptchaHandler, { startCaptchaC } from "../../plugins/geeTest/captcha";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { config, findGame, getFirstGame } from "../../plugins/gamesInfo/data";
@@ -149,32 +149,15 @@ const loginOnClick = (gameAccount: string) => {
 const isLoading = ref(false);
 
 const gameLogin = async (account: string) => {
-    isLoading.value = true;
-    // 先通过 recaptcha 加载失败的时候直接降级到 geeTest
-    if (!window.grecaptcha) {
-        await startCaptcha(geeTestLoginGameOnSuccess(account));
+    try {
+        isLoading.value = true;
+        await startCaptchaC(geeTestLoginGameOnSuccess(account));
+        setMsg("启动完成", Type.Info);
+    } catch (e) {
+        setMsg("启动失败", Type.Warning);
+    } finally {
         isLoading.value = false;
-        return;
-    }
-
-    // 使用 Promise 包装 grecaptcha.ready 和 execute 操作
-    const token = await new Promise<string>((resolve) => {
-        window.grecaptcha.ready(() => {
-            window.grecaptcha
-                .execute("6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN", { action: "submit" })
-                .then((res) => resolve(res || "")); // 确保返回值为字符串，即使为空也返回 ""
-        });
-    });
-
-    // 检查 token 是否为空
-    if (token === "") {
-        setMsg("图灵测试エロ,请检查你的 Network", Type.Warning);
-        isLoading.value = false;
-        return;
-    }
-    // 进行登录
-    await login(token, account);
-    isLoading.value = false;
+    };
 };
 
 
@@ -293,10 +276,6 @@ const openGameConf = (account: string) => {
     show.value = !show.value;
 };
 
-
-function startCaptcha(arg0: (geeTestToken: string) => void) {
-    throw new Error("Function not implemented.");
-}
 </script>
 <style>
 div,
