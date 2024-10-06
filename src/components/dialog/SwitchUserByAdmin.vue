@@ -3,12 +3,17 @@
         <h2>用户切换</h2>
         <p>确定切换到【{{ uuid }}】用户吗?</p>
 
-
         <div class="grid gap-4 grid-cols-2 mt-2">
-            <button class="btn btn-outline btn-sm btn-block  btn-info" :disabled="isLoading"
-                @click.stop="handleCloseBtnOnClick()">取消</button>
-            <button class="btn btn-outline btn-sm btn-block  btn-primary" @click="handleConfirmBtnOnClick()"
-                :disabled="isLoading">确定</button>
+            <button class="btn btn-outline btn-sm btn-block btn-info" :disabled="isLoading"
+                @click.stop="handleCloseBtnOnClick()">
+                <span v-if="isLoading" className="loading loading-spinner"></span>
+                取消
+            </button>
+            <button class="btn btn-outline btn-sm btn-block btn-primary" @click="handleConfirmBtnOnClick()"
+                :disabled="isLoading">
+                <span v-if="isLoading" className="loading loading-spinner"></span>
+                确定
+            </button>
         </div>
     </div>
 </template>
@@ -19,26 +24,27 @@ import { DialogComponentProps } from "../../plugins/dialog/dialog";
 import { Type } from "../toast/enum";
 
 interface Props extends DialogComponentProps {
-    uuid: string
-    switchFunc: (account: string) => Promise<void>
+    uuid: string;
+    switchFunc: (account: string) => Promise<void>;
 }
 
 const props = defineProps<Props>();
 const { uuid, switchFunc, dialogClose } = props;
-const isLoading = ref(false)
+const isLoading = ref(false);
 
 const handleCloseBtnOnClick = () => {
     dialogClose();
-}
+};
 const handleConfirmBtnOnClick = async () => {
+    if (isLoading.value) return;
     try {
+        isLoading.value = true;
         await switchFunc(uuid);
     } catch (error) {
-        setMsg(error, Type.Error)
+        setMsg(error, Type.Error);
     } finally {
+        isLoading.value = false;
         dialogClose();
     }
-}
-
-
+};
 </script>
