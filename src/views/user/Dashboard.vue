@@ -54,7 +54,7 @@
         </div>
         <div class="bg-base-300 flex-1 flex flex-col md:ml-8 max-w-xl p-4 shadow-lg rounded-lg items-center animate__animated"
             v-show="show" :class="show ? 'animate__fadeInRight' : 'animate__fadeOutRight'">
-            <GamePanel :account="selectGame" />
+            <GamePanel :account="selectGame" :closeFunc="() => { setShow(false) }" />
         </div>
     </div>
 </template>
@@ -63,22 +63,21 @@ import "animate.css";
 import { onMounted, ref, watch } from "vue";
 import { GameAccount, GameAddCard, GamePanel, IndexStatus } from "../../components/card/index";
 import { StatusMessage } from "../../components/dashboard/user";
+import CreateGame from "../../components/dialog/CreateGame.vue";
 import GeeTestNotify from "../../components/dialog/GeeTestNotify.vue";
 import UpdateGamePasswd from "../../components/dialog/UpdateGamePasswd.vue";
 import YouMayKnow from "../../components/dialog/YouMayKnow.vue";
 import { Type } from "../../components/toast/enum";
 import { Auth_Send_SMS, doDelGame, doGameLogin, doUpdateGameConf } from "../../plugins/axios";
+import { startCaptcha } from "../../plugins/captcha/captcha";
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { NOTIFY } from "../../plugins/config";
 import showDialog from "../../plugins/dialog/dialog";
+import { config, findGame, getFirstGame, isQueryGamesLoading } from "../../plugins/gamesInfo/data";
+import { queryGamesInfo } from "../../plugins/gamesInfo/net";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
-import { config, findGame, getFirstGame } from "../../plugins/gamesInfo/data";
 import { userStore } from "../../store/user";
-import { queryGamesInfo } from "../../plugins/gamesInfo/net";
-import CreateGame from "../../components/dialog/CreateGame.vue";
-import { startCaptcha } from "../../plugins/captcha/captcha";
-import { isQueryGamesLoading } from "../../plugins/gamesInfo/data";
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
@@ -256,6 +255,9 @@ const loginGameWithCaptcha = (gameAccount: string) => {
 };
 
 const selectGame = ref("");
+const setShow = (value: boolean) => {
+    show.value = value;
+};
 const openGameConf = (account: string) => {
     const game = findGame(account);
     if (!game) return;

@@ -19,7 +19,7 @@
     <div class="divider" v-else>你的游戏尚未启动，请先配置</div>
     <button class="btn btn-info btn-outline btn-block my-1" @click="handleGameConfigDialogOpen">托管配置</button>
     <div class="divider">不实时日志</div>
-    <div class="h-[calc(100vh-28rem)] overflow-y-auto">
+    <div class="h-[calc(100vh-32rem)] overflow-y-auto">
         <table class="text-[1rem]">
             <tbody>
                 <tr v-for="log in gameLogs.logs">
@@ -33,19 +33,21 @@
             {{ "加载更多" }}
         </button>
     </div>
-    <button @click="openScreenShots()" class="btn btn-block btn-info mt-2">查看托管截图</button>
+    <button @click="openScreenShots()" class="btn btn-block btn-info my-2">查看托管截图</button>
+    <button @click.stop="handleCloseBtnOnClick" class="btn btn-outline btn-sm btn-block btn-error">关闭托管详情</button>
 </template>
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import { fetchGameDetails, fetchGameLogs } from "../../plugins/axios";
 import { formatTime, setMsg } from "../../plugins/common";
-import { Type } from "../toast/enum";
-import { findGame } from "../../plugins/gamesInfo/data";
 import showDialog from "../../plugins/dialog/dialog";
+import { findGame } from "../../plugins/gamesInfo/data";
 import BattleScreenShots from "../dialog/BattleScreenShots.vue";
 import GameConfig from "../dialog/GameConfig.vue";
+import { Type } from "../toast/enum";
 interface Props {
     account: string;
+    closeFunc: () => void;
     // statusCode: number // 当前用户状态，-1=登陆失败 0=未开启/未初始化/正在初始化但未登录 1=登录中 2=登陆完成/运行中 3=游戏错误
 }
 const props = withDefaults(defineProps<Props>(), {
@@ -126,4 +128,8 @@ const handleGameConfigDialogOpen = () => {
     });
 };
 
+const handleCloseBtnOnClick = () => {
+    if (!props.closeFunc) return;
+    props.closeFunc();
+};
 </script>
