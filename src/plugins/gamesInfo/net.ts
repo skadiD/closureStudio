@@ -7,7 +7,7 @@ import { setMsg } from "../common";
 import showDialog from "../dialog/dialog";
 import { userQuota } from "../quota/userQuota";
 import { router } from "../router";
-import { globalSSR, updateGameList } from "./data";
+import { globalSSR, setIsLoading, updateGameList } from "./data";
 
 const isStarted = ref(false);
 
@@ -119,20 +119,29 @@ const startAxios = () => {
   // 轮询函数
   const poll = async () => {
     try {
-      const response = await fetchGameList()
-      if (!response) {
-        return;
-      }
-      if (response.code === 1 && response.data) {
+      // 通过 Promise.all 同时发起两个请求
+      const [response, queryMeResp] = await Promise.all([
+        fetchGameList(), // 请求游戏列表
+        userQuota.value.queryMe() // 请求用户配额数据
+      ]);
+      // 处理 fetchGameList 的结果
+      if (response && response.code === 1 && response.data) {
         updateGameList(response.data);
-        userQuota.value.queryMe();
+      }
+      // 处理 queryMe 的结果
+      if (queryMeResp) {
+        userQuota.value.data.value = queryMeResp;
       }
     } catch (error) {
-      console.error('Error during polling:', error);
+      console.error("Error during polling:", error);
+    } finally {
+      setIsLoading(false);
+      // 在 poll 完成后，等待指定时间再进行下一次轮询
+      setTimeout(poll, intervalTime);
     }
   };
+
   poll();
-  setInterval(poll, intervalTime);
   return true;
 };
 
