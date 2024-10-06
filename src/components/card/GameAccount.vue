@@ -4,7 +4,10 @@
     <div class="flex items-center">
       <div class="avatar mr-2">
         <div class="w-12 rounded-md">
-          <img :src="`https://assets.ltsc.vip/avatar/${getAvatarType()}/${getAvatarId()}.png`" alt="斯卡蒂" />
+          <!-- <img :src="`https://assets.ltsc.vip/avatar/${getAvatarType()}/${getAvatarId()}.png`" alt="斯卡蒂" /> -->
+          <img :src="`https://cc-im-kefu-cos.7moor-fs1.com/im/4d2c3f00-7d4c-11e5-af15-41bf63ae4ea0/ch9KONh0.jpg`"
+            alt="斯卡蒂" />
+
         </div>
       </div>
       <div class="flex">
