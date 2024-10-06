@@ -143,7 +143,7 @@
                             class="rounded border-s-4 border-warning bg-warning/10 p-4">
                             通行证账号: {{ findAccountRespData }}</div>
                         <a class="btn btn-block btn-info" @click="handleFindAccountBtnOnClick"><span
-                                v-if="isFindAcccountLoading" class="loading loading-bars" />查找!</a>
+                                v-if="isFindAccountLoading" class="loading loading-bars" />查找!</a>
                     </div>
                 </div>
             </div>
@@ -164,8 +164,7 @@ import { Auth_Login, Auth_Register, Auth_ResetPassword, SendCodeOnRegister, doFi
 import { userStore } from "../../store/user";
 import { useRouter } from "vue-router";
 import { checkIsEmail, getEmailUsernameLength } from "../../utils/regex";
-import updateCaptchaHandler from "../../plugins/geeTest/captcha";
-// @ts-ignore
+import { startCaptcha } from "../../plugins/captcha/captcha";
 
 enum ModelType {
     Login,
@@ -199,7 +198,7 @@ const router = useRouter();
 const isLoading = ref(false);
 const agreeTerms = ref(false);
 const isSendCodingIsLoading = ref(false);
-const isFindAcccountLoading = ref(false);
+const isFindAccountLoading = ref(false);
 const findAccountRespData = ref("")
 const loginBtn = () => {
     if (isLoading.value) return;
@@ -248,33 +247,7 @@ const sendCode = async (email: string) => {
     }
 };
 
-const findAccount = async (geetestToken: string) => {
-    try {
-        isFindAcccountLoading.value = true;
-        let gameAccount = "";
-        if (findAccountParams.value.platform === 1) {
-            // 官服
-            gameAccount = "G" + findAccountParams.value.gameAccount;
-        }
-        if (findAccountParams.value.platform === 2) {
-            // B站服
-            gameAccount = "B" + findAccountParams.value.gameAccount;
-        }
-        const resp = await doFindAccount(gameAccount, geetestToken);
-        console.log(resp);
-        if (resp.code === 1 && resp.data) {
-            findAccountRespData.value = resp.data.account;
-        }
-        if (resp.code === 0) {
-            setMsg(resp.message || "查询", Type.Warning);
-        }
-    } catch (e) {
-        console.error(e);
-        setMsg("请刷新页面重试", Type.Warning);
-    } finally {
-        isFindAcccountLoading.value = false;
-    }
-};
+
 
 const regBtn = () => {
     if (isLoading.value) return;
@@ -343,29 +316,42 @@ const resetPasswordBtn = () => {
 };
 
 const handleFindAccountBtnOnClick = async () => {
-    if (isFindAcccountLoading.value) return;
+    if (isFindAccountLoading.value) return;
     if (findAccountParams.value.gameAccount === "") {
         setMsg("请填写账号", Type.Warning);
         return;
     }
-    // 先通过 recaptcha 加载失败的时候直接降级到 geetest
-    if (!window.grecaptcha) {
-        updateCaptchaHandler(geetestFindAccountOnSuccess());
-        return;
-    }
-    window.grecaptcha?.ready(async () => {
-        const token = await window.grecaptcha.execute("6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN", { action: "submit" });
-        if (token === "") {
-            setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
-            isFindAcccountLoading.value = false;
-            return;
+    try {
+        isFindAccountLoading.value = true;
+        const gameAccount = findAccountParams.value.gameAccount;
+        const gamePlatform = findAccountParams.value.platform;
+        const resp = await startCaptcha(FindAccountWithCaptcha(gameAccount, gamePlatform));
+        if (resp.code === 0) {
+            setMsg(resp.message || "查询失败", Type.Warning);
         }
-        findAccount(token);
-    });
+        if (resp.code === 1 && resp.data) {
+            findAccountRespData.value = resp.data.account;
+        }
+    } catch (error) {
+        console.error(error);
+        setMsg("请刷新页面重试", Type.Warning);
+    } finally {
+        isFindAccountLoading.value = false;
+    }
 };
-const geetestFindAccountOnSuccess = () => {
-    return (geetestToken: string) => {
-        findAccount(geetestToken);
+
+const FindAccountWithCaptcha = (gameAccount: string, platform: number) => {
+    let account = "";
+    if (platform === 1) {
+        // 官服
+        account = "G" + gameAccount;
+    }
+    if (platform === 2) {
+        // B站服
+        account = "B" + gameAccount;
+    }
+    return async (captchaToken: string) => {
+        return await doFindAccount(account, captchaToken);
     };
 };
 </script>

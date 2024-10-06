@@ -74,10 +74,10 @@ import { ref } from "vue";
 import { doAddGame } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enum";
-import updateCaptchaHandler from "../../plugins/geeTest/captcha";
 import { DialogComponentProps } from "../../plugins/dialog/dialog";
 import { checkIsMobile } from "../../utils/regex";
 import { get } from "http";
+import { startCaptcha } from "../../plugins/captcha/captcha";
 
 interface Props extends DialogComponentProps {
   slotUUID: string
@@ -95,19 +95,24 @@ const form = ref<Registry.AddGameForm>({
   platform: 1
 })
 
-
-const createGame = async (token: string) => {
-  const resp = await doAddGame(slotUUID, token, form.value)
-  console.log(resp)
-  if (resp.code === 1) {
-    setMsg('账号托管提交成功', Type.Success)
-    return;
+const handleCreateBtnOnClick = async () => {
+  // protect multiple click
+  if (isLoading.value) return
+  try {
+    isLoading.value = true
+    // createGame
+    await createGame()
+    setMsg('创建账号成功。开始自动登录', Type.Success)
+    // loginFunc()
+    await loginFunc(buildGameAccount(form.value.account, form.value.platform))
+    dialogClose()
+  } catch (error) {
+  } finally {
+    isLoading.value = false
   }
-  if (resp.message) setMsg(resp.message, Type.Error)
-  throw new Error(resp.message)
 }
 
-const handleCreateGameProcess = async () => {
+const createGame = async () => {
   if (slotUUID === '') {
     setMsg('请刷新页面后重试', Type.Warning)
     throw new Error("slotUUID is empty")
@@ -125,29 +130,12 @@ const handleCreateGameProcess = async () => {
     }
   }
   setMsg('叠甲成功，提交托管信息中', Type.Success)
-  // 先通过 recaptcha 加载失败的时候直接降级到 geeTest
-  if (!window.grecaptcha) {
-    await updateCaptchaHandler(geeTestCreateGameOnSuccess())
-    return;
+  const createGameResp = await startCaptcha(createGameWithCaptcha(slotUUID, form.value))
+  if (createGameResp.code == 1) {
+    return createGameResp
   }
-
-  // 使用 Promise 包装 grecaptcha.ready 和 execute
-  const token = await new Promise<string>((resolve) => {
-    window.grecaptcha.ready(() => {
-      window.grecaptcha
-        .execute('6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN', { action: 'submit' })
-        .then((res) => resolve(res || "")); // 将 res 为空的情况处理成空字符串
-    });
-  });
-
-  // 检查 token 是否为空
-  if (token === "") {
-    setMsg("图灵测试失败，请检查你的网络连接", Type.Warning);
-    throw new Error("recaptcha token is empty");
-  }
-
-  // 直接调用 createGame，并等待执行完成
-  await createGame(token);
+  setMsg(createGameResp.message, Type.Error)
+  throw new Error(createGameResp.message)
 }
 
 const buildGameAccount = (account: string, platform: number) => {
@@ -160,9 +148,9 @@ const buildGameAccount = (account: string, platform: number) => {
   return account
 }
 
-const geeTestCreateGameOnSuccess = () => {
-  return (geeTestToken: string) => {
-    createGame(geeTestToken)
+const createGameWithCaptcha = (slotUUID: string, data: Registry.AddGameForm) => {
+  return async (captchaToken: string) => {
+    return await doAddGame(slotUUID, captchaToken, data)
   }
 }
 
@@ -173,23 +161,6 @@ const handleConfirmPhoneBtnOnClick = () => {
 const handleDeclinePhoneBtnOnClick = () => {
   confirmPhone.value = false
   dialogClose()
-}
-
-const handleCreateBtnOnClick = async () => {
-  // protect multiple click
-  if (isLoading.value) return
-  try {
-    isLoading.value = true
-    // createGame
-    await handleCreateGameProcess()
-    setMsg('创建账号成功。开始自动登录', Type.Success)
-    // loginFunc()
-    await loginFunc(buildGameAccount(form.value.account, form.value.platform))
-    dialogClose()
-  } catch (error) {
-  } finally {
-    isLoading.value = false
-  }
 }
 
 const handleCloseBtnOnClick = () => {
