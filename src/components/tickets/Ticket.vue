@@ -20,7 +20,7 @@
         </div>
         <div v-if="isExpanded" class="collapse-content w-full">
             <Ticket :ticket="myTicket" :refresh="refreshTicket" :getTickets="props.getTickets" />
-            <div v-for="(reply, key) in myReplys" :key="reply.id">
+            <div v-for="(reply, key) in myReplays" :key="reply.id">
                 <Ticket :ticket="reply" :refresh="refreshTicket" :getTickets="props.getTickets" />
             </div>
             <div v-if="isLoading" class="flex justify-center w-full">
@@ -41,19 +41,19 @@ const props = withDefaults(defineProps<Props>(), {
     ticket: null,
     getTickets: () => { }
 });
-import { nextTick, ref, watch } from "vue";
-import { userStore } from "../../store/user";
-import {  GetReplays, GetTicketById, UpdateTicketById } from "../../plugins/axios";
+import { ref, watch } from "vue";
+import { GetReplays, GetTicketById } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
+import { userStore } from "../../store/user";
 import { Type } from "../toast/enum";
-import Ticket from "./ticket/Ticket.vue";
 import Reply from "./ticket/Reply.vue";
+import Ticket from "./ticket/Ticket.vue";
 const user = userStore();
 const isExpanded = ref(false);
 const isLoading = ref(false);
 const isAuthor = ref(false);
 const myTicket = ref<TicketSystem.Ticket | null>(null);
-const myReplys = ref<TicketSystem.Ticket[]>([]);
+const myReplays = ref<TicketSystem.Ticket[]>([]);
 
 watch(
     () => myTicket,
@@ -98,7 +98,7 @@ const refreshTicket = async () => {
         throw new Error(respGetReplays.message);
     }
     if (respGetReplays.data) {
-        myReplys.value = respGetReplays.data;
+        myReplays.value = respGetReplays.data;
     }
     isLoading.value = false;
 };

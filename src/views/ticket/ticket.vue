@@ -11,8 +11,8 @@
 
             <div class="join my-2">
                 <input class="join-item btn btn-xs sm:btn-sm btn-active"
-                    @click="handleSelectBtnTypeOnClick(selectType.waitting)" type="radio"
-                    :checked="selectBtnType === selectType.waitting" aria-label="等待处理" />
+                    @click="handleSelectBtnTypeOnClick(selectType.waiting)" type="radio"
+                    :checked="selectBtnType === selectType.waiting" aria-label="等待处理" />
                 <input class="join-item btn btn-xs sm:btn-sm btn-active"
                     @click="handleSelectBtnTypeOnClick(selectType.solved)" type="radio"
                     :checked="selectBtnType === selectType.solved" aria-label="已解决" />
@@ -44,7 +44,7 @@ import Reply from "../../components/tickets/ticket/Reply.vue";
 import { GetTickets } from "../../plugins/axios";
 
 enum selectType {
-    waitting,
+    waiting,
     solved
 }
 
@@ -53,13 +53,13 @@ const user = userStore();
 queryGamesInfo();
 const isLoading = ref(true);
 const ticketList = ref<TicketSystem.Ticket[]>([]);
-const selectBtnType = ref<selectType>(selectType.waitting);
+const selectBtnType = ref<selectType>(selectType.waiting);
 const triggerAnimation = ref(false);
 
 
 // init
 const selectedTickets = computed(() => {
-    if (selectBtnType.value === selectType.waitting) {
+    if (selectBtnType.value === selectType.waiting) {
         return ticketList.value.filter((item) => {
             return item.status === selectBtnType.value;
         });

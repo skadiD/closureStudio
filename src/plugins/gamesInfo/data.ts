@@ -5,7 +5,11 @@ import { arknigthsGameCaptcha } from "../captcha/captcha";
 export const config = ref<ApiSystem.Config>({} as ApiSystem.Config);
 export const gameList = ref<ApiGame.Game[]>([]);
 export const globalSSR = ref<ApiGame.SSR[]>([]);
+export const isQueryGamesLoading = ref(true);
 
+export const setIsLoading = (status: boolean) => {
+  isQueryGamesLoading.value = status;
+}
 
 export const findGame = (gameAccount: string) => {
   return gameList.value.find((game) => game.status.account === gameAccount);

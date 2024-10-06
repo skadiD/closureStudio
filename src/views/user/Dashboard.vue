@@ -14,6 +14,11 @@
             <IndexStatus />
             <div class="text-2xl font-bold">我的托管（{{ userQuota.data.value?.slots.filter((slot) => slot.gameAccount !==
                 null)?.length }} 已用 / {{ userQuota.data.value?.slots?.length }} 可用）</div>
+            <div v-if="isQueryGamesLoading" class="h-72 flex justify-center w-full">
+                <span className="loading loading-ring loading-lg"></span>
+                <span className="loading loading-ring loading-lg"></span>
+                <span className="loading loading-ring loading-lg"></span>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <div v-for="(slot, key) in userQuota.data.value?.slots" :key="key">
                     <GameAddCard v-if="!slot.gameAccount" :slot="slot" :userQuota="userQuota.data.value" :key="key"
@@ -73,7 +78,7 @@ import { userStore } from "../../store/user";
 import { queryGamesInfo } from "../../plugins/gamesInfo/net";
 import CreateGame from "../../components/dialog/CreateGame.vue";
 import { startCaptcha } from "../../plugins/captcha/captcha";
-
+import { isQueryGamesLoading } from "../../plugins/gamesInfo/data";
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
