@@ -219,7 +219,7 @@ const doUpdateGamePasswd = (slot: string, token: string, params: any) =>
     token,
     params
   ); // GameCreate
-const doDelGame = (slot: string, token: string) =>
+const doDelGame = (token: string, slot: string) =>
   captchaPost<void>(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
     account: null,
   });
