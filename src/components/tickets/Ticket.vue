@@ -91,14 +91,14 @@ const refreshTicket = async () => {
     if (respGetTicket.data) {
         myTicket.value = respGetTicket.data;
     }
-    const respGetReplys = await GetReplys(myTicket.value.id);
-    if (respGetReplys.code === 0) {
-        setMsg(respGetReplys.message, Type.Error);
+    const respGetReplays = await GetReplys(myTicket.value.id);
+    if (respGetReplays.code === 0) {
+        setMsg(respGetReplays.message, Type.Error);
         isLoading.value = false;
-        throw new Error(respGetReplys.message);
+        throw new Error(respGetReplays.message);
     }
-    if (respGetReplys.data) {
-        myReplys.value = respGetReplys.data;
+    if (respGetReplays.data) {
+        myReplys.value = respGetReplays.data;
     }
     isLoading.value = false;
 };
