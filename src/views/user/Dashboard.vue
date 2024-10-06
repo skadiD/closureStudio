@@ -24,23 +24,24 @@
                             <div class="grid gap-4 grid-cols-2 mt-2">
                                 <button class="btn btn-outline btn-sm btn-block btn-primary"
                                     v-if="isUpdateStatus(slot.gameAccount)" :disabled="isLoading"
-                                    @click.stop="updatePasswdOnClick(slot)">更新</button>
+                                    @click.stop="handleUpdatePasswdBtnOnClick(slot)">更新</button>
 
                                 <button class="btn btn-outline btn-sm btn-block btn-primary"
                                     v-else-if="isSuspendStatus(slot.gameAccount)"
-                                    @click="suspendOnClick(slot.gameAccount)" :disabled="isLoading">暂停</button>
+                                    @click="handleGameSuspendBtnOnClick(slot.gameAccount)"
+                                    :disabled="isLoading">暂停</button>
 
                                 <button class="btn btn-outline btn-sm btn-block btn-info" v-else
-                                    @click="loginOnClick(slot.gameAccount)"
+                                    @click="handleGameLoginBtnOnClick(slot.gameAccount)"
                                     :disabled="isLoginBtnDisabled(slot.gameAccount)">启动</button>
 
                                 <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error"
-                                    @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">删除</button>
+                                    @click.stop="handleDeleteBtnOnClick(slot.uuid, slot.gameAccount)">删除</button>
                             </div>
                         </div>
                         <div v-if="!findGame(slot.gameAccount)">
                             <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error mt-2"
-                                @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">点击进行修复</button>
+                                @click.stop="handleDeleteBtnOnClick(slot.uuid, slot.gameAccount)">点击进行修复</button>
                         </div>
                     </GameAccount>
                 </div>
@@ -65,18 +66,19 @@ import { Auth_Send_SMS, doDelGame, doGameLogin, doUpdateGameConf } from "../../p
 import { getRealGameAccount, setMsg } from "../../plugins/common";
 import { NOTIFY } from "../../plugins/config";
 import showDialog from "../../plugins/dialog/dialog";
-import updateCaptchaHandler, { startCaptchaC } from "../../plugins/geeTest/captcha";
 import { allowGameCreate, canDeleteGame } from "../../plugins/quota/quota";
 import { userQuota } from "../../plugins/quota/userQuota";
 import { config, findGame, getFirstGame } from "../../plugins/gamesInfo/data";
 import { userStore } from "../../store/user";
 import { queryGamesInfo } from "../../plugins/gamesInfo/net";
 import CreateGame from "../../components/dialog/CreateGame.vue";
+import { startCaptcha } from "../../plugins/captcha/captcha";
+
 const show = ref(false);
 const user = userStore();
 const selectedSlotUUID = ref("");
 const selectedRegisterForm = ref({} as Registry.AddGameForm); // for update password
-
+const isLoading = ref(false);
 // start
 queryGamesInfo();
 const firstGame = getFirstGame;
@@ -143,109 +145,43 @@ const isLoginBtnDisabled = (gameAccount: string) => {
     return game.status.code === 1;
 };
 
-const suspendOnClick = (gameAccount: string) => {
+const handleGameSuspendBtnOnClick = (gameAccount: string) => {
     show.value = !show.value;
-    suspend(gameAccount);
+    gameSuspend(gameAccount);
 };
-const loginOnClick = (gameAccount: string) => {
+const handleGameLoginBtnOnClick = (gameAccount: string) => {
     show.value = !show.value;
     gameLogin(gameAccount);
 };
 
-const isLoading = ref(false);
 
-const gameLogin = async (account: string) => {
-    try {
-        isLoading.value = true;
-        await startCaptchaC(geeTestLoginGameOnSuccess(account));
-        setMsg("启动完成", Type.Info);
-    } catch (e) {
-        setMsg("启动失败", Type.Warning);
-    } finally {
-        isLoading.value = false;
-    };
-};
-
-
-const suspend = (account: string) => {
-    isLoading.value = true;
-    const config: ApiGame.Config = {
-        is_stopped: true
-    };
-    doUpdateGameConf(account, config).then((res) => {
-        isLoading.value = false;
-        setMsg(res.message, Type.Info);
-    });
-};
-
-const login = async (token: string, account: string) => {
-    try {
-        isLoading.value = false;
-        const resp = await doGameLogin(token, account);
-        if (resp.code === -1100) {
-            setMsg("请继续完成滑块验证", Type.Info);
-            updateCaptchaHandler(geeTestLoginGameOnSuccess(account));
-            return;
-        }
-        if (resp.code === 1) {
-            setMsg("启动成功", Type.Success);
-            showDialog(GeeTestNotify);
-        } else {
-            setMsg(resp.message, Type.Warning);
-        }
-    } catch (e) {
-    } finally {
-        isLoading.value = false;
-    }
-};
-
-const deleteGame = async (token: string, slotUUID: string) => {
-    doDelGame(slotUUID, token)
-        .then((res) => {
-            if (res.code === -1100) { // 通过 geeTest
-                setMsg('请继续完成滑块验证', Type.Info)
-                updateCaptchaHandler(geeTestDeleteGameOnSuccess(slotUUID))
-                return
-            }
-            if (res.code === 1) {
-                setMsg("删除成功", Type.Success);
-                return;
-            }
-            setMsg(res.message, Type.Warning);
-        })
-        .finally(() => {
-            isLoading.value = false;
-        });
-};
-
-const deleteOnClick = async (slotUUID: string, gameAccount: string) => {
+const handleDeleteBtnOnClick = async (slotUUID: string, gameAccount: string) => {
     // can you delete it?
     if (userQuota.value.data.value === undefined) {
         setMsg("游戏托管槽位数据异常，无法提交", Type.Warning);
         return;
     }
-
     if (!canDeleteGame(userQuota.value.data.value, gameAccount)) {
         setMsg(NOTIFY.NOT_ALLOW_DELETE_GAME, Type.Warning);
         return;
     }
     isLoading.value = true;
-    if (!window.grecaptcha) {
-        updateCaptchaHandler(geeTestDeleteGameOnSuccess(slotUUID));
-        return;
-    }
-    window.grecaptcha.ready(async () => {
-        const token = await window.grecaptcha.execute("6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN", { action: "submit" });
-        if (token === "") {
-            setMsg("pirnt（'图灵测试エロ,请检查你的 Network\")", Type.Warning);
+    try {
+        const deleteResp = await startCaptcha(deleteGameWithCaptcha(slotUUID));
+        if (deleteResp.code === 1) {
+            setMsg("删除成功", Type.Success);
             return;
         }
-        await deleteGame(token, slotUUID);
-        // window.captchaObj.showCaptcha();
-    });
+        setMsg(deleteResp.message, Type.Warning);
+    } catch (error) {
+        setMsg("删除失败", Type.Warning);
+    } finally {
+        isLoading.value = false;
+    }
 };
 
-const updatePasswdOnClick = async (slot: Registry.Slot) => {
+
+const handleUpdatePasswdBtnOnClick = async (slot: Registry.Slot) => {
     // can you delete it?
     if (!slot.gameAccount) return;
     const game = findGame(slot.gameAccount);
@@ -260,19 +196,60 @@ const updatePasswdOnClick = async (slot: Registry.Slot) => {
     });
 };
 
-// geeTest
-const geeTestDeleteGameOnSuccess = (slotUUID: string) => {
-    return (geeTestToken: string) => {
-        deleteGame(geeTestToken, slotUUID);
-    };
-};
-const geeTestLoginGameOnSuccess = (gameAccount: string) => {
-    return async (geeTestToken: string) => {
-        await doGameLogin(geeTestToken, gameAccount);
+const gameLogin = async (account: string) => {
+    try {
+        isLoading.value = true;
+        const loginResp = await startCaptcha(loginGameWithCaptcha(account));
+        if (loginResp.code === -1100) {
+            setMsg("请继续完成滑块验证", Type.Info);
+            await startCaptcha(loginGameWithCaptcha(account));
+            return;
+        }
+        if (loginResp.code === 1) {
+            setMsg("启动成功", Type.Success);
+            showDialog(GeeTestNotify);
+        } else {
+            setMsg(loginResp.message, Type.Warning);
+        }
+    } catch (e) {
+        setMsg("启动失败", Type.Warning);
+    } finally {
+        isLoading.value = false;
     };
 };
 
-// 账号配置面板
+
+const gameSuspend = async (account: string) => {
+    isLoading.value = true;
+    const config: ApiGame.Config = {
+        is_stopped: true
+    };
+    try {
+        const resp = await doUpdateGameConf(account, config);
+        if (resp.code === 1) {
+            setMsg("暂停成功", Type.Success);
+            return;
+        }
+        setMsg(resp.message, Type.Warning);
+    } catch (error) {
+        setMsg("暂停失败", Type.Warning);
+    } finally {
+        isLoading.value = false;
+
+    }
+};
+
+const deleteGameWithCaptcha = (slotUUID: string) => {
+    return async (captchaToken: string) => {
+        return await doDelGame(captchaToken, slotUUID);
+    };
+};
+const loginGameWithCaptcha = (gameAccount: string) => {
+    return async (captchaToken: string) => {
+        return await doGameLogin(captchaToken, gameAccount);
+    };
+};
+
 const selectGame = ref("");
 const openGameConf = (account: string) => {
     const game = findGame(account);

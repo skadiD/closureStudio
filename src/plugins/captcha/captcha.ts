@@ -1,22 +1,9 @@
 import { Type } from "../../components/toast/enum";
-import { setMsg } from "../common";
 import { doUpdateCaptcha } from "../axios";
+import { setMsg } from "../common";
 
 const googleRecaptchaSiteKey = "6LfrMU0mAAAAADoo9vRBTLwrt5mU0HvykuR3l8uN"
 
-type GeeTestResult = {
-  geetest_challenge: string;
-  geetest_validate: string;
-  geetest_seccode: string;
-};
-
-interface GeetestInstance {
-  onReady: (callback: () => void) => void; // 加载完成时的回调
-  verify: () => void; // 触发验证
-  onSuccess: (callback: () => void) => void; // 验证成功时的回调
-  onError: (callback: () => void) => void; // 出错时的回调
-  getValidate: () => GeeTestResult | null; // 获取验证结果
-}
 
 const captchaConfig = {
   config: {
@@ -26,7 +13,7 @@ const captchaConfig = {
   handler: (obj: any) => { },
 };
 
-export async function startCaptchaC<T>(myFunc: (captchaToken: string) => Promise<T>): Promise<T> {
+export async function startCaptcha<T>(myFunc: (captchaToken: string) => Promise<T>): Promise<T> {
   try {
     if (!window.grecaptcha) {
       const result = await startRecaptcha(myFunc);
@@ -39,7 +26,6 @@ export async function startCaptchaC<T>(myFunc: (captchaToken: string) => Promise
     throw error;
   }
 }
-
 
 async function startRecaptcha<T>(myFunc: (captchaToken: string) => Promise<T>): Promise<T> {
   try {
@@ -80,6 +66,8 @@ async function startGeeTest<T>(myFunc: (captchaToken: string) => Promise<T>): Pr
             resolve(myFuncResult); // 执行成功时，直接 resolve
           } catch (e) {
             reject(new Error(`执行 myFunc 时出错: ${(e as Error).message}`)); // 异常时 reject 错误信息
+          } finally {
+            obj.destroy(); // 无论如何，最终都销毁验证码组件
           }
         } else {
           setMsg("请完成验证", Type.Warning);
@@ -96,28 +84,7 @@ async function startGeeTest<T>(myFunc: (captchaToken: string) => Promise<T>): Pr
 }
 
 
-
-const updateCaptchaHandler = (onSuccess: (geetestResult: string) => void) => {
-  captchaConfig.handler = (obj: any) => {
-    window.captchaObj = obj;
-    obj.appendTo("#captcha")
-    obj.onReady(() => {
-      window.captchaObj.showCaptcha()
-    })
-    obj.onSuccess(() => {
-      const result: object = window.captchaObj.getValidate();
-      if (!result) {
-        setMsg("请完成验证", Type.Warning);
-        return;
-      }
-      const resultStr = JSON.stringify(result);
-      onSuccess(resultStr);
-    });
-  };
-  window.initGeetest4(captchaConfig.config, captchaConfig.handler);
-};
-
-export const gameCaptcha = (account: string, data: ApiGame.CaptchaInfo) => {
+export const arknigthsGameCaptcha = (account: string, data: ApiGame.CaptchaInfo) => {
   // @ts-ignore
   if (window["initGeetest"] === undefined) {
     console.log("没有初始化Geetest")
@@ -152,4 +119,3 @@ export const gameCaptcha = (account: string, data: ApiGame.CaptchaInfo) => {
     })
   })
 }
-export default updateCaptchaHandler;

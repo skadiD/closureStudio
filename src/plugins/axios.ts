@@ -208,7 +208,7 @@ const doGameLogin = (token: string, account: string) =>
   captchaPost<void>(`game/login/${account}`, token, null); // GameLogin
 
 const doAddGame = (slot: string, token: string, params: any) =>
-  captchaPost(
+  captchaPost<void>(
     `${RegistryServer}api/slots/gameAccount?uuid=${slot}`,
     token,
     params
@@ -220,7 +220,7 @@ const doUpdateGamePasswd = (slot: string, token: string, params: any) =>
     params
   ); // GameCreate
 const doDelGame = (slot: string, token: string) =>
-  captchaPost(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
+  captchaPost<void>(`${RegistryServer}api/slots/gameAccount?uuid=${slot}`, token, {
     account: null,
   });
 const doDelGameAdmin = (slot: string, token: string) =>
