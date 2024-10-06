@@ -51,6 +51,9 @@
                         class="btn btn-outline btn-xs m-1">
                         游戏槽
                     </button>
+                    <button v-if="user.isAdmin" @click="handleSwitchUserBtnOnClick" class="btn btn-outline btn-xs m-1">
+                        切换用户
+                    </button>
                     <button v-if="user.isAdmin" @click="() => (displayType = DisplayType.GameLog)"
                         class="btn btn-outline btn-xs m-1">
                         日志
@@ -200,6 +203,7 @@ import {
     fetchGameLogsAdmin,
     DelQuotaGameAdmin,
     doDelGame,
+    Auth_Login_Admin,
 } from "../../../plugins/axios";
 import { userStore } from "../../../store/user";
 import { Type } from "../../toast/enum";
@@ -210,6 +214,9 @@ import { formatTime } from "../../../plugins/common";
 import QA from "./QA.vue";
 import Permission from "../../permission/Permission.vue";
 import VueMarkdown from 'vue-markdown-render'
+import showDialog from "../../../plugins/dialog/dialog";
+import SwitchUserByAdmin from "../../dialog/SwitchUserByAdmin.vue";
+import { router } from "../../../plugins/router";
 enum DisplayType {
     None,
     UserInfo,
@@ -273,6 +280,17 @@ watch(
         immediate: false,
     }
 );
+
+const handleSwitchUserBtnOnClick = async () => {
+    if (!myTicket.value) {
+        setMsg("该Ticket用户信息不存在", Type.Warning);
+    }
+    // Auth_Login_Admin
+    showDialog(SwitchUserByAdmin, {
+        uuid: myTicket.value?.authorUUID,
+        switchFunc: switchUser,
+    });
+};
 
 const handleDeleteSlotBtnOnClick = async (slotId: string) => {
     try {
@@ -433,6 +451,33 @@ const copyToClipboard = async (text: string) => {
         setMsg("复制成功", Type.Success);
     } catch (err) {
         console.error("复制到剪贴板失败", err);
+    }
+};
+
+const switchUser = async (uuid: string) => {
+    if (!uuid) {
+        setMsg("该Ticket用户信息不存在", Type.Warning);
+    }
+    try {
+        isLoading.value = true;
+        const resp = await Auth_Login_Admin({ uuid: uuid });
+        if (resp.code !== 1) {
+            setMsg("切换用户失败: " + resp.message, Type.Warning);
+            return;
+        }
+        if (resp.data && resp.data.token) {
+            setMsg("切换用户成功", Type.Success);
+            user.login(resp.data.token);
+            window.location.href = "/dashboard";
+            return;
+        }
+        setMsg("切换用户失败", Type.Warning);
+    } catch (error) {
+        const err = error as Error;
+        setMsg(err.message, Type.Warning);
+        console.log(err);
+    } finally {
+        isLoading.value = false;
     }
 };
 
