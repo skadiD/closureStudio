@@ -8,7 +8,7 @@
                 }
                     " name="options" :aria-label="author.value.nickname" />
         </div>
-        <div>
+        <div v-if="!Array.isArray(user.getGames) || user.getGames.length === 0">
             <input className="join-item btn btn-xs" type="radio" :checked="isSelectedAuthor('匿名玩家')" @click="() => {
                 setSelectAuthor(null, '')
             }" name="options" aria-label="匿名玩家" />

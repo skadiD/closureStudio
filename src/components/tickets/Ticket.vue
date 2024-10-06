@@ -43,7 +43,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 import { nextTick, ref, watch } from "vue";
 import { userStore } from "../../store/user";
-import { GetReplys, GetTicketById, UpdateTicketById } from "../../plugins/axios";
+import {  GetReplays, GetTicketById, UpdateTicketById } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
 import { Type } from "../toast/enum";
 import Ticket from "./ticket/Ticket.vue";
@@ -91,7 +91,7 @@ const refreshTicket = async () => {
     if (respGetTicket.data) {
         myTicket.value = respGetTicket.data;
     }
-    const respGetReplays = await GetReplys(myTicket.value.id);
+    const respGetReplays = await GetReplays(myTicket.value.id);
     if (respGetReplays.code === 0) {
         setMsg(respGetReplays.message, Type.Error);
         isLoading.value = false;
