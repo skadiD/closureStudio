@@ -15,7 +15,7 @@ const captchaConfig = {
 
 export async function startCaptcha<T>(myFunc: (captchaToken: string) => Promise<T>): Promise<T> {
   try {
-    if (!window.grecaptcha) {
+    if (window.grecaptcha) {
       const result = await startRecaptcha(myFunc);
       return result;
     }
