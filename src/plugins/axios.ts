@@ -266,7 +266,7 @@ const fetchGameDetails = (account: string) =>
 const GetTicketById = (id: string) =>
   get<TicketSystem.Ticket>(`${TicketsServer}tickets/${id}`); // getTIckets
 const GetTickets = () => get<TicketSystem.Ticket[]>(`${TicketsServer}tickets`); // getTIckets
-const GetReplys = (id: string) =>
+const GetReplays = (id: string) =>
   get<TicketSystem.Ticket[]>(`${TicketsServer}tickets/${id}/replies`); // getTIckets
 const UpdateTicketById = (id: string, data: TicketSystem.updateTicket) =>
   put(`${TicketsServer}tickets/${id}`, data); // getTIckets
@@ -328,7 +328,7 @@ export {
   UpdateTicketById,
   GetTicketById,
   ReplyTicket,
-  GetReplys,
+  GetReplays,
   PostTicket,
 };
 
