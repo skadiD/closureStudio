@@ -183,6 +183,8 @@ const UpdateUserPermission = (uuid: string, permission: number) =>
 const SendCodeOnRegister = (params: { email: string }) =>
   post(`${AuthServer}mail/register/code`, params);
 const Auth_Info = () => get(`${AuthServer}info`);
+const Auth_Login_Admin = (params: { uuid: string }) =>
+  post<ApiUser.Auth>(`${AuthServer}admin/users/login`, params);
 const fetchCron = () => get("Nodes"); // Cron
 const fetchAnnounce = () => get("Common/Announcement"); // Announce
 
@@ -293,6 +295,7 @@ export {
   Auth_Refresh,
   Auth_Send_SMS,
   QueryUser,
+  Auth_Login_Admin,
   SendSMS,
   UpdateUserPermission,
   SendCodeOnRegister,

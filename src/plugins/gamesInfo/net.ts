@@ -1,3 +1,4 @@
+import { ref } from "vue";
 import NewSSRNotice from "../../components/dialog/NewSSRNotice.vue";
 import { Type } from "../../components/toast/enum";
 import { userStore } from "../../store/user";
@@ -7,6 +8,8 @@ import showDialog from "../dialog/dialog";
 import { userQuota } from "../quota/userQuota";
 import { router } from "../router";
 import { globalSSR, updateGameList } from "./data";
+
+const isStarted = ref(false);
 
 const startSSE = async () => {
   const user = userStore();
@@ -141,6 +144,10 @@ const queryGamesInfo = async () => {
   // }
   // setMsg("链接到服务器失败，将使用轮询模式", Type.Warning);
   // startAxios();
+  if (isStarted.value) {
+    return;
+  }
+  isStarted.value = true;
   startSSE();
   startAxios();
 };
