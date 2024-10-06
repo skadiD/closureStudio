@@ -20,21 +20,27 @@
                         @click="createGameButtonOnClick(slot, slot.uuid)" />
                     <GameAccount v-else :game="findGame(slot.gameAccount)" @click="openGameConf(slot.gameAccount)">
                         <div class="divider mt-2 mb-3 text-info font-arknigths text-xl">START</div>
-                        <div class="grid gap-4 grid-cols-2 mt-2">
-                            <button class="btn btn-outline btn-sm btn-block btn-primary"
-                                v-if="isUpdateStatus(slot.gameAccount)" :disabled="isLoading"
-                                @click.stop="updatePasswdOnClick(slot)">更新</button>
+                        <div v-if="findGame(slot.gameAccount)">
+                            <div class="grid gap-4 grid-cols-2 mt-2">
+                                <button class="btn btn-outline btn-sm btn-block btn-primary"
+                                    v-if="isUpdateStatus(slot.gameAccount)" :disabled="isLoading"
+                                    @click.stop="updatePasswdOnClick(slot)">更新</button>
 
-                            <button class="btn btn-outline btn-sm btn-block btn-primary"
-                                v-else-if="isSuspendStatus(slot.gameAccount)" @click="suspendOnClick(slot.gameAccount)"
-                                :disabled="isLoading">暂停</button>
+                                <button class="btn btn-outline btn-sm btn-block btn-primary"
+                                    v-else-if="isSuspendStatus(slot.gameAccount)"
+                                    @click="suspendOnClick(slot.gameAccount)" :disabled="isLoading">暂停</button>
 
-                            <button class="btn btn-outline btn-sm btn-block btn-info" v-else
-                                @click="loginOnClick(slot.gameAccount)"
-                                :disabled="isLoginBtnDisabled(slot.gameAccount)">启动</button>
+                                <button class="btn btn-outline btn-sm btn-block btn-info" v-else
+                                    @click="loginOnClick(slot.gameAccount)"
+                                    :disabled="isLoginBtnDisabled(slot.gameAccount)">启动</button>
 
-                            <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error"
-                                @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">删除</button>
+                                <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error"
+                                    @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">删除</button>
+                            </div>
+                        </div>
+                        <div v-if="!findGame(slot.gameAccount)">
+                            <button :disabled="isLoading" class="btn btn-outline btn-sm btn-block btn-error mt-2"
+                                @click.stop="deleteOnClick(slot.uuid, slot.gameAccount)">点击进行修复</button>
                         </div>
                     </GameAccount>
                 </div>
