@@ -19,28 +19,15 @@ declare namespace Service {
     msg: string;
   }
 
-  /** 自定义的请求成功结果 */
-  interface SuccessResult<T = any> {
-    /** 请求错误 */
-    error: null;
-    /** 请求数据 */
+  interface AxiosResult<T> {
+    error?: null;
     data: T;
     message: string;
     code: number;
   }
-
-  /** 自定义的请求失败结果 */
-  interface FailedResult {
-    /** 请求错误 */
-    error: RequestError;
-    /** 请求数据 */
-    data: null;
-    message: string;
-    code: number;
-  }
-
-  /** 自定义的请求结果 */
-  type RequestResult<T = any> = SuccessResult<T> | FailedResult;
+  
+  type RequestResult<T> = AxiosResult<T>;
+  
 }
 
 declare namespace Gamedata {

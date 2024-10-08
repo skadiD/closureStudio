@@ -72,12 +72,11 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import { doAddGame } from "../../plugins/axios";
+import { startCaptcha } from "../../plugins/captcha/captcha";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enum";
 import { DialogComponentProps } from "../../plugins/dialog/dialog";
 import { checkIsMobile } from "../../utils/regex";
-import { get } from "http";
-import { startCaptcha } from "../../plugins/captcha/captcha";
+import { Type } from "../toast/enum";
 
 interface Props extends DialogComponentProps {
   slotUUID: string

@@ -204,11 +204,6 @@ const gameLogin = async (account: string) => {
     try {
         isLoading.value = true;
         const loginResp = await startCaptcha(loginGameWithCaptcha(account));
-        if (loginResp.code === -1100) {
-            setMsg("请继续完成滑块验证", Type.Info);
-            await startCaptcha(loginGameWithCaptcha(account));
-            return;
-        }
         if (loginResp.code === 1) {
             setMsg("启动成功", Type.Success);
             showDialog(GeeTestNotify);
