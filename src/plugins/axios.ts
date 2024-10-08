@@ -41,16 +41,6 @@ service.interceptors.response.use(
       default:
         return response.data;
     }
-  },
-  (axiosError: AxiosError) => {
-    const error = handleAxiosError(axiosError);
-    const fail: Service.FailedResult = {
-      error,
-      data: null,
-      message: "error",
-      code: error.code as number,
-    };
-    return fail;
   }
 );
 type RequestMethod = "get" | "post" | "put" | "delete" | "patch";
@@ -60,12 +50,6 @@ interface RequestParam {
   data?: any;
   token?: string;
   isSSE?: boolean;
-}
-interface RequestResultHook<T = any> {
-  data: Ref<T | null>;
-  error: Ref<Service.RequestError | null>;
-  loading: Ref<boolean>;
-  network: Ref<boolean>;
 }
 async function getRequestResponse(params: {
   instance: AxiosInstance;
