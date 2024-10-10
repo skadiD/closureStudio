@@ -108,18 +108,11 @@ const initConfig = {
     map_id: "",
     allow_login_assist: false
 };
-
-const config = ref<ApiGame.GameConfig>(initConfig);
+const game = findGame(account);
+const config = ref<ApiGame.GameConfig>(game?.game_config || initConfig);
 
 const isLoading = ref(false);
 const stageKeyWord = ref("");
-
-watch(() => findGame(account), (game) => {
-    if (game) {
-        config.value = game.game_config;
-    }
-}, { immediate: true });
-
 
 const addStageToConfig = (event: Event) => {
     const selectElement = event.target as HTMLSelectElement;
