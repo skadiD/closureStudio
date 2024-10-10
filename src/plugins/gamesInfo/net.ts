@@ -69,6 +69,11 @@ const startSSE = async () => {
       updateGameList(data);
       userQuota.value.queryMe();
     });
+    event.addEventListener("log", (event) => {
+      if (!event.data) return;
+      const parsedData = JSON.parse(event.data) as ApiGame.LogEvent;
+      setMsg(parsedData.content, Type.Success);
+    });
 
     event.addEventListener("close", () => {
       setMsg("你已在其他窗口或设备访问，本页面暂停更新", Type.Warning);

@@ -1,8 +1,8 @@
 import {
-    Appearance, Type
+    Appearance, Position, Type
 } from "./enum";
 
-interface ToastDismiss  {
+interface ToastDismiss {
     automatically: boolean;
     manually: boolean;
 }
@@ -16,4 +16,5 @@ export interface Toast {
     duration: number;
     showProgress: boolean;
     appearance: Appearance; // 背景 可选 Dark Light Glass
+    position: Position; // 添加 position 属性
 }

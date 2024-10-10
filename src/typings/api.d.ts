@@ -101,21 +101,21 @@ declare namespace ApiUser {
     }
 
     interface WXPusher {
-        uuid:string;
-        wxUID:string;
-        createdAt:number;
-        isDeleted:boolean;
-        deletedAt:number;
-        userHeadImg:string;
-        userName:string;
+        uuid: string;
+        wxUID: string;
+        createdAt: number;
+        isDeleted: boolean;
+        deletedAt: number;
+        userHeadImg: string;
+        userName: string;
     }
 
     interface WXPusherQRCode {
-        expires:number;
-        code:string;
-        shortUrl:string;
-        url:string;
-        extra:string;
+        expires: number;
+        code: string;
+        shortUrl: string;
+        url: string;
+        extra: string;
     }
 }
 declare namespace ApiGame {
@@ -230,6 +230,10 @@ declare namespace ApiGame {
         gachaInfo: string;
         charId: string;
         createdAt: number;
+    }
+    interface LogEvent extends MessageEvent {
+        name: string;
+        content: number;
     }
 }
 declare namespace Registry {

@@ -1,7 +1,5 @@
+import type { AxiosInstance } from "axios";
 import axios from "axios";
-import type { Ref } from "vue";
-import type { AxiosInstance, AxiosError } from "axios";
-import { handleAxiosError } from "./axiosHelper";
 
 enum Host {
   ArkHostServer = "api.ltsc.vip",
@@ -71,6 +69,7 @@ async function asyncRequest<T>(
   param: RequestParam
 ): Promise<Service.RequestResult<T>> {
   const { url } = param;
+
   if (param.token) {
     service.defaults.headers["X-Platform"] = "postman";
     service.defaults.headers["token"] = param.token;
@@ -135,6 +134,7 @@ function load<T>(fileName: string): Promise<T> {
       .catch((error) => reject(error));
   });
 }
+
 // idServer
 const Auth_Login = (params: { email: string; password: string }) =>
   post<ApiUser.Auth>(`${AuthServer}login`, params);
@@ -271,49 +271,16 @@ const buildCodeFromRegisterResp = (resp: any): number => {
       : resp.data.code ?? 0 // Otherwise, use the provided code or default to 0
 }
 export {
-  Auth_Login,
-  Auth_Register,
-  Auth_ResetPassword,
-  Auth_Verify,
-  Auth_Info,
-  Auth_Refresh,
-  Auth_Send_SMS,
-  QueryUser,
-  Auth_Login_Admin,
-  SendSMS,
-  UpdateUserPermission,
-  SendCodeOnRegister,
-};
-export {
-  fetchSytemConfig,
-  fetchSytemList,
-  fetchGameList,
-  fetchGameListBySSE,
-  fetchUserSlots,
-  fetchGameDetails,
-  fetchUserSlotsAdmin,
-  fetchGameLogsAdmin,
-  DelQuotaGameAdmin,
-  doFindAccount,
-};
-export {
-  doAddGame,
-  doGameLogin,
-  doDelGame,
-  doUpdateGamePasswd,
-  doUpdateGameConf,
-  fetchQQBindCode,
-};
-export { doUpdateCaptcha, fetchGameLogs };
-export { load };
-
-export {
-  GetTickets,
-  UpdateTicketById,
-  GetTicketById,
-  ReplyTicket,
-  GetReplays,
-  PostTicket,
+  Auth_Info, Auth_Login, Auth_Login_Admin, Auth_Refresh, Auth_Register,
+  Auth_ResetPassword, Auth_Send_SMS, Auth_Verify, DelQuotaGameAdmin, doAddGame, doDelGame, doFindAccount, doGameLogin, doUpdateCaptcha, doUpdateGameConf, doUpdateGamePasswd, fetchGameDetails, fetchGameList,
+  fetchGameListBySSE, fetchGameLogs, fetchGameLogsAdmin, fetchQQBindCode, fetchSytemConfig,
+  fetchSytemList, fetchUserSlots, fetchUserSlotsAdmin, load, QueryUser, SendCodeOnRegister, SendSMS,
+  UpdateUserPermission
 };
 
-export { QueryWXPusher, CreateWXPusherQRCode };
+  export {
+    GetReplays, GetTicketById, GetTickets, PostTicket, ReplyTicket, UpdateTicketById
+  };
+
+  export { CreateWXPusherQRCode, QueryWXPusher };
+
