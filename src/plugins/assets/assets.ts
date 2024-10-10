@@ -1,6 +1,6 @@
 import { computed, ref } from "vue";
 import { setMsg } from "../common";
-import { Type } from "../../components/toast/enmu";
+import { Type } from "../../components/toast/enum";
 import { load } from "../axios";
 import { constants } from "../config";
 

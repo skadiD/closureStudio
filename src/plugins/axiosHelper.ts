@@ -9,7 +9,7 @@ import {
     REQUEST_TIMEOUT_MSG
 } from "./config";
 import {setMsg} from "./common";
-import {Type} from "../components/toast/enmu";
+import {Type} from "../components/toast/enum";
 
 type ErrorStatus = keyof typeof ERROR_STATUS;
 /**

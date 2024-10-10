@@ -11,8 +11,8 @@
 
             <div class="join my-2">
                 <input class="join-item btn btn-xs sm:btn-sm btn-active"
-                    @click="handleSelectBtnTypeOnClick(selectType.waitting)" type="radio"
-                    :checked="selectBtnType === selectType.waitting" aria-label="等待处理" />
+                    @click="handleSelectBtnTypeOnClick(selectType.waiting)" type="radio"
+                    :checked="selectBtnType === selectType.waiting" aria-label="等待处理" />
                 <input class="join-item btn btn-xs sm:btn-sm btn-active"
                     @click="handleSelectBtnTypeOnClick(selectType.solved)" type="radio"
                     :checked="selectBtnType === selectType.solved" aria-label="已解决" />
@@ -33,35 +33,33 @@
             <Reply :ticket="null" :refresh="getTickets" />
         </div>
     </div>
-    <YouMayKnowDialog />
 </template>
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import { userStore } from "../../store/user";
-import { startSSE } from "../../plugins/sse";
+import { queryGamesInfo } from "../../plugins/gamesInfo/net";
 import "animate.css";
-import { YouMayKnowDialog } from "../../components/dialog";
 import TicketTable from "../../components/tickets/TicketTable.vue";
 import Reply from "../../components/tickets/ticket/Reply.vue";
 import { GetTickets } from "../../plugins/axios";
 
 enum selectType {
-    waitting,
+    waiting,
     solved
 }
 
 const show = ref(false);
 const user = userStore();
-startSSE(user);
+queryGamesInfo();
 const isLoading = ref(true);
 const ticketList = ref<TicketSystem.Ticket[]>([]);
-const selectBtnType = ref<selectType>(selectType.waitting);
+const selectBtnType = ref<selectType>(selectType.waiting);
 const triggerAnimation = ref(false);
 
 
 // init
 const selectedTickets = computed(() => {
-    if (selectBtnType.value === selectType.waitting) {
+    if (selectBtnType.value === selectType.waiting) {
         return ticketList.value.filter((item) => {
             return item.status === selectBtnType.value;
         });

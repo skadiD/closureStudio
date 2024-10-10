@@ -20,7 +20,7 @@
         </div>
         <div v-if="isExpanded" class="collapse-content w-full">
             <Ticket :ticket="myTicket" :refresh="refreshTicket" :getTickets="props.getTickets" />
-            <div v-for="(reply, key) in myReplys" :key="reply.id">
+            <div v-for="(reply, key) in myReplays" :key="reply.id">
                 <Ticket :ticket="reply" :refresh="refreshTicket" :getTickets="props.getTickets" />
             </div>
             <div v-if="isLoading" class="flex justify-center w-full">
@@ -41,19 +41,19 @@ const props = withDefaults(defineProps<Props>(), {
     ticket: null,
     getTickets: () => { }
 });
-import { nextTick, ref, watch } from "vue";
-import { userStore } from "../../store/user";
-import { GetReplys, GetTicketById, UpdateTicketById } from "../../plugins/axios";
+import { ref, watch } from "vue";
+import { GetReplays, GetTicketById } from "../../plugins/axios";
 import { setMsg } from "../../plugins/common";
-import { Type } from "../toast/enmu";
-import Ticket from "./ticket/Ticket.vue";
+import { userStore } from "../../store/user";
+import { Type } from "../toast/enum";
 import Reply from "./ticket/Reply.vue";
+import Ticket from "./ticket/Ticket.vue";
 const user = userStore();
 const isExpanded = ref(false);
 const isLoading = ref(false);
 const isAuthor = ref(false);
 const myTicket = ref<TicketSystem.Ticket | null>(null);
-const myReplys = ref<TicketSystem.Ticket[]>([]);
+const myReplays = ref<TicketSystem.Ticket[]>([]);
 
 watch(
     () => myTicket,
@@ -91,14 +91,14 @@ const refreshTicket = async () => {
     if (respGetTicket.data) {
         myTicket.value = respGetTicket.data;
     }
-    const respGetReplys = await GetReplys(myTicket.value.id);
-    if (respGetReplys.code === 0) {
-        setMsg(respGetReplys.message, Type.Error);
+    const respGetReplays = await GetReplays(myTicket.value.id);
+    if (respGetReplays.code === 0) {
+        setMsg(respGetReplays.message, Type.Error);
         isLoading.value = false;
-        throw new Error(respGetReplys.message);
+        throw new Error(respGetReplays.message);
     }
-    if (respGetReplys.data) {
-        myReplys.value = respGetReplys.data;
+    if (respGetReplays.data) {
+        myReplays.value = respGetReplays.data;
     }
     isLoading.value = false;
 };

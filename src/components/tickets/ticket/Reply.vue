@@ -4,14 +4,14 @@
         <div v-for="(author, key) in user.getGames" :key="author.key">
             <input className="join-item btn btn-xs" type="radio" :checked="isSelectedAuthor(author.value.nickname)"
                 @click="() => {
-            setSelectAuthor(author.value, author.key);
-        }
-            " name="options" :aria-label="author.value.nickname" />
+                    setSelectAuthor(author.value, author.key);
+                }
+                    " name="options" :aria-label="author.value.nickname" />
         </div>
-        <div>
+        <div v-if="!Array.isArray(user.getGames) || user.getGames.length === 0">
             <input className="join-item btn btn-xs" type="radio" :checked="isSelectedAuthor('匿名玩家')" @click="() => {
-            setSelectAuthor(null, '')
-        }" name="options" aria-label="匿名玩家" />
+                setSelectAuthor(null, '')
+            }" name="options" aria-label="匿名玩家" />
         </div>
     </div>
     <Tags v-if="!props.ticket" :tags="tags" @update:tags="updateTags" />
@@ -45,7 +45,7 @@
 import { ref } from "vue";
 import { defaultAuthor, setMsg } from "../../../plugins/common";
 import { userStore } from "../../../store/user";
-import { Type } from "../../toast/enmu";
+import { Type } from "../../toast/enum";
 import { PostTicket, ReplyTicket } from "../../../plugins/axios";
 import Tags from "./Tags.vue";
 import showDialog from "../../../plugins/dialog/dialog";
@@ -112,7 +112,7 @@ const createTicketData = () => {
         return;
     }
     if (privateInfoCheck()) {
-        showDialog("噢,天啊", "请不要在帖子中透露私人信息", () => { });
+        setMsg("请不要在帖子中透露私人信息", Type.Warning);
         return;
     }
     const data: TicketSystem.createTicket = {
@@ -172,7 +172,7 @@ const postTicket = async () => {
     }
     if (!props.ticket) {
         // create
-        
+
         await createTicket(data);
     }
     if (props.refresh) {

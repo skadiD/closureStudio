@@ -29,14 +29,24 @@
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
 import { useWXPusher } from '../../plugins/wxPusher/wxPusher';
-
+import { ref } from 'vue';
 let intervalId = null; // 用于存储setInterval返回的ID
+const isLoading = ref(false);
 
-onMounted(() => {
-  queryWxPusher();
-  createQRCodes();
-  intervalId = setInterval(() => {
-    queryWxPusher();
+const query = async () => {
+  if (isQueryWxPusher.value) {
+    return;
+  }
+  isLoading.value = true;
+  await queryWxPusher();
+  await createQRCodes();
+  isLoading.value = false;
+};
+
+onMounted(async () => {
+  await query();
+  intervalId = setInterval(async () => {
+    await query();
   }, 10000);
 });
 

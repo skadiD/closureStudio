@@ -4,13 +4,16 @@ import { fetchUserSlots } from "../axios";
 const userQuotaData = ref<Registry.UserInfo>();
 
 export const userQuota = computed(() => {
-    const queryMe = () => {
-        fetchUserSlots().then((res) => {
-            if (res.data) {
-                res.data.slots = quotaSlotsSort(res.data.slots);
-                userQuotaData.value = res.data;
+    const queryMe = async () => {
+        try {
+            const resp = await fetchUserSlots();
+            if (resp.data) {
+                resp.data.slots = quotaSlotsSort(resp.data.slots);
+                return resp.data;
             }
-        });
+        } catch (error) {
+            console.error("Error during queryMe:", error);
+        }
     };
     return {
         data: userQuotaData,
