@@ -4,8 +4,14 @@
             :class="show ? 'xl:ml-0 !hidden' : 'lg:ml-[calc((100vw-56rem)/2)] 2xl:ml-[calc((100vw-72rem)/2)]'">
             <div class="bg-base-300 shadow-lg rounded-lg px-4 py-1 blog relative">
                 <div class="text-2xl md:text-4xl font-bold text-info mt-3">📢 今日特价</div>
-                <p v-for="k in config.announcement?.split('\n') || ['可露希尔逃跑了']">
+                <!-- <p v-for="k in config.announcement?.split('\n') || ['可露希尔逃跑了']">
                     {{ k }}
+                </p> -->
+                <p>
+                    https://arknights.host 准备过期。
+                </p>
+                <p>
+                    请及时更换到 https://closure.ltsc.vip 或 https://arknights.app
                 </p>
                 <div class="divider mt-0">个人信息</div>
                 <StatusMessage />

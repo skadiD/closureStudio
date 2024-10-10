@@ -16,8 +16,7 @@ const props = defineProps<DialogComponentProps>();
 const { dialogClose } = props;
 const message = ref('');
 onMounted(() => {
-  // const element = selectRandomElement<string>(YouMayKnowArray);
-  const element = '昨天晚上你站有样东西忘记修改了。今晚你站需要进行维护，请各位注意托管状态。'
+  const element = selectRandomElement<string>(YouMayKnowArray);
   if (element) message.value = element;
 })
 const iknow = () => {
